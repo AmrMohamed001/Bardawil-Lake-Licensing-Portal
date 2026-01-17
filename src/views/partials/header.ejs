@@ -1,0 +1,29 @@
+<!-- Header Navigation -->
+<header class="bg-white shadow-md fixed w-full z-10 transition-all duration-300">
+  <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <img src="/UI/splash.png" alt="Logo" class="h-10 w-auto" onerror="this.src='https://placehold.co/50x50?text=Logo'">
+      <a href="/" class="text-2xl font-bold text-primary">بوابة البردويل</a>
+    </div>
+    
+    <nav class="hidden md:flex gap-6 items-center">
+      <a href="/" class="text-gray-600 hover:text-accent font-semibold transition">الرئيسية</a>
+      <a href="#services" class="text-gray-600 hover:text-accent font-semibold transition">الخدمات</a>
+      <a href="#about" class="text-gray-600 hover:text-accent font-semibold transition">عن البوابة</a>
+    </nav>
+
+    <div class="flex gap-3">
+      <% if (locals.user) { %>
+        <% if (user.role === 'admin' || user.role === 'super_admin') { %>
+          <a href="/admin-dashboard" class="px-5 py-2 rounded-full bg-primary text-white font-bold hover:bg-opacity-90 transition">لوحة الإدارة</a>
+        <% } else { %>
+          <a href="/dashboard" class="px-5 py-2 rounded-full bg-accent text-white font-bold hover:bg-opacity-90 transition">لوحة التحكم</a>
+        <% } %>
+        <button id="logoutBtn" class="px-5 py-2 rounded-full border border-red-500 text-red-500 hover:bg-red-50 transition">خروج</button>
+      <% } else { %>
+        <a href="/login" class="px-5 py-2 rounded-full text-primary hover:bg-gray-100 transition">دخول</a>
+        <a href="/register" class="px-5 py-2 rounded-full bg-primary text-white font-bold hover:bg-opacity-90 transition shadow-lg">حساب جديد</a>
+      <% } %>
+    </div>
+  </div>
+</header>

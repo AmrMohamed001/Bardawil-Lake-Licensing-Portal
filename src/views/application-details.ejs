@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - منصة تراخيص بحيرة البردويل</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+<body>
+  <%- include('partials/spinner') %>
+  <%- include('partials/navbar') %>
+
+  <div class="details-page">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="/dashboard"><i class="fas fa-home"></i> لوحة التحكم</a>
+        <span>/</span>
+        <span>تفاصيل الطلب</span>
+      </div>
+
+      <div class="page-header">
+        <div class="header-info">
+          <h1><i class="fas fa-file-alt"></i> طلب رقم <%= application.applicationNumber %></h1>
+          <p>تاريخ التقديم: <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %></p>
+        </div>
+        <%- include('partials/status-badge', { status: application.status }) %>
+      </div>
+
+      <div class="content-grid">
+        <!-- Application Info -->
+        <div class="card info-card">
+          <h3><i class="fas fa-info-circle"></i> معلومات الطلب</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">نوع الترخيص</span>
+              <span class="value">
+                <% if (application.applicationType === 'fisherman') { %>
+                  <i class="fas fa-fish text-primary"></i> ترخيص صياد
+                <% } else if (application.applicationType === 'boat') { %>
+                  <i class="fas fa-ship text-accent"></i> ترخيص مركب
+                <% } else if (application.applicationType === 'vehicle') { %>
+                  <i class="fas fa-truck text-warning"></i> ترخيص سيارة
+                <% } %>
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">الفئة</span>
+              <span class="value"><%= application.licenseCategory %></span>
+            </div>
+            <div class="info-item">
+              <span class="label">نوع الطلب</span>
+              <span class="value"><%= application.isRenewal ? 'تجديد' : 'جديد' %></span>
+            </div>
+            <% if (application.paymentAmount) { %>
+            <div class="info-item">
+              <span class="label">مبلغ الرسوم</span>
+              <span class="value"><%= application.paymentAmount %> جنيه</span>
+            </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="card timeline-card">
+          <h3><i class="fas fa-history"></i> تاريخ الطلب</h3>
+          <div class="timeline">
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><%= new Date(application.createdAt).toLocaleDateString('ar-EG') %></span>
+                <p>تم استلام الطلب</p>
+              </div>
+            </div>
+            <% if (application.reviewedAt) { %>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><%= new Date(application.reviewedAt).toLocaleDateString('ar-EG') %></span>
+                <p>تمت مراجعة الطلب</p>
+              </div>
+            </div>
+            <% } %>
+            <% if (application.approvedAt) { %>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><%= new Date(application.approvedAt).toLocaleDateString('ar-EG') %></span>
+                <p>تمت الموافقة على الطلب</p>
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Personal/Submitted Data -->
+        <div class="card data-card">
+          <h3><i class="fas fa-user"></i> البيانات المقدمة</h3>
+          <div class="info-grid">
+            <!-- User Info (Always visible) -->
+            <div class="info-item">
+               <span class="label">اسم مقدم الطلب</span>
+               <span class="value"><%= user.firstNameAr %> <%= user.lastNameAr %></span>
+            </div>
+            <div class="info-item">
+               <span class="label">الرقم القومي</span>
+               <span class="value"><%= user.nationalId %></span>
+            </div>
+            <div class="info-item">
+               <span class="label">رقم الهاتف</span>
+               <span class="value"><%= user.phone %></span>
+            </div>
+
+            <% if (application.data) { %>
+              <% const data = typeof application.data === 'string' ? JSON.parse(application.data) : application.data; %>
+              
+              <!-- Fisherman Fields -->
+              <% if (data.unionCardNumber) { %>
+              <div class="info-item">
+                <span class="label">رقم البطاقة النقابية</span>
+                <span class="value"><%= data.unionCardNumber %></span>
+              </div>
+              <% } %>
+              
+              <% if (data.marina) { %>
+              <div class="info-item">
+                <span class="label">المرسى</span>
+                <span class="value"><%= data.marina %></span>
+              </div>
+              <% } %>
+              
+              <% if (data.previousLicenseNumber) { %>
+              <div class="info-item">
+                <span class="label">رقم الرخصة السابقة</span>
+                <span class="value"><%= data.previousLicenseNumber %></span>
+              </div>
+              <% } %>
+              
+              <!-- Boat Fields -->
+              <% if (data.boatNumber) { %>
+              <div class="info-item">
+                <span class="label">رقم الصال</span>
+                <span class="value"><%= data.boatNumber %></span>
+              </div>
+              <% } %>
+              <% if (data.boatRegistration) { %>
+              <div class="info-item">
+                <span class="label">رقم تسجيل المركب</span>
+                <span class="value"><%= data.boatRegistration %></span>
+              </div>
+              <% } %>
+              <% if (data.boatLength) { %>
+              <div class="info-item">
+                <span class="label">طول المركب</span>
+                <span class="value"><%= data.boatLength %> متر</span>
+              </div>
+              <% } %>
+              <% if (data.enginePower) { %>
+              <div class="info-item">
+                <span class="label">قوة المحرك</span>
+                <span class="value"><%= data.enginePower %> حصان</span>
+              </div>
+              <% } %>
+              <% if (data.plateNumber) { %>
+              <div class="info-item">
+                <span class="label">رقم لوحة السيارة</span>
+                <span class="value"><%= data.plateNumber %></span>
+              </div>
+              <% } %>
+              <% if (data.vehicleModel) { %>
+              <div class="info-item">
+                <span class="label">موديل السيارة</span>
+                <span class="value"><%= data.vehicleModel %></span>
+              </div>
+              <% } %>
+              <% if (data.previousBoatNumber) { %>
+              <div class="info-item">
+                <span class="label">رقم المركب في الموسم السابق</span>
+                <span class="value"><%= data.previousBoatNumber %></span>
+              </div>
+              <% } %>
+            <% } else { %>
+              <p style="color: #757575;">لا توجد بيانات إضافية</p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <% if (application.documents && application.documents.length > 0) { %>
+  <div class="card documents-card">
+    <h3><i class="fas fa-file-alt"></i> المستندات المرفقة</h3>
+    <div class="documents-list">
+      <% application.documents.forEach(doc => { %>
+      <div class="document-item">
+        <div class="doc-info">
+          <i class="<%= doc.mimeType === 'application/pdf' ? 'fas fa-file-pdf' : 'fas fa-image' %>"></i>
+          <span><%= doc.originalName || doc.fileName %></span>
+        </div>
+        <a href="/uploads/<%= doc.fileName %>" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-eye"></i> عرض
+        </a>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+<% } %>
+        <% if (application.rejectionReason) { %>
+        <!-- Rejection Reason -->
+        <div class="card rejection-card">
+          <h3><i class="fas fa-exclamation-triangle"></i> سبب الرفض</h3>
+          <p><%= application.rejectionReason %></p>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="actions-bar">
+        <a href="/dashboard" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+<style>
+.details-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 200px);
+  background: #FAFAFA;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: #757575;
+}
+
+.breadcrumb a {
+  color: #1e3c72;
+  text-decoration: none;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-info h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-info h1 i {
+  color: #1e3c72;
+}
+
+.header-info p {
+  color: #757575;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card h3 i {
+  color: #1e3c72;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  color: #757575;
+}
+
+.info-item .value {
+  font-weight: 600;
+  color: #212121;
+}
+
+.timeline {
+  position: relative;
+  padding-right: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  right: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  right: -2rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #e0e0e0;
+}
+
+.timeline-item.active .timeline-dot {
+  background: #4CAF50;
+  box-shadow: 0 0 0 2px #4CAF50;
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  color: #757575;
+}
+
+.timeline-content p {
+  font-weight: 600;
+  color: #212121;
+  margin: 0.25rem 0 0 0;
+}
+
+.rejection-card {
+  grid-column: 1 / -1;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+}
+
+.rejection-card h3 {
+  color: #c62828;
+}
+
+.rejection-card h3 i {
+  color: #c62828;
+}
+
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+}
+
+.doc-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.document-item i {
+  color: #e53935;
+  font-size: 1.25rem;
+}
+
+.actions-bar {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

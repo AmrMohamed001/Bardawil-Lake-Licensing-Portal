@@ -1,0 +1,266 @@
+<% layout('admin-layout') -%>
+<div class="p-6 md:p-10">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">إعدادات التسعير</h1>
+      <p class="text-gray-500 mt-1">إدارة أسعار التراخيص المختلفة</p>
+    </div>
+    <button onclick="showAddModal()" class="px-6 py-3 bg-accent text-white font-bold rounded-lg shadow hover:bg-teal-600 transition flex items-center gap-2">
+      <span class="text-xl">+</span> إضافة سعر جديد
+    </button>
+  </div>
+
+  <!-- Price Categories -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    
+    <!-- Fisherman Licenses -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-100 bg-blue-50">
+        <h3 class="font-bold text-lg text-primary">تراخيص الصيادين</h3>
+      </div>
+      <div class="p-6">
+        <table class="w-full">
+          <thead class="text-gray-500 text-sm">
+            <tr>
+              <th class="text-right pb-3">الفئة</th>
+              <th class="text-right pb-3">جديد</th>
+              <th class="text-right pb-3">تجديد</th>
+              <th class="text-right pb-3">إجراء</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% 
+              const fishermanCategories = ['صياد', 'صياد تحت السن', 'مندوب', 'تاجر', 'عامل تاجر', 'شيال'];
+              fishermanCategories.forEach(cat => {
+                const newPrice = prices.find(p => p.licenseType === 'fisherman' && p.category === cat && !p.isRenewalPrice);
+                const renewPrice = prices.find(p => p.licenseType === 'fisherman' && p.category === cat && p.isRenewalPrice);
+            %>
+            <tr>
+              <td class="py-3 font-medium text-gray-800"><%= cat %></td>
+              <td class="py-3 text-gray-600"><%= newPrice ? newPrice.price + ' ج.م' : '-' %></td>
+              <td class="py-3 text-gray-600"><%= renewPrice ? renewPrice.price + ' ج.م' : '-' %></td>
+              <td class="py-3">
+                <% if (newPrice) { %>
+                  <button onclick="editPrice('<%= newPrice.id %>')" class="text-accent hover:text-teal-700 text-sm font-medium">تعديل</button>
+                <% } else { %>
+                  <button onclick="showAddModalFor('fisherman', '<%= cat %>')" class="text-primary hover:text-blue-700 text-sm font-medium">إضافة</button>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Boat/Vehicle Licenses -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-100 bg-teal-50">
+        <h3 class="font-bold text-lg text-accent">تراخيص المراكب والسيارات</h3>
+      </div>
+      <div class="p-6">
+        <table class="w-full">
+          <thead class="text-gray-500 text-sm">
+            <tr>
+              <th class="text-right pb-3">النوع</th>
+              <th class="text-right pb-3">السعر</th>
+              <th class="text-right pb-3">إجراء</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% 
+              const boatCategories = [
+                { type: 'boat', label: 'مركب' },
+                { type: 'vehicle', label: 'سيارة' },
+                { type: 'individual_float', label: 'عائمة أفراد' }
+              ];
+              boatCategories.forEach(cat => {
+                const price = prices.find(p => p.licenseType === cat.type);
+            %>
+            <tr>
+              <td class="py-3 font-medium text-gray-800"><%= cat.label %></td>
+              <td class="py-3 text-gray-600"><%= price ? price.price + ' ج.م' : '-' %></td>
+              <td class="py-3">
+                <% if (price) { %>
+                  <button onclick="editPrice('<%= price.id %>')" class="text-accent hover:text-teal-700 text-sm font-medium">تعديل</button>
+                <% } else { %>
+                  <button onclick="showAddModalFor('<%= cat.type %>', '<%= cat.label %>')" class="text-primary hover:text-blue-700 text-sm font-medium">إضافة</button>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Prices Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <h3 class="font-bold text-lg text-gray-800">جميع الأسعار</h3>
+    </div>
+    <table class="w-full">
+      <thead class="bg-gray-50 text-gray-500 text-sm">
+        <tr>
+          <th class="px-6 py-4 text-right font-medium">نوع الترخيص</th>
+          <th class="px-6 py-4 text-right font-medium">الفئة</th>
+          <th class="px-6 py-4 text-right font-medium">السعر</th>
+          <th class="px-6 py-4 text-right font-medium">تجديد؟</th>
+          <th class="px-6 py-4 text-right font-medium">تاريخ السريان</th>
+          <th class="px-6 py-4 text-right font-medium">الحالة</th>
+          <th class="px-6 py-4 text-right font-medium">إجراء</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% prices.forEach(price => { %>
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-6 py-4 text-gray-600"><%= price.licenseType %></td>
+          <td class="px-6 py-4 font-medium text-gray-800"><%= price.category %></td>
+          <td class="px-6 py-4 font-bold text-accent"><%= price.price %> ج.م</td>
+          <td class="px-6 py-4 text-gray-500"><%= price.isRenewalPrice ? 'نعم' : 'لا' %></td>
+          <td class="px-6 py-4 text-gray-500 text-sm"><%= price.effectiveFrom %></td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-1 rounded-full text-xs font-bold <%= price.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' %>">
+              <%= price.isActive ? 'نشط' : 'غير نشط' %>
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <button onclick="editPrice('<%= price.id %>')" class="text-accent hover:text-teal-700 text-sm font-medium ml-2">تعديل</button>
+            <button onclick="deletePrice('<%= price.id %>')" class="text-red-500 hover:text-red-700 text-sm font-medium">حذف</button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Price Modal -->
+<div id="priceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+    <h3 id="modalTitle" class="text-lg font-bold text-gray-800 mb-4">إضافة سعر جديد</h3>
+    <form id="priceForm" class="space-y-4">
+      <input type="hidden" id="priceId">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الترخيص</label>
+        <select id="licenseType" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary" required>
+          <option value="fisherman">صياد</option>
+          <option value="boat">مركب</option>
+          <option value="vehicle">سيارة</option>
+          <option value="individual_float">عائمة أفراد</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الفئة</label>
+        <input type="text" id="category" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary" placeholder="مثال: صياد" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">السعر (جنيه مصري)</label>
+        <input type="number" id="price" step="0.01" min="0" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary" required>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="isRenewalPrice" class="w-4 h-4 text-primary">
+        <label for="isRenewalPrice" class="text-sm text-gray-700">سعر تجديد</label>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ بداية السريان</label>
+        <input type="date" id="effectiveFrom" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary" required>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button type="submit" class="flex-1 py-2 bg-accent hover:bg-teal-600 text-white rounded-lg font-bold transition">حفظ</button>
+        <button type="button" onclick="hideModal()" class="flex-1 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-bold transition">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const api = axios.create({
+    baseURL: '/api/v1',
+    withCredentials: true
+  });
+
+  const showAddModal = () => {
+    document.getElementById('modalTitle').textContent = 'إضافة سعر جديد';
+    document.getElementById('priceId').value = '';
+    document.getElementById('priceForm').reset();
+    document.getElementById('effectiveFrom').value = new Date().toISOString().split('T')[0];
+    document.getElementById('priceModal').classList.remove('hidden');
+    document.getElementById('priceModal').classList.add('flex');
+  };
+
+  const showAddModalFor = (type, category) => {
+    showAddModal();
+    document.getElementById('licenseType').value = type;
+    document.getElementById('category').value = category;
+  };
+
+  const hideModal = () => {
+    document.getElementById('priceModal').classList.add('hidden');
+    document.getElementById('priceModal').classList.remove('flex');
+  };
+
+  const editPrice = async (id) => {
+    try {
+      const res = await api.get('/admin/prices/' + id);
+      const price = res.data.data.price;
+      
+      document.getElementById('modalTitle').textContent = 'تعديل السعر';
+      document.getElementById('priceId').value = price.id;
+      document.getElementById('licenseType').value = price.licenseType;
+      document.getElementById('category').value = price.category;
+      document.getElementById('price').value = price.price;
+      document.getElementById('isRenewalPrice').checked = price.isRenewalPrice;
+      document.getElementById('effectiveFrom').value = price.effectiveFrom;
+      
+      document.getElementById('priceModal').classList.remove('hidden');
+      document.getElementById('priceModal').classList.add('flex');
+    } catch (err) {
+      alert(err.response?.data?.message || 'خطأ');
+    }
+  };
+
+  const deletePrice = async (id) => {
+    if (!confirm('هل أنت متأكد من حذف هذا السعر؟')) return;
+    try {
+      await api.delete('/admin/prices/' + id);
+      location.reload();
+    } catch (err) {
+      alert(err.response?.data?.message || 'خطأ');
+    }
+  };
+
+  document.getElementById('priceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('priceId').value;
+    const data = {
+      licenseType: document.getElementById('licenseType').value,
+      category: document.getElementById('category').value,
+      price: parseFloat(document.getElementById('price').value),
+      isRenewalPrice: document.getElementById('isRenewalPrice').checked,
+      effectiveFrom: document.getElementById('effectiveFrom').value,
+    };
+
+    try {
+      if (id) {
+        await api.put('/admin/prices/' + id, data);
+      } else {
+        await api.post('/admin/prices', data);
+      }
+      location.reload();
+    } catch (err) {
+      alert(err.response?.data?.message || 'خطأ');
+    }
+  });
+
+  document.getElementById('logoutBtnAdmin')?.addEventListener('click', async () => {
+    try {
+      await api.post('/auth/logout');
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  });
+</script>

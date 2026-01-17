@@ -1,0 +1,103 @@
+<% layout('admin-layout') -%>
+<div class="p-6 md:p-10">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">إدارة الطلبات</h1>
+      <p class="text-gray-500 mt-1">عرض ومراجعة جميع طلبات التراخيص</p>
+    </div>
+    
+    <!-- Filters -->
+    <form action="/admin/applications" method="GET" class="flex gap-3">
+      <select name="status" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary">
+        <option value="">جميع الحالات</option>
+        <option value="received">تم الاستلام</option>
+        <option value="under_review">قيد المراجعة</option>
+        <option value="approved_payment_required">بانتظار الدفع</option>
+        <option value="payment_verified">تم الدفع</option>
+        <option value="ready">جاهز للاستلام</option>
+        <option value="completed">مكتمل</option>
+        <option value="rejected">مرفوض</option>
+      </select>
+      <select name="type" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary">
+        <option value="">جميع الأنواع</option>
+        <option value="fisherman">صياد</option>
+        <option value="boat">مركب</option>
+        <option value="vehicle">سيارة</option>
+        <option value="individual_float">عائمة أفراد</option>
+      </select>
+      <input type="text" name="search" placeholder="بحث برقم الطلب..." class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary">
+      <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition">بحث</button>
+    </form>
+  </div>
+
+  <!-- Applications Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50 text-gray-500 text-sm">
+        <tr>
+          <th class="px-6 py-4 text-right font-medium">رقم الطلب</th>
+          <th class="px-6 py-4 text-right font-medium">مقدم الطلب</th>
+          <th class="px-6 py-4 text-right font-medium">النوع</th>
+          <th class="px-6 py-4 text-right font-medium">الفئة</th>
+          <th class="px-6 py-4 text-right font-medium">التاريخ</th>
+          <th class="px-6 py-4 text-right font-medium">الحالة</th>
+          <th class="px-6 py-4 text-right font-medium">الإجراء</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% if (applications && applications.length > 0) { %>
+          <% applications.forEach(app => { %>
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4 text-sm font-medium text-primary">#<%= app.applicationNumber %></td>
+            <td class="px-6 py-4">
+              <div class="font-semibold text-gray-800"><%= app.applicant ? app.applicant.firstNameAr + ' ' + app.applicant.lastNameAr : '-' %></div>
+              <div class="text-xs text-gray-500"><%= app.applicant?.nationalId || '' %></div>
+            </td>
+            <td class="px-6 py-4 text-gray-600 text-sm"><%= app.applicationType %></td>
+            <td class="px-6 py-4 text-gray-600 text-sm"><%= app.licenseCategory %></td>
+            <td class="px-6 py-4 text-gray-500 text-sm"><%= new Date(app.createdAt).toLocaleDateString('ar-EG') %></td>
+            <td class="px-6 py-4">
+              <%- include('partials/status-badge', { status: app.status }) %>
+            </td>
+            <td class="px-6 py-4">
+              <a href="/admin/application/<%= app.id %>" class="text-accent hover:text-teal-700 font-bold text-sm">مراجعة</a>
+            </td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="px-6 py-12 text-center text-gray-500">لا توجد طلبات</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <% if (pagination && pagination.pages > 1) { %>
+    <div class="p-4 border-t border-gray-100 flex justify-center">
+      <nav class="flex gap-2">
+        <% if (pagination.page > 1) { %>
+          <a href="?page=<%= pagination.page - 1 %>" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 text-sm">السابق</a>
+        <% } %>
+        <% for (let i = 1; i <= Math.min(pagination.pages, 5); i++) { %>
+          <a href="?page=<%= i %>" class="px-3 py-1 rounded <%= i === pagination.page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-100' %> text-sm"><%= i %></a>
+        <% } %>
+        <% if (pagination.page < pagination.pages) { %>
+          <a href="?page=<%= pagination.page + 1 %>" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 text-sm">التالي</a>
+        <% } %>
+      </nav>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.getElementById('logoutBtnAdmin')?.addEventListener('click', async () => {
+    try {
+      await axios.post('/api/v1/auth/logout', {}, { withCredentials: true });
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  });
+</script>

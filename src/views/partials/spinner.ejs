@@ -1,0 +1,27 @@
+<div class="spinner-container" id="loadingSpinner">
+  <img src="/imgs/logo.png" alt="Loading" class="spinner-logo" />
+  <p class="spinner-text pulse">جاري التحميل...</p>
+</div>
+
+<script>
+  // Hide spinner after minimum 1 second display time
+  const spinnerStartTime = Date.now();
+
+  window.addEventListener('load', function () {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) {
+      const elapsed = Date.now() - spinnerStartTime;
+      const minDisplayTime = 1000; // 1 second minimum
+      const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+      setTimeout(() => {
+        spinner.style.opacity = '0';
+        spinner.style.transition = 'opacity 0.5s ease';
+
+        setTimeout(() => {
+          spinner.style.display = 'none';
+        }, 500);
+      }, remainingTime);
+    }
+  });
+</script>

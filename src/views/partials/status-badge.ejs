@@ -1,0 +1,92 @@
+<%
+const statusLabels = {
+  received: 'تم الاستلام',
+  under_review: 'قيد المراجعة',
+  approved_payment_required: 'بانتظار الدفع',
+  payment_verified: 'تم التحقق من الدفع',
+  ready: 'جاهز للاستلام',
+  completed: 'مكتمل',
+  rejected: 'مرفوض'
+};
+
+const statusClasses = {
+  received: 'badge-received',
+  under_review: 'badge-under-review',
+  approved_payment_required: 'badge-payment-required',
+  payment_verified: 'badge-payment-verified',
+  ready: 'badge-ready',
+  completed: 'badge-completed',
+  rejected: 'badge-rejected'
+};
+
+const statusIcons = {
+  received: 'inbox',
+  under_review: 'search',
+  approved_payment_required: 'credit-card',
+  payment_verified: 'check-double',
+  ready: 'gift',
+  completed: 'trophy',
+  rejected: 'times-circle'
+};
+%>
+
+<span class="status-badge <%= statusClasses[status] || 'badge-default' %>">
+  <i class="fas fa-<%= statusIcons[status] || 'circle' %>"></i>
+  <%= statusLabels[status] || status %>
+</span>
+
+<style>
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.status-badge i {
+  font-size: 0.75rem;
+}
+
+.badge-received {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.badge-under-review {
+  background: #FFF3E0;
+  color: #EF6C00;
+}
+
+.badge-payment-required {
+  background: #FFF8E1;
+  color: #F9A825;
+}
+
+.badge-payment-verified {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.badge-ready {
+  background: #E0F2F1;
+  color: #00695C;
+}
+
+.badge-completed {
+  background: #E8F5E9;
+  color: #1B5E20;
+}
+
+.badge-rejected {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.badge-default {
+  background: #F5F5F5;
+  color: #616161;
+}
+</style>

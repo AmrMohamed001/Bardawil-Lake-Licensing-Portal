@@ -1,0 +1,856 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="container">
+      <div class="hero-text">
+        <img src="/images/logo-white.png" alt="بحيرة البردويل" class="hero-logo">
+        <h1 class="hero-title">منصة تراخيص بحيرة البردويل</h1>
+        <p class="hero-subtitle">Bardawil Lake Licensing Portal - Egypt's Future Authority</p>
+        <p class="hero-description">
+          نحو مستقبل مستدام لمصر الحديثة<br>
+          Towards a Sustainable Future for Modern Egypt
+        </p>
+        
+        <div class="hero-actions">
+          <% if (user) { %>
+            <a href="/dashboard" class="btn btn-primary btn-lg">
+              <i class="fas fa-tachometer-alt"></i>
+              لوحة التحكم
+            </a>
+            <a href="/licenses/new" class="btn btn-outline btn-lg">
+              <i class="fas fa-plus-circle"></i>
+              تقديم طلب جديد
+            </a>
+          <% } else { %>
+            <a href="/register" class="btn btn-primary btn-lg">
+              <i class="fas fa-user-plus"></i>
+              إنشاء حساب جديد
+            </a>
+            <a href="/track" class="btn btn-outline btn-lg">
+              <i class="fas fa-search"></i>
+              تتبع الطلب
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">خدماتنا</h2>
+      <p class="section-subtitle">Our Services</p>
+    </div>
+    
+    <div class="grid grid-cols-3">
+      
+      <!-- Fishermen Licenses -->
+      <div class="service-card">
+        <div class="service-icon" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+          <i class="fas fa-fish"></i>
+        </div>
+        <h3 class="service-title">تراخيص الصيادين</h3>
+        <p class="service-description">
+          احصل على ترخيص الصياد من خلال منصتنا، وتمتع بعملية سريعة ومريحة
+        </p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> تقديم طلب إلكتروني</li>
+          <li><i class="fas fa-check"></i> متابعة حالة الطلب</li>
+          <li><i class="fas fa-check"></i> استلام الترخيص رقميًا</li>
+        </ul>
+        <a href="/licenses/fishermen" class="btn btn-primary btn-block">
+          ابدأ الآن
+          <i class="fas fa-arrow-left"></i>
+        </a>
+      </div>
+      
+      <!-- Boat Licenses -->
+      <div class="service-card">
+        <div class="service-icon" style="background: linear-gradient(135deg, #00897B 0%, #00695C 100%);">
+          <i class="fas fa-ship"></i>
+        </div>
+        <h3 class="service-title">تراخيص المراكب</h3>
+        <p class="service-description">
+          قدم طلب ترخيص مركب جديد أو جدد ترخيصك الحالي بكل سهولة
+        </p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> إدارة بيانات المركب</li>
+          <li><i class="fas fa-check"></i> تحديث المستندات</li>
+          <li><i class="fas fa-check"></i> تجديد الترخيص</li>
+        </ul>
+        <a href="/licenses/boats" class="btn btn-success btn-block">
+          ابدأ الآن
+          <i class="fas fa-arrow-left"></i>
+        </a>
+      </div>
+      
+      <!-- Track Application -->
+      <div class="service-card">
+        <div class="service-icon" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">
+          <i class="fas fa-search-location"></i>
+        </div>
+        <h3 class="service-title">تتبع الطلبات</h3>
+        <p class="service-description">
+          تابع حالة طلبك في أي وقت من خلال رقم الطلب أو رقم الهوية
+        </p>
+        <ul class="service-features">
+          <li><i class="fas fa-check"></i> تتبع فوري</li>
+          <li><i class="fas fa-check"></i> إشعارات تلقائية</li>
+          <li><i class="fas fa-check"></i> تحميل المستندات</li>
+        </ul>
+        <a href="/track" class="btn btn-warning btn-block">
+          تتبع الآن
+          <i class="fas fa-arrow-left"></i>
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="stats-overlay"></div>
+  <div class="container">
+    <div class="grid grid-cols-4">
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="stat-number" data-count="1247">0</h3>
+        <p class="stat-label">إجمالي التراخيص</p>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="stat-number" data-count="987">0</h3>
+        <p class="stat-label">تراخيص نشطة</p>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <h3 class="stat-number" data-count="89">0</h3>
+        <p class="stat-label">طلبات جديدة</p>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3 class="stat-number" data-count="124">0</h3>
+        <p class="stat-label">تراخيص منتهية</p>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">لماذا تختار منصتنا؟</h2>
+      <p class="section-subtitle">Why Choose Our Platform?</p>
+    </div>
+    
+    <div class="features-grid">
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h4>سريع وفعال</h4>
+        <p>معالجة الطلبات في أسرع وقت ممكن مع نظام آلي متطور</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h4>آمن ومحمي</h4>
+        <p>حماية كاملة لبياناتك الشخصية مع أعلى معايير الأمان</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-mobile-alt"></i>
+        </div>
+        <h4>سهل الاستخدام</h4>
+        <p>واجهة بسيطة وسهلة الاستخدام من أي جهاز</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-headset"></i>
+        </div>
+        <h4>دعم فني متميز</h4>
+        <p>فريق دعم متاح على مدار الساعة لمساعدتك</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-bell"></i>
+        </div>
+        <h4>إشعارات فورية</h4>
+        <p>تلقى تحديثات فورية حول حالة طلبك</p>
+      </div>
+      
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="fas fa-file-download"></i>
+        </div>
+        <h4>تحميل سهل</h4>
+        <p>تحميل التراخيص والمستندات بكل سهولة</p>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Marinas Section -->
+<section class="marinas-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">المراسي المتاحة</h2>
+      <p class="section-subtitle">Available Marinas</p>
+    </div>
+    
+    <!-- Marina Map -->
+    <div class="marina-map-container">
+      <div id="marinaMap" class="marina-map">
+        <!-- Embedded map or image -->
+        <img src="/images/marina-map.jpg" alt="خريطة المراسي" style="width: 100%; border-radius: 1rem;">
+      </div>
+      
+      <div class="marina-list">
+        <h3>قائمة المراسي</h3>
+        
+        <div class="marina-item">
+          <div class="marina-info">
+            <h4>المقطع الشيشني</h4>
+            <p>متاح للملك - شمال البحيرة</p>
+          </div>
+          <div class="marina-status available">
+            <i class="fas fa-check-circle"></i>
+            <span>متاح</span>
+          </div>
+          <div class="marina-hours">
+            <i class="fas fa-clock"></i>
+            <span>٨:٠٠ص - ٦:٠٠م</span>
+          </div>
+        </div>
+        
+        <div class="marina-item">
+          <div class="marina-info">
+            <h4>فرع الشمال</h4>
+            <p>حي النقل، الرياض</p>
+          </div>
+          <div class="marina-status available">
+            <i class="fas fa-check-circle"></i>
+            <span>متاح</span>
+          </div>
+          <div class="marina-hours">
+            <i class="fas fa-clock"></i>
+            <span>٩:٠٠ص - ٣:٠٠م</span>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- News Section -->
+<section class="news-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">آخر الأخبار والتحديثات</h2>
+        <p class="section-subtitle">Latest News & Updates from Lake Management</p>
+      </div>
+      <a href="/news" class="btn btn-outline">عرض الكل</a>
+    </div>
+    
+    <div class="grid grid-cols-3">
+      
+      <!-- News Item 1 -->
+      <article class="news-card">
+        <div class="news-image">
+          <img src="/images/news-1.jpg" alt="افتتاح موسم الصيد الجديد">
+          <div class="news-badge">جديد</div>
+        </div>
+        <div class="news-content">
+          <div class="news-meta">
+            <span><i class="fas fa-calendar"></i> ٢٥ أكتوبر ٢٠٢٥</span>
+            <span><i class="fas fa-user"></i> إدارة البحيرة</span>
+          </div>
+          <h3 class="news-title">افتتاح موسم الصيد الجديد في بحيرة البردويل</h3>
+          <p class="news-excerpt">
+            بالتعاون مع حي جهاز مستقبل مصر للتنمية الوطنية، نفخر بالإعلان عن افتتاح موسم الصيد الجديد...
+          </p>
+          <a href="/news/1" class="news-link">
+            اقرأ المزيد <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+      </article>
+      
+      <!-- News Item 2 -->
+      <article class="news-card">
+        <div class="news-image">
+          <img src="/images/news-2.jpg" alt="تحديث نوائح الصيد الجديدة">
+        </div>
+        <div class="news-content">
+          <div class="news-meta">
+            <span><i class="fas fa-calendar"></i> ٢٣ أكتوبر ٢٠٢٥</span>
+            <span><i class="fas fa-user"></i> فريق الإدارة</span>
+          </div>
+          <h3 class="news-title">تحديث نواتع الصيد الجديدة</h3>
+          <p class="news-excerpt">
+            إعلان جديد حول نواتع الصيد الجديدة من قبل وزارة البيئة للحفاظ على الواحد البيئة...
+          </p>
+          <a href="/news/2" class="news-link">
+            اقرأ المزيد <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+      </article>
+      
+      <!-- News Item 3 -->
+      <article class="news-card">
+        <div class="news-image">
+          <img src="/images/news-3.jpg" alt="تسيط إجراءات استخراج التراخيص">
+        </div>
+        <div class="news-content">
+          <div class="news-meta">
+            <span><i class="fas fa-calendar"></i> ٢٠ أكتوبر ٢٠٢٥</span>
+            <span><i class="fas fa-user"></i> قسم التراخيص</span>
+          </div>
+          <h3 class="news-title">تسيط إجراءات استخراج التراخيص</h3>
+          <p class="news-excerpt">
+            تقنيات جديدة لتسريع خدمة المواطنين وتسهيل إجراءات الحصول على التراخيص...
+          </p>
+          <a href="/news/3" class="news-link">
+            اقرأ المزيد <i class="fas fa-arrow-left"></i>
+          </a>
+        </div>
+      </article>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Weather Widget -->
+<section class="weather-section">
+  <div class="container">
+    <div class="weather-widget">
+      <div class="weather-icon">
+        <i class="fas fa-sun"></i>
+      </div>
+      <div class="weather-content">
+        <h3>أحوال بحيرة البردويل</h3>
+        <p class="weather-temp">٢٤°C</p>
+        <p class="weather-desc">صافي جزئيًا</p>
+      </div>
+      <div class="weather-details">
+        <div class="weather-detail-item">
+          <span class="label">الرياح:</span>
+          <span class="value">١٥ كم/س</span>
+        </div>
+        <div class="weather-detail-item">
+          <span class="label">الرطوبة:</span>
+          <span class="value">٦٨ ٪</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="cta-overlay"></div>
+  <div class="container">
+    <div class="cta-content">
+      <h2>هل أنت مستعد للبدء؟</h2>
+      <p>انضم إلى آلاف الصيادين الذين يستخدمون منصتنا لإدارة تراخيصهم بكل سهولة</p>
+      <div class="cta-buttons">
+        <% if (!user) { %>
+          <a href="/register" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus"></i>
+            ابدأ الآن - مجانًا
+          </a>
+          <a href="/about" class="btn btn-outline btn-lg">
+            <i class="fas fa-info-circle"></i>
+            تعرف على المزيد
+          </a>
+        <% } else { %>
+          <a href="/licenses/new" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus-circle"></i>
+            تقديم طلب جديد
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ==========================================
+   HERO SECTION
+   ========================================== */
+
+.hero-section {
+  position: relative;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  background-image: url('/images/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(30, 60, 114, 0.95) 0%, rgba(0, 137, 123, 0.9) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 0;
+  width: 100%;
+}
+
+.hero-text {
+  text-align: center;
+  color: white;
+}
+
+.hero-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 2rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  opacity: 0.95;
+}
+
+.hero-description {
+  font-size: 1.125rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-actions .btn {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================
+   SERVICES SECTION
+   ========================================== */
+
+.services-section {
+  padding: 5rem 0;
+  background: white;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  font-size: 1.125rem;
+  color: #757575;
+  font-weight: 300;
+}
+
+.service-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.service-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.service-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #212121;
+}
+
+.service-description {
+  color: #616161;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.service-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  flex-grow: 1;
+}
+
+.service-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  color: #424242;
+}
+
+.service-features i {
+  color: #4CAF50;
+  font-size: 1.125rem;
+}
+
+/* ==========================================
+   STATS SECTION
+   ========================================== */
+
+.stats-section {
+  position: relative;
+  padding: 4rem 0;
+  background-image: url('/images/stats-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.stats-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(30, 60, 114, 0.92) 0%, rgba(0, 137, 123, 0.88) 100%);
+}
+
+.stats-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  text-align: center;
+  color: white;
+}
+
+.stat-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.125rem;
+  opacity: 0.95;
+}
+
+/* ==========================================
+   FEATURES SECTION
+   ========================================== */
+
+.features-section {
+  padding: 5rem 0;
+  background: #FAFAFA;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 2rem;
+}
+
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #2196F3 0%, #00897B 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+}
+
+.feature-item h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #212121;
+}
+
+.feature-item p {
+  color: #616161;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   MARINAS SECTION
+   ========================================== */
+
+.marinas-section {
+  padding: 5rem 0;
+  background: white;
+}
+
+.marina-map-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.marina-map {
+  background: #f5f5f5;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.marina-list {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.marina-list h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+}
+
+.marina-item {
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.marina-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.marina-info p {
+  font-size: 0.875rem;
+  color: #757575;
+  margin-bottom: 0.75rem;
+}
+
+.marina-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.marina-status.available {
+  background: #E8F5E9;
+  color: #4CAF50;
+}
+
+.marina-hours {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #757575;
+  font-size: 0.875rem;
+}
+
+/* ==========================================
+   NEWS SECTION
+   ========================================== */
+
+.news-section {
+  padding: 5rem 0;
+  background: #FAFAFA;
+}
+
+.news-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.news-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.news-card:hover .news-image img {
+  transform: scale(1.1);
+}
+
+.news-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #FF9800;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.news-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #757575;
+}
+
+.news-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.news-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #212121;
+  line-height: 1.4;
+}
+
+.news-excerpt {
+  color: #616161;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.news-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2196F3;
+  font-weight: 600;
+  transition: gap 0.2s;
+}
+
+.news-link:hover {
+  gap: 0.75rem;
+}
+
+/* ==========================================
+   WEATHER SECTION

@@ -1,0 +1,316 @@
+<% layout('admin-layout') -%>
+<div class="p-6 md:p-10">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">سجل النشاطات</h1>
+      <p class="text-gray-500 mt-1">عرض جميع الإجراءات المهمة في النظام</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+    <form id="filterForm" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >نوع الإجراء</label
+        >
+        <select
+          name="action"
+          id="actionFilter"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">الكل</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >نوع الكيان</label
+        >
+        <select
+          name="entityType"
+          id="entityTypeFilter"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="">الكل</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >من تاريخ</label
+        >
+        <input
+          type="date"
+          name="startDate"
+          id="startDate"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >إلى تاريخ</label
+        >
+        <input
+          type="date"
+          name="endDate"
+          id="endDate"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        />
+      </div>
+      <div class="flex items-end">
+        <button
+          type="submit"
+          class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition"
+        >
+          بحث
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Audit Logs Table -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <table class="w-full">
+      <thead class="bg-gray-50 text-gray-500 text-sm">
+        <tr>
+          <th class="px-6 py-4 text-right font-medium">التاريخ</th>
+          <th class="px-6 py-4 text-right font-medium">المستخدم</th>
+          <th class="px-6 py-4 text-right font-medium">الإجراء</th>
+          <th class="px-6 py-4 text-right font-medium">الكيان</th>
+          <th class="px-6 py-4 text-right font-medium">الوصف</th>
+          <th class="px-6 py-4 text-right font-medium">IP</th>
+        </tr>
+      </thead>
+      <tbody id="logsTableBody" class="divide-y divide-gray-100">
+        <tr>
+          <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+            جاري التحميل...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div
+      id="paginationContainer"
+      class="p-4 border-t border-gray-100 flex justify-center"
+    ></div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div
+  id="detailsModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+>
+  <div
+    class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
+  >
+    <h3 class="text-lg font-bold text-gray-800 mb-4">تفاصيل السجل</h3>
+    <div id="detailsContent" class="space-y-4"></div>
+    <button
+      onclick="hideDetailsModal()"
+      class="mt-4 w-full py-2 border border-gray-300 hover:bg-gray-50 rounded-lg font-bold transition"
+    >
+      إغلاق
+    </button>
+  </div>
+</div>
+
+<script>
+  const api = axios.create({
+    baseURL: '/api/v1',
+    withCredentials: true,
+  });
+
+  let actionTypes = [];
+  let entityTypes = [];
+
+  const actionLabels = {
+    LOGIN: 'تسجيل دخول',
+    LOGOUT: 'تسجيل خروج',
+    REGISTER: 'تسجيل حساب',
+    CREATE: 'إنشاء',
+    UPDATE: 'تعديل',
+    DELETE: 'حذف',
+    STATUS_CHANGE: 'تغيير حالة',
+    APPROVE: 'موافقة',
+    REJECT: 'رفض',
+    VERIFY_PAYMENT: 'تأكيد دفع',
+    PRICE_UPDATE: 'تحديث سعر',
+  };
+
+  const entityLabels = {
+    user: 'مستخدم',
+    application: 'طلب',
+    price: 'سعر',
+    notification: 'إشعار',
+    document: 'مستند',
+  };
+
+  const loadLogs = async (page = 1) => {
+    const params = new URLSearchParams();
+    params.append('page', page);
+
+    const action = document.getElementById('actionFilter').value;
+    const entityType = document.getElementById('entityTypeFilter').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    if (action) params.append('action', action);
+    if (entityType) params.append('entityType', entityType);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+
+    try {
+      const res = await api.get('/admin/audit-logs?' + params.toString());
+      const { logs, pagination, data } = res.data;
+
+      // Populate filter dropdowns on first load
+      if (!actionTypes.length) {
+        actionTypes = res.data.data.actionTypes;
+        entityTypes = res.data.data.entityTypes;
+        populateFilters();
+      }
+
+      renderLogs(res.data.data.logs);
+      renderPagination(res.data.pagination);
+    } catch (err) {
+      console.error('Error loading logs:', err);
+      document.getElementById('logsTableBody').innerHTML =
+        '<tr><td colspan="6" class="px-6 py-12 text-center text-red-500">خطأ في تحميل البيانات</td></tr>';
+    }
+  };
+
+  const populateFilters = () => {
+    const actionSelect = document.getElementById('actionFilter');
+    const entitySelect = document.getElementById('entityTypeFilter');
+
+    actionTypes.forEach(action => {
+      const option = document.createElement('option');
+      option.value = action;
+      option.textContent = actionLabels[action] || action;
+      actionSelect.appendChild(option);
+    });
+
+    entityTypes.forEach(entity => {
+      const option = document.createElement('option');
+      option.value = entity;
+      option.textContent = entityLabels[entity] || entity;
+      entitySelect.appendChild(option);
+    });
+  };
+
+  const renderLogs = logs => {
+    const tbody = document.getElementById('logsTableBody');
+
+    if (!logs.length) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">لا توجد سجلات</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = logs
+      .map(
+        log => `
+      <tr class="hover:bg-gray-50 transition cursor-pointer" onclick='showDetails(${JSON.stringify(log)})'>
+        <td class="px-6 py-4 text-sm text-gray-500">${new Date(log.createdAt).toLocaleString('ar-EG')}</td>
+        <td class="px-6 py-4">
+          ${log.user ? `<span class="font-medium text-gray-800">${log.user.firstNameAr} ${log.user.lastNameAr}</span>` : '<span class="text-gray-400">النظام</span>'}
+        </td>
+        <td class="px-6 py-4">
+          <span class="px-2 py-1 rounded-full text-xs font-bold ${getActionColor(log.action)}">
+            ${actionLabels[log.action] || log.action}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-600">${entityLabels[log.entityType] || log.entityType}</td>
+        <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">${log.description || '-'}</td>
+        <td class="px-6 py-4 text-xs text-gray-400">${log.ipAddress || '-'}</td>
+      </tr>
+    `
+      )
+      .join('');
+  };
+
+  const getActionColor = action => {
+    const colors = {
+      LOGIN: 'bg-blue-100 text-blue-700',
+      LOGOUT: 'bg-gray-100 text-gray-700',
+      REGISTER: 'bg-green-100 text-green-700',
+      CREATE: 'bg-green-100 text-green-700',
+      UPDATE: 'bg-yellow-100 text-yellow-700',
+      DELETE: 'bg-red-100 text-red-700',
+      STATUS_CHANGE: 'bg-purple-100 text-purple-700',
+      APPROVE: 'bg-green-100 text-green-700',
+      REJECT: 'bg-red-100 text-red-700',
+      VERIFY_PAYMENT: 'bg-teal-100 text-teal-700',
+      PRICE_UPDATE: 'bg-amber-100 text-amber-700',
+    };
+    return colors[action] || 'bg-gray-100 text-gray-700';
+  };
+
+  const renderPagination = pagination => {
+    const container = document.getElementById('paginationContainer');
+    if (pagination.pages <= 1) {
+      container.innerHTML = '';
+      return;
+    }
+
+    let html = '<nav class="flex gap-2">';
+    if (pagination.page > 1) {
+      html += `<button onclick="loadLogs(${pagination.page - 1})" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 text-sm">السابق</button>`;
+    }
+    for (let i = 1; i <= Math.min(pagination.pages, 5); i++) {
+      html += `<button onclick="loadLogs(${i})" class="px-3 py-1 rounded ${i === pagination.page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-100'} text-sm">${i}</button>`;
+    }
+    if (pagination.page < pagination.pages) {
+      html += `<button onclick="loadLogs(${pagination.page + 1})" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 text-sm">التالي</button>`;
+    }
+    html += '</nav>';
+    container.innerHTML = html;
+  };
+
+  const showDetails = log => {
+    const content = document.getElementById('detailsContent');
+    content.innerHTML = `
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><span class="text-gray-500">التاريخ:</span> <span class="font-medium">${new Date(log.createdAt).toLocaleString('ar-EG')}</span></div>
+        <div><span class="text-gray-500">المستخدم:</span> <span class="font-medium">${log.user ? log.user.firstNameAr + ' ' + log.user.lastNameAr : 'النظام'}</span></div>
+        <div><span class="text-gray-500">الإجراء:</span> <span class="font-medium">${actionLabels[log.action] || log.action}</span></div>
+        <div><span class="text-gray-500">الكيان:</span> <span class="font-medium">${entityLabels[log.entityType] || log.entityType}</span></div>
+        <div class="col-span-2"><span class="text-gray-500">الوصف:</span> <span class="font-medium">${log.description || '-'}</span></div>
+        <div><span class="text-gray-500">IP:</span> <span class="font-medium">${log.ipAddress || '-'}</span></div>
+        <div><span class="text-gray-500">User Agent:</span> <span class="font-medium text-xs">${log.userAgent || '-'}</span></div>
+      </div>
+      ${log.previousData ? `<div class="mt-4"><h4 class="font-bold text-gray-700 mb-2">البيانات السابقة:</h4><pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto">${JSON.stringify(log.previousData, null, 2)}</pre></div>` : ''}
+      ${log.newData ? `<div class="mt-4"><h4 class="font-bold text-gray-700 mb-2">البيانات الجديدة:</h4><pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto">${JSON.stringify(log.newData, null, 2)}</pre></div>` : ''}
+    `;
+    document.getElementById('detailsModal').classList.remove('hidden');
+    document.getElementById('detailsModal').classList.add('flex');
+  };
+
+  const hideDetailsModal = () => {
+    document.getElementById('detailsModal').classList.add('hidden');
+    document.getElementById('detailsModal').classList.remove('flex');
+  };
+
+  document.getElementById('filterForm').addEventListener('submit', e => {
+    e.preventDefault();
+    loadLogs(1);
+  });
+
+  document
+    .getElementById('logoutBtnAdmin')
+    ?.addEventListener('click', async () => {
+      try {
+        await api.post('/auth/logout');
+        window.location.href = '/login';
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    });
+
+  // Load logs on page load
+  loadLogs();
+</script>

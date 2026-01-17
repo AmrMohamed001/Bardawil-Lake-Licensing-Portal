@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خطأ - منصة تراخيص بحيرة البردويل</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+<body>
+  <%- include('partials/navbar') %>
+
+  <div class="error-page">
+    <div class="container">
+      <div class="error-content">
+        <div class="error-icon">
+          <% if (statusCode === 404) { %>
+            <i class="fas fa-search"></i>
+          <% } else if (statusCode === 403) { %>
+            <i class="fas fa-lock"></i>
+          <% } else if (statusCode === 500) { %>
+            <i class="fas fa-server"></i>
+          <% } else { %>
+            <i class="fas fa-exclamation-circle"></i>
+          <% } %>
+        </div>
+        
+        <h1 class="error-code"><%= statusCode || 500 %></h1>
+        
+        <h2 class="error-title">
+          <% if (statusCode === 404) { %>
+            الصفحة غير موجودة
+          <% } else if (statusCode === 403) { %>
+            الوصول مرفوض
+          <% } else if (statusCode === 500) { %>
+            خطأ في الخادم
+          <% } else { %>
+            حدث خطأ
+          <% } %>
+        </h2>
+        
+        <p class="error-message">
+          <% if (message) { %>
+            <%= message %>
+          <% } else if (statusCode === 404) { %>
+            الصفحة التي تبحث عنها غير موجودة أو تم نقلها
+          <% } else if (statusCode === 403) { %>
+            ليس لديك صلاحية للوصول إلى هذه الصفحة
+          <% } else { %>
+            حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً
+          <% } %>
+        </p>
+        
+        <div class="error-actions">
+          <a href="/" class="btn btn-primary">
+            <i class="fas fa-home"></i> الصفحة الرئيسية
+          </a>
+          <button onclick="history.back()" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-right"></i> العودة للخلف
+          </button>
+        </div>
+        
+        <% if (process.env.NODE_ENV === 'development' && error) { %>
+        <div class="error-details">
+          <details>
+            <summary>تفاصيل الخطأ (للمطورين فقط)</summary>
+            <pre><%= error.stack || error %></pre>
+          </details>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+<style>
+.error-page {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.error-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.error-icon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(30, 60, 114, 0.3);
+}
+
+.error-icon i {
+  font-size: 3rem;
+  color: white;
+}
+
+.error-code {
+  font-size: 6rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1;
+}
+
+.error-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212121;
+  margin: 1rem 0 0.5rem;
+}
+
+.error-message {
+  font-size: 1.125rem;
+  color: #757575;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-details {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.error-details summary {
+  cursor: pointer;
+  color: #1e3c72;
+  font-weight: 600;
+}
+
+.error-details pre {
+  background: #263238;
+  color: #eceff1;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  text-align: left;
+  direction: ltr;
+  margin-top: 1rem;
+}
+
+@media (max-width: 480px) {
+  .error-code {
+    font-size: 4rem;
+  }
+  
+  .error-title {
+    font-size: 1.25rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+  }
+  
+  .error-actions .btn {
+    width: 100%;
+  }
+}
+</style>
+
+</body>
+</html>

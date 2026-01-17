@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إنشاء حساب - منصة تراخيص بحيرة البردويل</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+  </head>
+  <body>
+    <%- include('partials/spinner') %>
+    <div class="auth-page">
+      <div class="auth-container">
+        <!-- Left Side - Image -->
+        <div class="auth-image-side">
+          <div class="auth-image-overlay"></div>
+          <div class="auth-image-content">
+            <h2>انضم إلى منصة البردويل</h2>
+            <p>سجّل الآن واستفد من خدماتنا الإلكترونية</p>
+            <ul class="auth-features">
+              <li>
+                <i class="fas fa-check-circle"></i> تقديم طلبات التراخيص
+                إلكترونياً
+              </li>
+              <li>
+                <i class="fas fa-check-circle"></i> متابعة حالة الطلبات لحظياً
+              </li>
+              <li><i class="fas fa-check-circle"></i> استلام إشعارات فورية</li>
+              <li>
+                <i class="fas fa-check-circle"></i> تحميل المستندات بسهولة
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="auth-form-side">
+          <div class="auth-form-wrapper">
+            <div class="auth-header">
+              <a href="/"
+                ><img
+                  src="/imgs/logo.png"
+                  alt="بحيرة البردويل"
+                  class="auth-logo"
+              /></a>
+              <h1>إنشاء حساب جديد</h1>
+              <p>سجّل بياناتك لإنشاء حساب على المنصة</p>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <form id="registerForm" class="auth-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    الاسم الأول (بالعربية)
+                  </label>
+                  <input
+                    type="text"
+                    name="firstNameAr"
+                    class="form-control"
+                    placeholder="أحمد"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    الاسم الأخير (بالعربية)
+                  </label>
+                  <input
+                    type="text"
+                    name="lastNameAr"
+                    class="form-control"
+                    placeholder="محمد"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-id-card"></i>
+                  الرقم القومي
+                </label>
+                <input
+                  type="text"
+                  name="nationalId"
+                  class="form-control"
+                  placeholder="الرقم القومي المكون من 14 رقم"
+                  required
+                  maxlength="14"
+                  pattern="[0-9]{14}"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-phone"></i>
+                  رقم الهاتف
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  class="form-control"
+                  placeholder="01xxxxxxxxx"
+                  required
+                  pattern="01[0125][0-9]{8}"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-lock"></i>
+                  كلمة المرور
+                </label>
+                <div class="password-input-wrapper">
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    class="form-control"
+                    placeholder="كلمة المرور (8 أحرف على الأقل)"
+                    required
+                    minlength="8"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    onclick="togglePassword('password', 'passwordIcon')"
+                  >
+                    <i class="fas fa-eye" id="passwordIcon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-lock"></i>
+                  تأكيد كلمة المرور
+                </label>
+                <div class="password-input-wrapper">
+                  <input
+                    type="password"
+                    name="passwordConfirm"
+                    id="passwordConfirm"
+                    class="form-control"
+                    placeholder="أعد إدخال كلمة المرور"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    onclick="
+                      togglePassword('passwordConfirm', 'passwordConfirmIcon')
+                    "
+                  >
+                    <i class="fas fa-eye" id="passwordConfirmIcon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-block btn-lg"
+                id="submitBtn"
+              >
+                <span class="btn-text">إنشاء الحساب</span>
+                <span class="btn-loading hidden">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  جاري التسجيل...
+                </span>
+              </button>
+            </form>
+
+            <div class="auth-footer">
+              <p>لديك حساب بالفعل؟ <a href="/login">تسجيل الدخول</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: stretch;
+      }
+
+      .auth-container {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+      }
+
+      .auth-form-side {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: white;
+        overflow-y: auto;
+      }
+
+      .auth-form-wrapper {
+        width: 100%;
+        max-width: 500px;
+        padding: 1rem 0;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .auth-logo {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 1rem;
+      }
+
+      .auth-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #212121;
+        margin-bottom: 0.5rem;
+      }
+
+      .auth-header p {
+        color: #757575;
+        font-size: 1rem;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .auth-form .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .auth-form .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #424242;
+        font-size: 0.9375rem;
+      }
+
+      .auth-form .form-label i {
+        color: #1e3c72;
+        font-size: 0.875rem;
+      }
+
+      .password-input-wrapper {
+        position: relative;
+      }
+
+      .password-toggle {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #9e9e9e;
+        cursor: pointer;
+        padding: 0.25rem;
+      }
+
+      .password-toggle:hover {
+        color: #1e3c72;
+      }
+
+      .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+      }
+
+      .auth-footer p {
+        color: #757575;
+      }
+
+      .auth-footer a {
+        color: #1e3c72;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .auth-footer a:hover {
+        text-decoration: underline;
+      }
+
+      .auth-image-side {
+        flex: 1;
+        position: relative;
+        background-image: url('/imgs/welcome photo regestration.png');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .auth-image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(30, 60, 114, 0.9) 0%,
+          rgba(0, 137, 123, 0.85) 100%
+        );
+      }
+
+      .auth-image-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: white;
+        padding: 3rem;
+      }
+
+      .auth-image-content h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .auth-image-content p {
+        font-size: 1.25rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+      }
+
+      .auth-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: right;
+      }
+
+      .auth-features li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        font-size: 1.125rem;
+      }
+
+      .auth-features i {
+        color: #4caf50;
+      }
+
+      .btn-text,
+      .btn-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 1024px) {
+        .auth-image-side {
+          display: none;
+        }
+
+        .auth-form-side {
+          padding: 1.5rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script>
+      function togglePassword(fieldId, iconId) {
+        const password = document.getElementById(fieldId);
+        const icon = document.getElementById(iconId);
+
+        if (password.type === 'password') {
+          password.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          password.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      }
+
+      function showAlert(message, type = 'danger') {
+        const container = document.getElementById('alertContainer');
+        const icons = {
+          success: 'check-circle',
+          danger: 'exclamation-circle',
+          warning: 'exclamation-triangle',
+          info: 'info-circle',
+        };
+
+        container.innerHTML = `
+    <div class="alert alert-${type}">
+      <i class="fas fa-${icons[type]} alert-icon"></i>
+      <div class="alert-content"><p>${message}</p></div>
+      <button class="alert-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+      }
+
+      document
+        .getElementById('registerForm')
+        .addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const submitBtn = document.getElementById('submitBtn');
+          const btnText = submitBtn.querySelector('.btn-text');
+          const btnLoading = submitBtn.querySelector('.btn-loading');
+
+          const formData = new FormData(this);
+
+          if (formData.get('password') !== formData.get('passwordConfirm')) {
+            showAlert('كلمة المرور غير متطابقة');
+            return;
+          }
+
+          btnText.classList.add('hidden');
+          btnLoading.classList.remove('hidden');
+          submitBtn.disabled = true;
+
+          const data = {
+            nationalId: formData.get('nationalId'),
+            firstNameAr: formData.get('firstNameAr'),
+            lastNameAr: formData.get('lastNameAr'),
+            phone: formData.get('phone'),
+            password: formData.get('password'),
+            passwordConfirm: formData.get('passwordConfirm'),
+          };
+
+          try {
+            const res = await axios.post('/api/v1/auth/register', data, {
+              withCredentials: true,
+            });
+
+            if (res.data.status === 'success') {
+              showAlert('تم إنشاء الحساب بنجاح! جاري التحويل...', 'success');
+
+              setTimeout(() => {
+                window.location.href = '/dashboard';
+              }, 1500);
+            }
+          } catch (err) {
+            showAlert(err.response?.data?.message || 'حدث خطأ أثناء التسجيل');
+          } finally {
+            btnText.classList.remove('hidden');
+            btnLoading.classList.add('hidden');
+            submitBtn.disabled = false;
+          }
+        });
+    </script>
+  </body>
+</html>

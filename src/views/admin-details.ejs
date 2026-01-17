@@ -1,0 +1,304 @@
+<% layout('admin-layout') -%>
+<div class="p-6 md:p-10">
+  <div class="mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-2 text-sm text-gray-500">
+      <a href="/admin-dashboard" class="hover:text-primary">لوحة الإدارة</a>
+      <span>/</span>
+      <span class="text-gray-800 font-semibold">تفاصيل الطلب #<%= application.applicationNumber %></span>
+    </div>
+    
+    <a href="/admin-dashboard" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 text-sm font-medium">
+      عودة للقائمة
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    
+    <!-- Main Details -->
+    <div class="md:col-span-2 space-y-6">
+      
+      <!-- Application Info -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-primary px-6 py-4 border-b border-primary text-white flex justify-between items-center">
+          <h2 class="font-bold text-lg">بيانات الطلب</h2>
+          <%- include('partials/status-badge', { status: application.status }) %>
+        </div>
+        <div class="p-6 grid grid-cols-2 gap-y-4 text-sm">
+          <div>
+            <p class="text-gray-500">نوع الترخيص</p>
+            <p class="font-bold text-gray-800"><%= application.applicationType %></p>
+          </div>
+          <div>
+            <p class="text-gray-500">الفئة</p>
+            <p class="font-bold text-gray-800"><%= application.licenseCategory %></p>
+          </div>
+          <div>
+            <p class="text-gray-500">تاريخ التقديم</p>
+            <p class="font-bold text-gray-800"><%= new Date(application.createdAt).toLocaleDateString('ar-EG') %></p>
+          </div>
+          <div>
+            <p class="text-gray-500">رقم أمر التوريد</p>
+            <p class="font-bold text-gray-800"><%= application.supplyOrderId || '-' %></p>
+          </div>
+          <% if (application.paymentAmount) { %>
+          <div>
+            <p class="text-gray-500">المبلغ المطلوب</p>
+            <p class="font-bold text-accent"><%= application.paymentAmount %> ج.م</p>
+          </div>
+          <% } %>
+          <% if (application.rejectionReason) { %>
+          <div class="col-span-2">
+            <p class="text-gray-500">سبب الرفض</p>
+            <p class="font-bold text-red-600"><%= application.rejectionReason %></p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Documents Viewer -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="font-bold text-lg text-gray-800">المرفقات</h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% if (application.documents && application.documents.length > 0) { %>
+            <% application.documents.forEach(doc => { %>
+            <div class="border rounded-lg p-2 <%= doc.documentType === 'payment_receipt' ? 'border-yellow-400 bg-yellow-50' : '' %>">
+              <p class="text-xs font-bold <%= doc.documentType === 'payment_receipt' ? 'text-yellow-700' : 'text-gray-500' %> mb-2"><%= doc.documentType %></p>
+              <% if (doc.filePath.match(/\.(jpg|jpeg|png|gif)$/i)) { %>
+                <img src="/uploads/<%= doc.filePath %>" class="w-full h-48 object-cover rounded cursor-pointer hover:opacity-90 transition" onclick="window.open(this.src)">
+              <% } else { %>
+                <a href="/uploads/<%= doc.filePath %>" target="_blank" class="flex items-center justify-center h-48 bg-gray-100 rounded hover:bg-gray-200 transition">
+                  <span class="text-primary font-semibold">عرض المستند</span>
+                </a>
+              <% } %>
+            </div>
+            <% }) %>
+          <% } else { %>
+            <div class="col-span-2 text-center py-8 text-gray-500">لا توجد مرفقات</div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Status History -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="font-bold text-lg text-gray-800">سجل الحالة</h2>
+        </div>
+        <div class="p-6">
+          <% if (application.statusHistory && application.statusHistory.length > 0) { %>
+            <div class="space-y-4">
+              <% application.statusHistory.forEach(history => { %>
+              <div class="flex gap-4 items-start">
+                <div class="w-3 h-3 bg-primary rounded-full mt-1.5"></div>
+                <div class="flex-1">
+                  <p class="font-semibold text-gray-800">
+                    <%= history.oldStatus || 'جديد' %> → <%= history.newStatus %>
+                  </p>
+                  <p class="text-sm text-gray-500"><%= history.notes || '' %></p>
+                  <p class="text-xs text-gray-400 mt-1">
+                    <%= new Date(history.changedAt).toLocaleString('ar-EG') %>
+                    <% if (history.changedByUser) { %>
+                      - بواسطة <%= history.changedByUser.firstNameAr %> <%= history.changedByUser.lastNameAr %>
+                    <% } %>
+                  </p>
+                </div>
+              </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-center text-gray-500">لا يوجد سجل حالة</p>
+          <% } %>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="space-y-6">
+      
+      <!-- Applicant Info -->
+      <div class="bg-white rounded-xl shadow-sm p-6 text-center">
+        <div class="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden">
+          <img src="<%= application.applicant?.profilePicture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(application.applicant?.firstNameAr || 'User') %>" class="w-full h-full object-cover">
+        </div>
+        <h3 class="font-bold text-gray-800"><%= application.applicant?.firstNameAr %> <%= application.applicant?.lastNameAr %></h3>
+        <p class="text-sm text-gray-500"><%= application.applicant?.nationalId %></p>
+        <p class="text-sm text-gray-500 mt-1"><%= application.applicant?.phone %></p>
+      </div>
+
+      <!-- Action Buttons (Dynamic based on status) -->
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-3">
+        <h3 class="font-bold text-gray-800 mb-2 text-sm">الإجراءات المتاحة</h3>
+        
+        <% if (application.status === 'received') { %>
+          <button onclick="startReview('<%= application.id %>')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition">📋 بدء المراجعة</button>
+        <% } %>
+
+        <% if (application.status === 'under_review') { %>
+          <button onclick="approveApplication('<%= application.id %>')" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition">✅ قبول الطلب</button>
+          <button onclick="showRejectModal('<%= application.id %>')" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition">❌ رفض الطلب</button>
+        <% } %>
+
+        <% if (application.status === 'approved_payment_required') { %>
+          <button onclick="verifyPayment('<%= application.id %>')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition">💰 تأكيد استلام إيصال الدفع</button>
+          <div class="bg-amber-50 p-3 rounded text-sm text-amber-700">
+            بانتظار دفع المتقدم في القسم المالي
+          </div>
+          <button onclick="downloadSupplyOrder('<%= application.id %>')" class="w-full py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-bold transition">طباعة أمر التوريد</button>
+        <% } %>
+
+        <% if (application.status === 'payment_verified') { %>
+          <button onclick="markReady('<%= application.id %>')" class="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold transition">📦 الرخصة جاهزة للاستلام</button>
+          <div class="bg-green-50 p-3 rounded text-sm text-green-700">
+            تم التحقق من الدفع - جاري إعداد الرخصة
+          </div>
+        <% } %>
+
+        <% if (application.status === 'ready') { %>
+          <button onclick="completeApplication('<%= application.id %>')" class="w-full py-2 bg-accent hover:bg-teal-700 text-white rounded-lg font-bold transition">🎉 تم تسليم الرخصة</button>
+          <div class="bg-teal-50 p-3 rounded text-sm text-teal-700">
+            الرخصة جاهزة - بانتظار تسليمها للمتقدم
+          </div>
+        <% } %>
+
+        <% if (application.status === 'completed') { %>
+          <div class="bg-green-50 p-3 rounded text-sm text-green-700 font-bold text-center">
+            ✨ تم تسليم الترخيص بنجاح
+          </div>
+          <button onclick="printLicense('<%= application.id %>')" class="w-full py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-bold transition">طباعة الشهادة</button>
+        <% } %>
+
+        <% if (application.status === 'rejected') { %>
+          <div class="bg-red-50 p-3 rounded text-sm text-red-700 font-bold text-center">
+            ❌ تم رفض هذا الطلب
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Pricing Info -->
+      <% if (application.paymentAmount) { %>
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <p class="text-sm text-gray-500">قيمة الرسوم</p>
+        <p class="text-2xl font-bold text-accent"><%= application.paymentAmount %> ج.م</p>
+      </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">سبب الرفض</h3>
+    <textarea id="rejectReason" rows="4" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary" placeholder="اكتب سبب الرفض..."></textarea>
+    <div class="flex gap-3 mt-4">
+      <button onclick="confirmReject()" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition">تأكيد الرفض</button>
+      <button onclick="hideRejectModal()" class="flex-1 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-bold transition">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentRejectId = null;
+
+  const api = axios.create({
+    baseURL: '/api/v1',
+    withCredentials: true
+  });
+
+  const startReview = async (id) => {
+    if(!confirm('هل تريد بدء مراجعة هذا الطلب؟')) return;
+    try {
+      const res = await api.put('/admin/applications/' + id + '/review');
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const approveApplication = async (id) => {
+    if(!confirm('هل أنت متأكد من قبول الطلب وإصدار أمر التوريد؟')) return;
+    try {
+      const res = await api.post('/admin/applications/' + id + '/approve');
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const showRejectModal = (id) => {
+    currentRejectId = id;
+    document.getElementById('rejectModal').classList.remove('hidden');
+    document.getElementById('rejectModal').classList.add('flex');
+  };
+
+  const hideRejectModal = () => {
+    currentRejectId = null;
+    document.getElementById('rejectModal').classList.add('hidden');
+    document.getElementById('rejectModal').classList.remove('flex');
+    document.getElementById('rejectReason').value = '';
+  };
+
+  const confirmReject = async () => {
+    const reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+      alert('يجب إدخال سبب الرفض');
+      return;
+    }
+    try {
+      const res = await api.post('/admin/applications/' + currentRejectId + '/reject', { reason });
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+  
+  const verifyPayment = async (id) => {
+    if(!confirm('هل استلمت وصل استلام نقدية وتم التحقق من صحته؟')) return;
+    try {
+      const res = await api.put('/admin/applications/' + id + '/verify-payment');
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const markReady = async (id) => {
+    if(!confirm('هل الرخصة جاهزة للاستلام؟')) return;
+    try {
+      const res = await api.put('/admin/applications/' + id + '/ready');
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const completeApplication = async (id) => {
+    if(!confirm('هل تم تسليم الرخصة للمتقدم؟')) return;
+    try {
+      const res = await api.put('/admin/applications/' + id + '/complete');
+      if(res.data.status === 'success') location.reload();
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const downloadSupplyOrder = async (id) => {
+    try {
+      const res = await api.get('/admin/applications/' + id + '/supply-order');
+      if(res.data.status === 'success') {
+        console.log('Supply order data:', res.data.data);
+        alert('بيانات أمر التوريد جاهزة للطباعة - PDF generation in frontend');
+      }
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  const printLicense = async (id) => {
+    try {
+      const res = await api.get('/admin/applications/' + id + '/license-pdf');
+      if(res.data.status === 'success') {
+        console.log('License data:', res.data.data);
+        alert('بيانات الشهادة جاهزة للطباعة - PDF generation in frontend');
+      }
+    } catch(err) { alert(err.response?.data?.message || 'خطأ'); }
+  };
+
+  document.getElementById('logoutBtnAdmin')?.addEventListener('click', async () => {
+    try {
+      await api.post('/auth/logout');
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  });
+</script>

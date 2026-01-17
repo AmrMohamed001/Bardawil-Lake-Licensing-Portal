@@ -1,0 +1,1306 @@
+<style>
+  :root {
+    --navy: #1a3a6b;
+    --teal: #2d7a7a;
+    --green: #4a8b6f;
+    --gold: #c9a961;
+    --sand: #f5ebe0;
+    --white: #ffffff;
+    --dark: #0f1419;
+  }
+
+  /* Hero Section */
+  .hero {
+    position: relative;
+    height: 80vh; /* Reduced from 100vh for better fit */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(rgba(26, 58, 107, 0.7), rgba(45, 122, 122, 0.7)),
+      url('/imgs/hero.png') no-repeat center center/cover;
+    overflow: hidden;
+    margin-top: -1px; /* seamless join with navbar if needed */
+  }
+
+  .hero::before {
+    content: '';
+    display: none;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px;
+    max-width: 1000px;
+  }
+
+  .hero-logo {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 40px;
+    animation: fadeInUp 1s ease;
+  }
+
+  .hero h1 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 20px;
+    animation: fadeInUp 1s ease 0.2s backwards;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 300;
+    margin-bottom: 15px;
+    animation: fadeInUp 1s ease 0.4s backwards;
+  }
+
+  .hero-tagline {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: var(--gold);
+    font-weight: 600;
+    animation: fadeInUp 1s ease 0.6s backwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-indicator i {
+    font-size: 2rem;
+    color: var(--white);
+    opacity: 0.7;
+  }
+
+  @keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+
+  /* Container */
+  .container-custom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Introduction Section */
+  .intro-section {
+    padding: 120px 0;
+    background: var(--white);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .intro-text h2 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--navy);
+    margin-bottom: 30px;
+    line-height: 1.3;
+  }
+
+  .intro-text p {
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin-bottom: 20px;
+  }
+
+  .intro-text .highlight {
+    color: var(--teal);
+    font-weight: 700;
+  }
+
+  .intro-visual {
+    position: relative;
+    height: 500px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  .intro-visual::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path d="M 0 300 Q 150 250 300 300 T 600 300 T 900 300 T 1200 300 L 1200 600 L 0 600 Z" fill="rgba(255,255,255,0.1)"/><path d="M 0 350 Q 150 320 300 350 T 600 350 T 900 350 T 1200 350 L 1200 600 L 0 600 Z" fill="rgba(255,255,255,0.2)"/></svg>')
+      no-repeat bottom center;
+    background-size: cover;
+  }
+
+  .stat-badge {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px 35px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .stat-badge.top-left {
+    top: 30px;
+    right: 30px;
+  }
+
+  .stat-badge.bottom-right {
+    bottom: 30px;
+    left: 30px;
+  }
+
+  .stat-badge h3 {
+    font-size: 2.5rem;
+    color: var(--navy);
+    font-weight: 800;
+    margin-bottom: 5px;
+  }
+
+  .stat-badge p {
+    font-size: 1rem;
+    color: #666;
+    font-weight: 600;
+  }
+
+  /* Stats Section */
+  .stats-section {
+    padding: 100px 0;
+    background: var(--sand);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 40px 30px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-10px);
+  }
+
+  .stat-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 25px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--white);
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 600;
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 120px 0;
+    background: var(--white);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .section-header h2 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: var(--navy);
+    margin-bottom: 20px;
+  }
+
+  .section-header p {
+    font-size: 1.3rem;
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 50px;
+  }
+
+  .feature-card {
+    padding: 50px 40px;
+    border-radius: 20px;
+    background: linear-gradient(
+      135deg,
+      rgba(26, 58, 107, 0.03),
+      rgba(45, 122, 122, 0.03)
+    );
+    border: 2px solid rgba(26, 58, 107, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    border-color: var(--teal);
+    box-shadow: 0 20px 40px rgba(45, 122, 122, 0.1);
+    transform: translateY(-5px);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    color: var(--teal);
+    margin-bottom: 25px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.8rem;
+    color: var(--navy);
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .feature-card p {
+    font-size: 1.1rem;
+    color: #4a5568;
+    line-height: 1.8;
+  }
+
+  /* Timeline Section */
+  .timeline-section {
+    padding: 120px 0;
+    background: var(--navy);
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .timeline-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(
+        circle at 30% 20%,
+        rgba(45, 122, 122, 0.2) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 70% 80%,
+        rgba(74, 139, 111, 0.2) 0%,
+        transparent 50%
+      );
+  }
+
+  .timeline-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .timeline-header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .timeline-header h2 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 20px;
+  }
+
+  .timeline-items {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+    align-items: center;
+  }
+
+  .timeline-year {
+    text-align: left;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+
+  .timeline-dot {
+    width: 30px;
+    height: 30px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .timeline-dot::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100px;
+    background: rgba(201, 169, 97, 0.3);
+  }
+
+  .timeline-item:last-child .timeline-dot::before {
+    display: none;
+  }
+
+  .timeline-content-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+  }
+
+  .timeline-content-box h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: var(--gold);
+  }
+
+  .timeline-content-box p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  /* Leadership Section */
+  .leadership-section {
+    padding: 120px 0;
+    background: var(--sand);
+  }
+
+  .leadership-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 50px;
+    margin-top: 80px;
+  }
+
+  .leader-card {
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .leader-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .leader-image {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(135deg, var(--teal), var(--green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--white);
+  }
+
+  .leader-info {
+    padding: 40px 30px;
+  }
+
+  .leader-info h3 {
+    font-size: 1.8rem;
+    color: var(--navy);
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .leader-info .title {
+    font-size: 1.1rem;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .leader-info p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.8;
+  }
+
+  /* CTA Section styles */
+  .cta-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, var(--navy), var(--teal));
+    text-align: center;
+    color: var(--white);
+  }
+
+  .cta-section h2 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 30px;
+  }
+
+  .cta-section p {
+    font-size: 1.3rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 18px 45px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary-custom {
+    background: var(--gold);
+    color: var(--navy);
+  }
+
+  .btn-primary-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(201, 169, 97, 0.4);
+  }
+
+  .btn-secondary-custom {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+  }
+
+  .btn-secondary-custom:hover {
+    background: var(--white);
+    color: var(--navy);
+  }
+
+  /* Fish & Gear Sections */
+  .info-section {
+    padding: 100px 0;
+    background: var(--white);
+  }
+
+  .info-section.alt-bg {
+    background: var(--sand);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+  }
+
+  .info-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-top: 4px solid var(--teal);
+    transition: transform 0.3s ease;
+  }
+
+  .info-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .info-card h4 {
+    color: var(--navy);
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .info-card p {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .info-card .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(45, 122, 122, 0.1);
+    color: var(--teal);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  /* Gallery Section */
+  .gallery-section {
+    padding: 100px 0;
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+  }
+
+  .gallery-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 250px;
+    cursor: pointer;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.1);
+  }
+
+  .gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .gallery-item:hover .gallery-caption {
+    transform: translateY(0);
+  }
+
+  .gallery-caption h5 {
+    color: var(--white);
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+
+    .intro-visual {
+      height: 400px;
+    }
+
+    .timeline-item {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .timeline-year {
+      text-align: center;
+    }
+
+    .timeline-dot {
+      margin: 0 auto;
+    }
+
+    .timeline-dot::before {
+      display: none;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Scroll Animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s ease;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <img
+      src="/imgs/logo.png"
+      alt="شعار بحيرة البردويل"
+      class="hero-logo"
+      style="
+        width: 150px;
+        height: auto;
+        margin: 0 auto 40px;
+        border-radius: 50%;
+      "
+    />
+
+    <h1>بحيرة البردويل</h1>
+    <div class="hero-subtitle">جوهرة سيناء ومستقبل التنمية المستدامة</div>
+    <div class="hero-tagline">Bardawil Lake - Egypt's Sustainable Future</div>
+  </div>
+
+  <div class="scroll-indicator">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+</section>
+
+<!-- Introduction Section -->
+<section class="intro-section">
+  <div class="container-custom">
+    <div class="intro-grid reveal">
+      <div class="intro-text">
+        <h2>ثاني أكبر بحيرات مصر وأنقى مصادر الأسماك عالمياً</h2>
+        <p>
+          تُعد <span class="highlight">بحيرة البردويل</span>، الواقعة في محافظة
+          شمال سيناء على الساحل الشمالي لشبه جزيرة سيناء، ثاني أكبر بحيرات مصر
+          وأحد أنقى المصادر الطبيعية للأسماك على مستوى العالم.
+        </p>
+        <p>
+          تبلغ مساحتها حوالي <span class="highlight">165 ألف فدان</span> (690
+          كم²)، وتتميز بضحالة مياهها حيث يصل متوسط عمقها إلى 3 أمتار، مما يخلق
+          بيئة مثالية لتربية ونمو أجود أنواع الأسماك.
+        </p>
+        <p>
+          سُميت البحيرة نسبةً إلى الملك الصليبي "بلدوين الأول" (Baldwin I) الذي
+          توفي في منطقة العريش، وتحمل اليوم رؤية جديدة للتنمية المستدامة في مصر.
+        </p>
+      </div>
+
+      <div class="intro-visual">
+        <div class="stat-badge top-left">
+          <h3>690</h3>
+          <p>كيلومتر مربع</p>
+        </div>
+        <div class="stat-badge bottom-right">
+          <h3>50K</h3>
+          <p>طن إنتاج سنوي</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="container-custom">
+    <div class="stats-grid reveal">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-water"></i>
+        </div>
+        <div class="stat-number">165K</div>
+        <div class="stat-label">فدان مساحة</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-fish"></i>
+        </div>
+        <div class="stat-number">50K</div>
+        <div class="stat-label">طن إنتاج سنوي</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-arrows-alt-v"></i>
+        </div>
+        <div class="stat-number">3</div>
+        <div class="stat-label">متر متوسط العمق</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-leaf"></i>
+        </div>
+        <div class="stat-number">100%</div>
+        <div class="stat-label">بيئة طبيعية نقية</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2>ما يميز بحيرة البردويل</h2>
+      <p>مزايا فريدة تجعلها وجهة عالمية للثروة السمكية</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h3>ثروة سمكية فاخرة</h3>
+        <p>
+          تشتهر بإنتاج أنواع فاخرة من الأسماك المخصصة للتصدير مثل الدنيس،
+          القاروص، سمك موسى، الوقار، الجمبري والكابوريا.
+        </p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-tree"></i>
+        </div>
+        <h3>أهمية بيئية فريدة</h3>
+        <p>
+          تضم محمية الزرانيق، محطة هامة للطيور المهاجرة مع تنوع بيولوجي استثنائي
+          يحظى بحماية دولية.
+        </p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3>خطة تطوير طموحة</h3>
+        <p>
+          تشهد البحيرة في 2026 أعمال تطوير شاملة تهدف لزيادة إنتاجيتها إلى 50
+          ألف طن سنوياً مع تحسين البنية التحتية.
+        </p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-recycle"></i>
+        </div>
+        <h3>إدارة مستدامة</h3>
+        <p>
+          تطبيق نظام إغلاق موسمي لمدة 4 أشهر للسماح بتكاثر الأسماك ونمو الزريعة،
+          مع تطوير الممرات المائية والبواغيز.
+        </p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-globe"></i>
+        </div>
+        <h3>جودة عالمية</h3>
+        <p>
+          تُعتبر من أنقى مصادر الأسماك عالمياً بفضل النظام البيئي الطبيعي
+          والمياه النظيفة غير الملوثة.
+        </p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3>دعم المجتمع المحلي</h3>
+        <p>
+          توفير فرص عمل لآلاف الصيادين والعاملين في القطاع السمكي مع تحسين مستوى
+          المعيشة في سيناء.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fish Species Section -->
+<section class="info-section alt-bg">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2>أهم أنواع الأسماك</h2>
+      <p>تتميز بحيرة البردويل بتنوع بيولوجي فريد وإنتاج أنواع فاخرة</p>
+    </div>
+
+    <div class="info-grid intro-grid reveal">
+      <div class="info-card">
+        <span class="tag">أسماك فاخرة</span>
+        <h4>الدنيس (Seabream)</h4>
+        <p>
+          من أفخر أنواع الأسماك في البحيرة، يتميز بجودته العالية وطعمه المميز،
+          ويعتبر من أهم الأنواع المطلوبة للتصدير للأسواق الأوروبية.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">تصدير</span>
+        <h4>القاروص (Seabass)</h4>
+        <p>
+          يحظى بطلب كبير في الأسواق العالمية والمحلية، يتميز بقيمة غذائية عالية
+          ويعتبر من الأسماك الرئيسية في إنتاج البحيرة.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">قيمة اقتصادية</span>
+        <h4>سمك موسى (Sole)</h4>
+        <p>
+          من الأسماك ذات القيمة الاقتصادية العالية، يعيش في القاع الرملي للبحيرة
+          ويتميز بمذاقه الفريد وجودة لحمه.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">قشريات</span>
+        <h4>الجمبري والكابوريا</h4>
+        <p>
+          تنتج البحيرة أجود أنواع الجمبري والكابوريا، والتي تعتمد على الغذاء
+          الطبيعي في البحيرة مما يكسبها نكهة مميزة.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">أنواع أخرى</span>
+        <h4>الوقار واللوت</h4>
+        <p>
+          من الأسماك الكبيرة التي تتميز بها البحيرة، وتجذب هواة الصيد ومحبي
+          الأسماك الفاخرة.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">العائلة البورية</span>
+        <h4>البوري والطوبار</h4>
+        <p>
+          تعتبر البحيرة بيئة مثالية لنمو العائلة البورية (البوري، الطوبار،
+          الدهبان)، وتتميز بإنتاج الفسيخ العرايشي الشهير.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fishing Methods Section -->
+<section class="info-section">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2>حرف الصيد التقليدية</h2>
+      <p>نستخدم طرق صيد صديقة للبيئة للحفاظ على الثروة السمكية</p>
+    </div>
+
+    <div class="info-grid reveal">
+      <div class="info-card">
+        <span class="tag">الأكثر شيوعاً</span>
+        <h4>الدبة</h4>
+        <p>
+          شبكة مكونة من ثلاث طبقات بارتفاع 1-2 متر وطول 750 متراً. تعتبر طريقة
+          صديقة للبيئة تسمح بجمع كميات كبيرة دون الإضرار بالبيئة البحرية.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">للمسافات القريبة</span>
+        <h4>الدبدببة</h4>
+        <p>
+          شبكة ثلاثية الطبقات بطول 400 متر، فعالة للصيد على مسافات قريبة وتستخدم
+          بشكل واسع من قبل الصيادين المحليين.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">سهلة الاستخدام</span>
+        <h4>البوص</h4>
+        <p>
+          شبكة ذات طبقة واحدة بعرض 5 أمتار وطول 800 متر. تتميز بسهولة التحكم
+          والاستعمال وتناسب أنواع محددة من الأسماك.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">متخصص</span>
+        <h4>الكابوريا</h4>
+        <p>
+          شباك خاصة بارتفاع متر واحد، مصممة خصيصاً لصيد القشريات (الكابوريا) دون
+          الإضرار بالأسماك الأخرى.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">للأسماك الكبيرة</span>
+        <h4>السنار</h4>
+        <p>
+          خيوط نايلون بطول 300 متر مع خطافات بأبعاد متساوية. تستخدم انتقائياً
+          لصيد الأسماك الكبيرة ذات القيمة العالية.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <span class="tag">للمياه الضحلة</span>
+        <h4>الدهبانة</h4>
+        <p>
+          شبكة مكونة من جزئين لا يزيد طول كل منهما عن 400 متر، مثالية للصيد في
+          المناطق الضحلة التي تتميز بها البحيرة.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Development Projects Details -->
+<section class="info-section alt-bg">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2>مشاريع التطوير الشاملة</h2>
+      <p>خطة طموحة لتحويل البحيرة إلى صرح اقتصادي عالمي</p>
+    </div>
+
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-hard-hat"></i></div>
+        <h3>البنية التحتية</h3>
+        <p>
+          تطوير البواغيز (1 و 2) لتقليل الملوحة، إعادة رصف المراسي (التلول،
+          إغزيوان، النصر)، وإنشاء قنوات شعاعية لتحسين تدفق المياه.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-home"></i></div>
+        <h3>قرى الصيادين</h3>
+        <p>
+          إنشاء 4 تجمعات سكنية في إغزيوان تضم 200 منزل مدعوم، مع توفير كافة
+          الخدمات (مدارس، وحدة صحية، مركز شباب، مسجد).
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-industry"></i></div>
+        <h3>التصنيع والخدمات</h3>
+        <p>
+          إنشاء مصنع لإنتاج ألواح الثلج، وحدة لإنتاج أدوات التعبئة والتغليف،
+          ومظلات حديثة لفرز وتعبئة الأسماك لضمان أعلى معايير الجودة.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Photo Gallery Section -->
+<section class="gallery-section">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2 style="color: white">معرض صور البحيرة</h2>
+      <p style="color: rgba(255, 255, 255, 0.8)">
+        لقطات حية تنقل جمال الطبيعة وكفاح الصيادين
+      </p>
+    </div>
+
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/295875-بحيرة-البردويل--اهم-بحيرات-مصر-.jpeg"
+          loading="lazy"
+          alt="بحيرة البردويل"
+        />
+        <div class="gallery-caption">
+          <h5>جمال الطبيعة في بحيرة البردويل</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/330232-الصيادون-بالبحيرة-.jpeg"
+          loading="lazy"
+          alt="الصيادون"
+        />
+        <div class="gallery-caption">
+          <h5>الصيادون في قلب البحيرة</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/235834-الصيد-ببحيرة-البردويل-.jpeg"
+          loading="lazy"
+          alt="الصيد"
+        />
+        <div class="gallery-caption">
+          <h5>عمليات الصيد اليومية</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/390915-التجهيز-لرحلة-صيد-.jpeg"
+          loading="lazy"
+          alt="تجهيز المراكب"
+        />
+        <div class="gallery-caption">
+          <h5>التجهيز لرحلة الصيد</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/247612-ارزراق-وخير-.jpeg"
+          loading="lazy"
+          alt="لإرزاق والخير"
+        />
+        <div class="gallery-caption">
+          <h5>خيرات البحيرة</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/116778-مراكب-الصيد.JPG"
+          loading="lazy"
+          alt="مراكب الصيد"
+        />
+        <div class="gallery-caption">
+          <h5>أسطول الصيد التقليدي</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/309001-صيادون-السمك-.jpeg"
+          loading="lazy"
+          alt="صيادون"
+        />
+        <div class="gallery-caption">
+          <h5>سواعد مصرية أصيلة</h5>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img
+          src="https://img.youm7.com/ArticleImgs/2024/10/31/148422-ساحل-البردويل.JPG"
+          loading="lazy"
+          alt="الساحل"
+        />
+        <div class="gallery-caption">
+          <h5>سحر الساحل السيناوي</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline Section -->
+<section class="timeline-section">
+  <div class="timeline-content">
+    <div class="container-custom">
+      <div class="timeline-header">
+        <h2>مسيرة التطوير</h2>
+      </div>
+
+      <div class="timeline-items">
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content-box">
+            <h3>تسليم الإدارة</h3>
+            <p>
+              تسلم جهاز مستقبل مصر للتنمية المستدامة إدارة وتطوير بحيرة البردويل
+              في نهاية العام، مع وضع خطة تطوير شاملة.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2025</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content-box">
+            <h3>بدء التطوير</h3>
+            <p>
+              إطلاق أعمال تطوير البنية التحتية والممرات المائية، مع التنسيق
+              المكثف مع جمعيات الصيادين لضمان نجاح المشروع.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2026</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content-box">
+            <h3>نتائج ملموسة</h3>
+            <p>
+              تطبيق معايير الجودة العالمية، زيادة الإنتاجية، وتنمية المجتمع
+              المحلي المحيط بالبحيرة.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leadership Section -->
+<section class="leadership-section">
+  <div class="container-custom">
+    <div class="section-header reveal">
+      <h2>القيادة والإدارة</h2>
+      <p>فريق من الخبراء يقود مشروع التنمية المستدامة</p>
+    </div>
+
+    <div class="leadership-grid">
+      <div class="leader-card reveal">
+        <div
+          class="leader-image"
+          style="
+            background-image: url('/imgs/info/bahaaElghnam.jpg');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
+        <div class="leader-info">
+          <h3>د. بهاء الغنام</h3>
+          <div class="title">المدير التنفيذي</div>
+          <p>
+            عقيد ومدير تنفيذي لجهاز مستقبل مصر للتنمية المستدامة، يقود الرؤية
+            الاستراتيجية لتطوير بحيرة البردويل.
+          </p>
+        </div>
+      </div>
+
+      <div class="leader-card reveal">
+        <div
+          class="leader-image"
+          style="
+            background-image: url('/imgs/info/PictureLeader.png');
+            background-size: cover;
+            background-position: top;
+          "
+        ></div>
+        <div class="leader-info">
+          <h3>اللواء عصام الحسيني</h3>
+          <div class="title">مدير بحيرة البردويل</div>
+          <p>
+            مسؤول عن التنسيق الميداني والإشراف على تنفيذ المشاريع التطويرية في
+            منطقة سيناء. يتولى الإشراف الميداني والتنسيق المباشر مع جمعيات
+            الصيادين، وتطبيق قوانين الصيد المستدام.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- background-image:
+  linear-gradient(rgb(0 0 255 / 0.5), rgb(255 255 0 / 0.5)),
+  url("/shared-assets/images/examples/lizard.png"); -->
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container-custom">
+    <h2>كن جزءاً من المستقبل المستدام</h2>
+    <p>انضم إلينا في رحلة التنمية وحماية البيئة البحرية</p>
+    <div class="cta-buttons">
+      <a href="/contact" class="btn btn-primary-custom">تواصل معنا</a>
+      <a href="/apply" class="btn btn-secondary-custom"
+        >تقدم للحصول على ترخيص</a
+      >
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Scroll Animation
+    const reveals = document.querySelectorAll('.reveal');
+
+    const revealOnScroll = () => {
+      const windowHeight = window.innerHeight;
+      const elementVisible = 150;
+
+      reveals.forEach(reveal => {
+        const elementTop = reveal.getBoundingClientRect().top;
+
+        if (elementTop < windowHeight - elementVisible) {
+          reveal.classList.add('active');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', revealOnScroll);
+    // Trigger once on load
+    revealOnScroll();
+
+    // Scroll Indicator
+    document
+      .querySelector('.scroll-indicator')
+      ?.addEventListener('click', () => {
+        const introSection = document.querySelector('.intro-section');
+        if (introSection) {
+          introSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+  });
+</script>

@@ -1,0 +1,756 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    
+    <!-- Logo and Brand -->
+    <div class="navbar-brand">
+      <img src="/images/logo.png" alt="بحيرة البردويل" class="navbar-logo">
+      <div class="navbar-brand-text">
+        <h1>جهاز مستقبل مصر</h1>
+        <p>منصة تراخيص بحيرة البردويل</p>
+      </div>
+    </div>
+    
+    <!-- Desktop Navigation -->
+    <ul class="navbar-menu">
+      <li class="navbar-item <%= currentPage === 'home' ? 'active' : '' %>">
+        <a href="/" class="navbar-link">
+          <i class="fas fa-home"></i>
+          <span>الرئيسية</span>
+        </a>
+      </li>
+      
+      <li class="navbar-item <%= currentPage === 'fishermen' ? 'active' : '' %>">
+        <a href="/licenses/fishermen" class="navbar-link">
+          <i class="fas fa-fish"></i>
+          <span>تراخيص الصيادين</span>
+        </a>
+      </li>
+      
+      <li class="navbar-item <%= currentPage === 'boats' ? 'active' : '' %>">
+        <a href="/licenses/boats" class="navbar-link">
+          <i class="fas fa-ship"></i>
+          <span>تراخيص المراكب</span>
+        </a>
+      </li>
+      
+      <li class="navbar-item <%= currentPage === 'news' ? 'active' : '' %>">
+        <a href="/news" class="navbar-link">
+          <i class="fas fa-newspaper"></i>
+          <span>الأخبار</span>
+        </a>
+      </li>
+      
+      <li class="navbar-item <%= currentPage === 'contact' ? 'active' : '' %>">
+        <a href="/contact" class="navbar-link">
+          <i class="fas fa-phone"></i>
+          <span>اتصل بنا</span>
+        </a>
+      </li>
+    </ul>
+    
+    <!-- User Actions -->
+    <div class="navbar-actions">
+      <% if (user) { %>
+        
+        <!-- Notifications -->
+        <div class="navbar-notifications">
+          <button class="navbar-notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <% if (notifications && notifications.unread > 0) { %>
+              <span class="notification-badge"><%= notifications.unread %></span>
+            <% } %>
+          </button>
+          
+          <!-- Notifications Dropdown -->
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-header">
+              <h3>الإشعارات</h3>
+              <button class="btn-text" onclick="markAllAsRead()">تحديد الكل كمقروء</button>
+            </div>
+            
+            <div class="notifications-list">
+              <% if (notifications && notifications.items && notifications.items.length > 0) { %>
+                <% notifications.items.forEach(notification => { %>
+                  <a href="<%= notification.link %>" class="notification-item <%= notification.read ? '' : 'unread' %>">
+                    <div class="notification-icon <%= notification.type %>">
+                      <i class="fas fa-<%= notification.icon %>"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p class="notification-title"><%= notification.title %></p>
+                      <p class="notification-text"><%= notification.message %></p>
+                      <span class="notification-time"><%= notification.time %></span>
+                    </div>
+                  </a>
+                <% }); %>
+              <% } else { %>
+                <div class="notifications-empty">
+                  <i class="fas fa-bell-slash"></i>
+                  <p>لا توجد إشعارات جديدة</p>
+                </div>
+              <% } %>
+            </div>
+            
+            <div class="notifications-footer">
+              <a href="/notifications" class="btn-text">عرض جميع الإشعارات</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- User Menu -->
+        <div class="navbar-user">
+          <button class="navbar-user-btn" id="userMenuBtn">
+            <img src="<%= user.avatar || '/images/default-avatar.png' %>" alt="<%= user.name %>" class="user-avatar">
+            <span class="user-name"><%= user.name %></span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          
+          <!-- User Dropdown -->
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <img src="<%= user.avatar || '/images/default-avatar.png' %>" alt="<%= user.name %>" class="user-avatar-large">
+              <h4><%= user.name %></h4>
+              <p class="text-muted"><%= user.email %></p>
+            </div>
+            
+            <div class="user-dropdown-menu">
+              <a href="/dashboard" class="user-dropdown-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>لوحة التحكم</span>
+              </a>
+              
+              <a href="/profile" class="user-dropdown-item">
+                <i class="fas fa-user"></i>
+                <span>الملف الشخصي</span>
+              </a>
+              
+              <a href="/settings" class="user-dropdown-item">
+                <i class="fas fa-cog"></i>
+                <span>الإعدادات</span>
+              </a>
+              
+              <hr class="dropdown-divider">
+              
+              <a href="/logout" class="user-dropdown-item text-danger">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>تسجيل الخروج</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+      <% } else { %>
+        
+        <!-- Login/Register Buttons -->
+        <div class="navbar-auth">
+          <a href="/login" class="btn btn-outline">تسجيل الدخول</a>
+          <a href="/register" class="btn btn-primary">إنشاء حساب</a>
+        </div>
+        
+      <% } %>
+      
+      <!-- Mobile Menu Toggle -->
+      <button class="navbar-mobile-toggle" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    
+  </div>
+  
+  <!-- Mobile Menu -->
+  <div class="navbar-mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <h3>القائمة</h3>
+      <button class="mobile-menu-close" id="mobileMenuClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <ul class="mobile-menu-list">
+      <li>
+        <a href="/" class="mobile-menu-item <%= currentPage === 'home' ? 'active' : '' %>">
+          <i class="fas fa-home"></i>
+          <span>الرئيسية</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/licenses/fishermen" class="mobile-menu-item <%= currentPage === 'fishermen' ? 'active' : '' %>">
+          <i class="fas fa-fish"></i>
+          <span>تراخيص الصيادين</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/licenses/boats" class="mobile-menu-item <%= currentPage === 'boats' ? 'active' : '' %>">
+          <i class="fas fa-ship"></i>
+          <span>تراخيص المراكب</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/news" class="mobile-menu-item <%= currentPage === 'news' ? 'active' : '' %>">
+          <i class="fas fa-newspaper"></i>
+          <span>الأخبار</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/contact" class="mobile-menu-item <%= currentPage === 'contact' ? 'active' : '' %>">
+          <i class="fas fa-phone"></i>
+          <span>اتصل بنا</span>
+        </a>
+      </li>
+      
+      <% if (user) { %>
+        <li class="mobile-menu-divider"></li>
+        
+        <li>
+          <a href="/dashboard" class="mobile-menu-item">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>لوحة التحكم</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/profile" class="mobile-menu-item">
+            <i class="fas fa-user"></i>
+            <span>الملف الشخصي</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/logout" class="mobile-menu-item text-danger">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>تسجيل الخروج</span>
+          </a>
+        </li>
+      <% } else { %>
+        <li class="mobile-menu-divider"></li>
+        
+        <li>
+          <a href="/login" class="mobile-menu-item">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>تسجيل الدخول</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/register" class="mobile-menu-item">
+            <i class="fas fa-user-plus"></i>
+            <span>إنشاء حساب</span>
+          </a>
+        </li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
+
+<style>
+/* ==========================================
+   NAVBAR STYLES
+   ========================================== */
+
+.navbar {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00897B 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Brand */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  padding: 5px;
+}
+
+.navbar-brand-text h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.navbar-brand-text p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+/* Menu */
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.navbar-link:hover,
+.navbar-item.active .navbar-link {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* Actions */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Notifications */
+.navbar-notifications {
+  position: relative;
+}
+
+.navbar-notification-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navbar-notification-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  background: #F44336;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.125rem 0.375rem;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Notifications Dropdown */
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 350px;
+  max-height: 500px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notifications-dropdown.show {
+  display: flex;
+}
+
+.notifications-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notifications-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #212121;
+}
+
+.notifications-list {
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.notification-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  transition: background 0.2s;
+  border-right: 3px solid transparent;
+}
+
+.notification-item:hover {
+  background: #f5f5f5;
+}
+
+.notification-item.unread {
+  background: #E3F2FD;
+  border-right-color: #2196F3;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon.success { background: #E8F5E9; color: #4CAF50; }
+.notification-icon.info { background: #E3F2FD; color: #2196F3; }
+.notification-icon.warning { background: #FFF3E0; color: #FF9800; }
+.notification-icon.danger { background: #FFEBEE; color: #F44336; }
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: #212121;
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9375rem;
+}
+
+.notification-text {
+  color: #757575;
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.notification-time {
+  color: #9E9E9E;
+  font-size: 0.8125rem;
+}
+
+.notifications-empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #9E9E9E;
+}
+
+.notifications-empty i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.notifications-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+/* User Menu */
+.navbar-user {
+  position: relative;
+}
+
+.navbar-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navbar-user-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 280px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: none;
+  overflow: hidden;
+}
+
+.user-dropdown.show {
+  display: block;
+}
+
+.user-dropdown-header {
+  padding: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1e3c72 0%, #00897B 100%);
+  color: white;
+}
+
+.user-avatar-large {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.75rem;
+}
+
+.user-dropdown-header h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.125rem;
+}
+
+.user-dropdown-header p {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.user-dropdown-menu {
+  padding: 0.5rem 0;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: #424242;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.user-dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+.user-dropdown-item.text-danger {
+  color: #F44336;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* Auth Buttons */
+.navbar-auth {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Mobile Toggle */
+.navbar-mobile-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Mobile Menu */
+.navbar-mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  height: 100vh;
+  background: white;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.navbar-mobile-menu.show {
+  right: 0;
+}
+
+.mobile-menu-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #1e3c72 0%, #00897B 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-menu-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.mobile-menu-list {
+  list-style: none;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: #424242;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item.active {
+  background: #f5f5f5;
+  color: #2196F3;
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  background: #eee;
+  margin: 0.5rem 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .navbar-menu {
+    display: none;
+  }
+  
+  .navbar-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 1rem;
+  }
+  
+  .navbar-brand-text h1 {
+    font-size: 1rem;
+  }
+  
+  .navbar-brand-text p {
+    font-size: 0.75rem;
+  }
+  
+  .navbar-auth {
+    display: none;
+  }
+  
+  .notifications-dropdown,
+  .user-dropdown {
+    left: auto;
+    right: 0;
+  }
+}
+</style>
+
+<script>
+// Notification Dropdown Toggle
+document.getElementById('notificationBtn')?.addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notificationsDropdown');
+  dropdown.classList.toggle('show');
+  document.getElementById('userDropdown')?.classList.remove('show');
+});
+
+// User Menu Dropdown Toggle
+document.getElementById('userMenuBtn')?.addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('userDropdown');
+  dropdown.classList.toggle('show');
+  document.getElementById('notificationsDropdown')?.classList.remove('show');
+});
+
+// Mobile Menu Toggle
+document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+  document.getElementById('mobileMenu').classList.add('show');
+});
+
+document.getElementById('mobileMenuClose')?.addEventListener('click', function() {
+  document.getElementById('mobileMenu').classList.remove('show');
+});
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.navbar-notifications')) {
+    document.getElementById('notificationsDropdown')?.classList.remove('show');
+  }
+  if (!e.target.closest('.navbar-user')) {
+    document.getElementById('userDropdown')?.classList.remove('show');
+  }
+});
+
+// Mark all notifications as read
+function markAllAsRead() {
+  // Add your AJAX call here
+  console.log('Marking all as read...');
+}
+</script>
