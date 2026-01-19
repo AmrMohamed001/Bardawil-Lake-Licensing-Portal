@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الإشعارات - منصة تراخيص بحيرة البردويل</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+<body>
+  <%- include('partials/spinner') %>
+  <%- include('partials/navbar') %>
+
+  <div class="notifications-page">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="/dashboard"><i class="fas fa-home"></i> لوحة التحكم</a>
+        <span>/</span>
+        <span>الإشعارات</span>
+      </div>
+
+      <div class="page-header">
+        <h1><i class="fas fa-bell"></i> الإشعارات</h1>
+      </div>
+
+      <div class="notifications-card card">
+        <% if (notifications && notifications.length > 0) { %>
+          <div class="notifications-list">
+            <% notifications.forEach(notification => { %>
+              <div class="notification-item <%= notification.isRead ? '' : 'unread' %>">
+                <div class="notification-icon">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                  <p class="notification-text"><%= notification.message %></p>
+                  <span class="notification-time"><%= new Date(notification.createdAt).toLocaleDateString('ar-EG') %></span>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h3>لا توجد إشعارات</h3>
+            <p>ستظهر هنا الإشعارات المتعلقة بطلباتك وتحديثات النظام</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+<style>
+.notifications-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 200px);
+  background: #FAFAFA;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: #757575;
+}
+
+.breadcrumb a {
+  color: #1e3c72;
+  text-decoration: none;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212121;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page-header h1 i {
+  color: #1e3c72;
+}
+
+.notifications-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+.notifications-list {
+  padding: 0;
+}
+
+.notification-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background: #fafafa;
+}
+
+.notification-item.unread {
+  background: #e3f2fd;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-text {
+  color: #212121;
+  font-weight: 500;
+  margin: 0 0 0.25rem 0;
+}
+
+.notification-time {
+  font-size: 0.8125rem;
+  color: #757575;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #757575;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #424242;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+</body>
+</html>

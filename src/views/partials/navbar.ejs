@@ -1,0 +1,435 @@
+<nav class="navbar">
+  <div class="navbar-container">
+
+    <!-- Logo and Brand -->
+    <a href="/" class="navbar-brand">
+      <img src="/imgs/logo.png" alt="بحيرة البردويل" class="navbar-logo">
+      <div class="navbar-brand-text">
+        <h1>جهاز مستقبل مصر</h1>
+        <p>منصة تراخيص بحيرة البردويل</p>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <ul class="navbar-menu">
+      <li class="navbar-item">
+        <a href="/" class="navbar-link">
+          <i class="fas fa-home"></i>
+          <span>الرئيسية</span>
+        </a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="/services" class="navbar-link">
+          <i class="fas fa-fish"></i>
+          <span>الخدمات</span>
+        </a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="/about" class="navbar-link">
+          <i class="fas fa-info-circle"></i>
+          <span>عن البحيرة</span>
+        </a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="/news" class="navbar-link">
+          <i class="fas fa-newspaper"></i>
+          <span>الأخبار</span>
+        </a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="/contact" class="navbar-link">
+          <i class="fas fa-phone"></i>
+          <span>اتصل بنا</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- User Actions -->
+    <div class="navbar-actions">
+      <% if (locals.user) { %>
+
+        <!-- Notifications -->
+        <div class="navbar-notifications">
+          <a href="/notifications" class="navbar-notification-btn" title="الإشعارات">
+            <i class="fas fa-bell"></i>
+          </a>
+        </div>
+
+        <!-- User Menu -->
+        <div class="navbar-user">
+          <button class="navbar-user-btn" id="userMenuBtn">
+            <div class="user-avatar-placeholder">
+              <% if (user.profilePicture) { %>
+                <img src="/uploads/<%= user.profilePicture %>" alt="Profile"
+                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <% } else { %>
+                  <%= user.firstNameAr ? user.firstNameAr.charAt(0) : 'م' %>
+                    <% } %>
+            </div>
+            <span class="user-name">
+              <%= user.firstNameAr %>
+                <%= user.lastNameAr %>
+            </span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+
+          <!-- User Dropdown -->
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="user-avatar-large">
+                <% if (user.profilePicture) { %>
+                  <img src="/uploads/<%= user.profilePicture %>" alt="Profile"
+                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                  <% } else { %>
+                    <%= user.firstNameAr ? user.firstNameAr.charAt(0) : 'م' %>
+                      <% } %>
+              </div>
+              <h4>
+                <%= user.firstNameAr %>
+                  <%= user.lastNameAr %>
+              </h4>
+              <p>
+                <%= user.nationalId %>
+              </p>
+            </div>
+
+            <div class="user-dropdown-menu">
+              <% if (user.role==='admin' || user.role==='super_admin' ) { %>
+                <a href="/admin-dashboard" class="user-dropdown-item">
+                  <i class="fas fa-cog"></i>
+                  <span>لوحة الإدارة</span>
+                </a>
+                <% } else { %>
+                  <a href="/dashboard" class="user-dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>لوحة التحكم</span>
+                  </a>
+                  <% } %>
+
+                    <a href="/profile" class="user-dropdown-item">
+                      <i class="fas fa-user"></i>
+                      <span>الملف الشخصي</span>
+                    </a>
+
+                    <hr class="dropdown-divider">
+
+                    <a href="#" class="user-dropdown-item text-danger" id="logoutBtn">
+                      <i class="fas fa-sign-out-alt"></i>
+                      <span>تسجيل الخروج</span>
+                    </a>
+            </div>
+          </div>
+        </div>
+
+        <% } else { %>
+
+          <!-- Login/Register Buttons -->
+          <div class="navbar-auth">
+            <a href="/login" class="btn btn-outline">تسجيل الدخول</a>
+            <a href="/register" class="btn btn-primary">إنشاء حساب</a>
+          </div>
+
+          <% } %>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="navbar-mobile-toggle" id="mobileMenuBtn">
+              <i class="fas fa-bars"></i>
+            </button>
+    </div>
+
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00897B 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+  }
+
+  .navbar-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    padding: 5px;
+    object-fit: contain;
+  }
+
+  .navbar-brand-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .navbar-brand-text p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  .navbar-menu {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .navbar-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .navbar-notification-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+  }
+
+  .navbar-notification-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar-user {
+    position: relative;
+  }
+
+  .navbar-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 999px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .navbar-user-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .user-avatar-placeholder {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .user-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 0 auto 0.75rem;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 280px;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: none;
+    overflow: hidden;
+  }
+
+  .user-dropdown.show {
+    display: block;
+  }
+
+  .user-dropdown-header {
+    padding: 1.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, #1e3c72 0%, #00897B 100%);
+    color: white;
+  }
+
+  .user-dropdown-header h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.125rem;
+  }
+
+  .user-dropdown-header p {
+    margin: 0;
+    font-size: 0.875rem;
+    opacity: 0.9;
+  }
+
+  .user-dropdown-menu {
+    padding: 0.5rem 0;
+  }
+
+  .user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: #424242;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .user-dropdown-item:hover {
+    background: #f5f5f5;
+  }
+
+  .user-dropdown-item.text-danger {
+    color: #F44336;
+  }
+
+  .dropdown-divider {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid #eee;
+  }
+
+  .navbar-auth {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .navbar-mobile-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 1024px) {
+    .navbar-menu {
+      display: none;
+    }
+
+    .navbar-mobile-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-name {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .navbar-container {
+      padding: 1rem;
+    }
+
+    .navbar-brand-text h1 {
+      font-size: 1rem;
+    }
+
+    .navbar-brand-text p {
+      display: none;
+    }
+
+    .navbar-auth {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.getElementById('userMenuBtn')?.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('show');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.navbar-user')) {
+      document.getElementById('userDropdown')?.classList.remove('show');
+    }
+  });
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async function (e) {
+    e.preventDefault();
+    try {
+      await axios.post('/api/v1/auth/logout', {}, { withCredentials: true });
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  });
+</script>
+
+<!-- Token Refresh Utility - keeps user logged in -->
+<% if (locals.user) { %>
+  <script src="/js/token-refresh.js"></script>
+  <% } %>

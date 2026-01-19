@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - منصة تراخيص بحيرة البردويل</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+<body>
+  <%- include('partials/spinner') %>
+  <%- include('partials/navbar') %>
+
+  <div class="news-detail-page">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="/"><i class="fas fa-home"></i> الرئيسية</a>
+        <span>/</span>
+        <a href="/news">الأخبار</a>
+        <span>/</span>
+        <span><%= article.titleAr.substring(0, 30) %>...</span>
+      </div>
+
+      <div class="content-grid">
+        <!-- Main Article -->
+        <div class="article-main">
+          <div class="article-card card">
+            <% if (article.imagePath) { %>
+            <div class="article-image">
+              <img src="<%= article.imagePath %>" alt="<%= article.titleAr %>">
+            </div>
+            <% } %>
+            
+            <div class="article-content">
+              <div class="article-meta">
+                <span class="article-category badge badge-<%= article.category %>">
+                  <% if (article.category === 'announcement') { %>
+                    <i class="fas fa-bullhorn"></i> إعلان
+                  <% } else if (article.category === 'news') { %>
+                    <i class="fas fa-newspaper"></i> خبر
+                  <% } else if (article.category === 'alert') { %>
+                    <i class="fas fa-exclamation-triangle"></i> تنبيه
+                  <% } else { %>
+                    <i class="fas fa-sync"></i> تحديث
+                  <% } %>
+                </span>
+                <span class="article-date">
+                  <i class="fas fa-calendar"></i> <%= new Date(article.publishedAt || article.createdAt).toLocaleDateString('ar-EG') %>
+                </span>
+                <span class="article-views">
+                  <i class="fas fa-eye"></i> <%= article.viewCount || 0 %> مشاهدة
+                </span>
+              </div>
+
+              <h1><%= article.titleAr %></h1>
+              
+              <div class="article-body">
+                <%= article.contentAr %>
+              </div>
+
+              <!-- Share Buttons -->
+              <div class="article-share">
+                <span>شارك الخبر:</span>
+                <div class="share-buttons">
+                  <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(currentUrl) %>" target="_blank" class="share-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                  </a>
+                  <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(currentUrl) %>&text=<%= encodeURIComponent(article.titleAr) %>" target="_blank" class="share-btn twitter">
+                    <i class="fab fa-twitter"></i>
+                  </a>
+                  <a href="https://wa.me/?text=<%= encodeURIComponent(article.titleAr + ' - ' + currentUrl) %>" target="_blank" class="share-btn whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="/news" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-right"></i> العودة للأخبار
+          </a>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="news-sidebar">
+          <div class="sidebar-card card">
+            <h3><i class="fas fa-fire"></i> أخبار ذات صلة</h3>
+            <ul class="related-news-list">
+              <% relatedNews.forEach(item => { %>
+                <% if (item.id !== article.id) { %>
+                <li>
+                  <a href="/news/<%= item.id %>">
+                    <span class="news-title"><%= item.titleAr %></span>
+                    <small><%= new Date(item.publishedAt || item.createdAt).toLocaleDateString('ar-EG') %></small>
+                  </a>
+                </li>
+                <% } %>
+              <% }); %>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+<style>
+.news-detail-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 200px);
+  background: #FAFAFA;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: #757575;
+}
+
+.breadcrumb a {
+  color: #1e3c72;
+  text-decoration: none;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+}
+
+.article-card {
+  margin-bottom: 1.5rem;
+}
+
+.article-image {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.article-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-content {
+  padding: 2rem;
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.article-meta span {
+  font-size: 0.875rem;
+  color: #757575;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.article-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212121;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+.article-body {
+  font-size: 1.125rem;
+  line-height: 2;
+  color: #424242;
+  white-space: pre-line;
+}
+
+.article-share {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.share-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.share-btn:hover {
+  transform: scale(1.1);
+}
+
+.share-btn.facebook { background: #1877f2; }
+.share-btn.twitter { background: #1da1f2; }
+.share-btn.whatsapp { background: #25d366; }
+
+.sidebar-card {
+  padding: 1.5rem;
+}
+
+.sidebar-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-card h3 i {
+  color: #ff6b35;
+}
+
+.related-news-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.related-news-list li {
+  border-bottom: 1px solid #eee;
+}
+
+.related-news-list li:last-child {
+  border-bottom: none;
+}
+
+.related-news-list a {
+  display: block;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.related-news-list a:hover .news-title {
+  color: #1e3c72;
+}
+
+.news-title {
+  display: block;
+  color: #212121;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.related-news-list small {
+  color: #9e9e9e;
+}
+
+.badge-announcement { background: #e3f2fd; color: #1565c0; }
+.badge-news { background: #e8f5e9; color: #2e7d32; }
+.badge-alert { background: #fff3e0; color: #ef6c00; }
+.badge-update { background: #f3e5f5; color: #7b1fa2; }
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .article-content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .article-image {
+    height: 250px;
+  }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+</body>
+</html>

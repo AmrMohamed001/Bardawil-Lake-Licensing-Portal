@@ -1,0 +1,33 @@
+/* Custom Styles for Bardawil Portal */
+
+/* Helper for RTL Direction */
+html[dir='rtl'] body {
+  text-align: right;
+}
+
+/* Form Inputs Focus Ring Color */
+.focus\:ring-accent:focus {
+  --tw-ring-color: #2e9b9f;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Print Styles for PDF Views */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

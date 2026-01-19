@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'منصة تراخيص بحيرة البردويل' %></title>
+  
+  <!-- Google Fonts - Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
+  
+  <!-- Page-specific CSS -->
+  <% if (typeof styles !== 'undefined') { %>
+    <% styles.forEach(style => { %>
+      <link rel="stylesheet" href="<%= style %>">
+    <% }); %>
+  <% } %>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/logo.png">
+</head>
+<body>
+  <!-- Main Wrapper -->
+  <div class="app-wrapper">
+    
+    <!-- Navbar -->
+    <%- include('../partials/navbar') %>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+      
+      <!-- Sidebar (if logged in) -->
+      <% if (user) { %>
+        <%- include('../partials/sidebar') %>
+      <% } %>
+      
+      <!-- Page Content -->
+      <main class="page-content <%= user ? 'with-sidebar' : '' %>">
+        
+        <!-- Flash Messages -->
+        <% if (typeof success !== 'undefined' && success.length > 0) { %>
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <div class="alert-content">
+              <p><%= success %></p>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        <% } %>
+        
+        <% if (typeof error !== 'undefined' && error.length > 0) { %>
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle alert-icon"></i>
+            <div class="alert-content">
+              <p><%= error %></p>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        <% } %>
+        
+        <% if (typeof warning !== 'undefined' && warning.length > 0) { %>
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle alert-icon"></i>
+            <div class="alert-content">
+              <p><%= warning %></p>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        <% } %>
+        
+        <% if (typeof info !== 'undefined' && info.length > 0) { %>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle alert-icon"></i>
+            <div class="alert-content">
+              <p><%= info %></p>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        <% } %>
+        
+        <!-- Page Body -->
+        <%- body %>
+        
+      </main>
+      
+    </div>
+    
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+    
+  </div>
+  
+  <!-- Scripts -->
+  <script src="/js/main.js"></script>
+  
+  <!-- Page-specific scripts -->
+  <% if (typeof scripts !== 'undefined') { %>
+    <% scripts.forEach(script => { %>
+      <script src="<%= script %>"></script>
+    <% }); %>
+  <% } %>
+</body>
+</html>

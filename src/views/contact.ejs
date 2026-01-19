@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+  </head>
+  <body>
+    <%- include('partials/spinner') %> <%- include('partials/navbar') %>
+
+    <div class="contact-page">
+      <!-- Hero Section -->
+      <header class="contact-hero">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content" data-aos="fade-up">
+          <h1>تواصل معنا</h1>
+          <p>نحن هنا للمساعدة. لا تتردد في الاتصال بنا لأي استفسار.</p>
+        </div>
+      </header>
+
+      <div class="container main-content">
+        <!-- Contact Cards -->
+        <div class="contact-cards">
+          <div class="contact-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="icon-wrapper">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>العنوان</h3>
+            <p>بحيرة البردويل، شمال سيناء<br />جمهورية مصر العربية</p>
+          </div>
+
+          <div class="contact-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="icon-wrapper">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h3>الهاتف</h3>
+            <p class="ltr">+20 68 123 4567</p>
+            <p class="ltr">+20 10 987 6543</p>
+          </div>
+
+          <div class="contact-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="icon-wrapper">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h3>البريد الإلكتروني</h3>
+            <p>info@bardawil-lake.eg</p>
+            <p>support@bardawil-lake.eg</p>
+          </div>
+        </div>
+
+        <div class="grid-layout">
+          <!-- Contact Form -->
+          <div class="form-wrapper card" data-aos="fade-right">
+            <div class="section-header">
+              <h2>أرسل لنا رسالة</h2>
+              <p>سقوم فريقنا بالرد عليك في أقرب وقت ممكن</p>
+            </div>
+
+            <form id="contactForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>الاسم بالكامل</label>
+                  <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="name"
+                      required
+                      placeholder="أدخل اسمك الكريم"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>البريد الإلكتروني</label>
+                  <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      required
+                      placeholder="example@email.com"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>موضوع الرسالة</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-tag"></i>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="subject"
+                    required
+                    placeholder="كيف يمكننا مساعدتك؟"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>نص الرسالة</label>
+                <div class="input-with-icon textarea-icon">
+                  <i class="fas fa-comment-alt"></i>
+                  <textarea
+                    class="form-control"
+                    name="message"
+                    rows="5"
+                    required
+                    placeholder="اكتب تفاصيل استفسارك هنا..."
+                  ></textarea>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="fas fa-paper-plane"></i> إرسال الرسالة
+              </button>
+            </form>
+          </div>
+
+          <!-- Map -->
+          <div class="map-wrapper card" data-aos="fade-left">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110550.41597464082!2d33.159333550259834!3d31.12788544923597!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f9c66fe3af4047%3A0xe549bd8377b557fb!2sBardawil%20Lake!5e0!3m2!1sen!2seg!4v1705615789154!5m2!1sen!2seg"
+              width="100%"
+              height="100%"
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            >
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <script>
+      AOS.init({
+        duration: 800,
+        once: true,
+      });
+
+      document
+        .getElementById('contactForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          // Since we don't have a contact API yet, show a success simulation
+          const btn = this.querySelector('button[type="submit"]');
+          const originalText = btn.innerHTML;
+
+          btn.disabled = true;
+          btn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> تم الإرسال بنجاح';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+
+            // Show toast via main.js global function if available, or fallback
+            if (typeof showAlert === 'function') {
+              showAlert(
+                'success',
+                'شكراً لتواصلك معنا! سنقوم بالرد عليك قريباً.'
+              );
+            } else {
+              alert('شكراً لتواصلك معنا! سنقوم بالرد عليك قريباً.');
+            }
+
+            this.reset();
+
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+              btn.classList.add('btn-primary');
+              btn.classList.remove('btn-success');
+            }, 3000);
+          }, 1500);
+        });
+    </script>
+
+    <style>
+      .contact-page {
+        background: #fafafa;
+        min-height: 100vh;
+        padding-bottom: 4rem;
+      }
+
+      /* Hero */
+      .contact-hero {
+        background: url('/imgs/hero.png') no-repeat center center/cover;
+        position: relative;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        margin-bottom: -60px; /* Overlap effect */
+      }
+
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(30, 60, 114, 0.9) 0%,
+          rgba(0, 137, 123, 0.85) 100%
+        );
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-content h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+      }
+
+      /* Contact Cards */
+      .contact-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+        position: relative;
+        z-index: 3;
+      }
+
+      .contact-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 1rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+
+      .contact-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      .icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 1.75rem;
+        box-shadow: 0 10px 20px rgba(30, 60, 114, 0.2);
+      }
+
+      .contact-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #212121;
+      }
+
+      .contact-card p {
+        color: #616161;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .contact-card .ltr {
+        direction: ltr;
+      }
+
+      /* Grid Layout */
+      .grid-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2rem;
+      }
+
+      .card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .form-wrapper {
+        padding: 2.5rem;
+      }
+
+      .section-header {
+        margin-bottom: 2rem;
+      }
+
+      .section-header h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #1e3c72;
+        margin-bottom: 0.5rem;
+      }
+
+      .section-header p {
+        color: #757575;
+      }
+
+      /* Form Styles */
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #424242;
+      }
+
+      .input-with-icon {
+        position: relative;
+      }
+
+      .input-with-icon i {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #1e3c72;
+        opacity: 0.7;
+      }
+
+      .input-with-icon.textarea-icon i {
+        top: 1.5rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.875rem 3rem 0.875rem 1rem; /* Space for icon */
+        border: 2px solid #e0e0e0;
+        border-radius: 0.75rem;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: #fdfdfd;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #1e3c72;
+        box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.1);
+        background: white;
+      }
+
+      .btn-block {
+        width: 100%;
+      }
+
+      .btn-lg {
+        padding: 1rem;
+        font-size: 1.1rem;
+        border-radius: 0.75rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .btn-success {
+        background-color: #4caf50;
+        border-color: #4caf50;
+        color: white;
+      }
+
+      /* Map */
+      .map-wrapper {
+        min-height: 400px;
+        position: relative;
+      }
+
+      .map-wrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      @media (max-width: 992px) {
+        .grid-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .map-wrapper {
+          height: 400px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .contact-hero {
+          height: 250px;
+        }
+
+        .contact-hero h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </body>
+</html>

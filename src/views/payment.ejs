@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %> - منصة تراخيص بحيرة البردويل
+    </title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+    <style>
+        .payment-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00897b 100%);
+            padding: 2rem;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+        }
+
+        .payment-header img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .payment-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .amount-box {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .amount-box .label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-box .amount {
+            font-size: 3rem;
+            font-weight: 900;
+        }
+
+        .amount-box .currency {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .payment-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: right;
+        }
+
+        .order-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-info-row .label {
+            color: #757575;
+        }
+
+        .order-info-row .value {
+            font-weight: 600;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4);
+        }
+
+        .btn-pay:disabled {
+            background: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #757575;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #1e3c72;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            color: #757575;
+            font-size: 0.875rem;
+        }
+
+        .secure-badge i {
+            color: #4CAF50;
+        }
+
+        .loading-state {
+            display: none;
+        }
+
+        .loading-state.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .paymob-logo {
+            height: 30px;
+            opacity: 0.7;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-page">
+        <div class="payment-card">
+            <div class="payment-header">
+                <img src="/imgs/logo.png" alt="البردويل">
+                <h1>دفع رسوم الترخيص</h1>
+                <p>طلب رقم <%= application.applicationNumber %>
+                </p>
+                <div class="amount-box">
+                    <div class="label">المبلغ المطلوب</div>
+                    <div class="amount">
+                        <span class="currency">ج.م</span>
+                        <%= application.paymentAmount || 0 %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-body">
+                <div id="paymentForm">
+                    <div class="order-info">
+                        <div class="order-info-row">
+                            <span class="label">نوع الترخيص</span>
+                            <span class="value">
+                                <% if (application.applicationType==='fisherman' ) { %>صياد
+                                    <% } else if (application.applicationType==='boat' ) { %>مركب
+                                        <% } else if (application.applicationType==='vehicle' ) { %>سيارة
+                                            <% } else if (application.applicationType==='other' ) { %>أخرى
+                                                <% } else { %>
+                                                    <%= application.applicationType %>
+                                                        <% } %>
+                            </span>
+                        </div>
+                        <div class="order-info-row">
+                            <span class="label">الفئة</span>
+                            <span class="value">
+                                <%= application.licenseCategory %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button id="payButton" class="btn-pay" onclick="initiatePayment()">
+                        <i class="fas fa-lock"></i>
+                        الانتقال للدفع الآمن
+                    </button>
+
+                    <a href="/applications/<%= application.id %>" class="btn-back">
+                        <i class="fas fa-arrow-right"></i>
+                        العودة لتفاصيل الطلب
+                    </a>
+
+                    <div class="secure-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        دفع آمن ومشفر عبر Paymob
+                    </div>
+
+                    <img src="https://accept.paymob.com/images/paymob-logo.svg" alt="Paymob" class="paymob-logo"
+                        onerror="this.style.display='none'">
+                </div>
+
+                <div id="loadingState" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #424242; font-weight: 600;">جاري تحويلك لبوابة الدفع...</p>
+                    <p style="color: #757575; font-size: 0.875rem;">يرجى الانتظار</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script>
+        var applicationId = '<%= application.id %>';
+
+        function initiatePayment() {
+            var button = document.getElementById('payButton');
+            var form = document.getElementById('paymentForm');
+            var loading = document.getElementById('loadingState');
+
+            button.disabled = true;
+            form.style.display = 'none';
+            loading.classList.add('active');
+
+            axios.post('/api/v1/payment/initiate/' + applicationId)
+                .then(function (response) {
+                    if (response.data.data && response.data.data.paymentUrl) {
+                        // Redirect to Paymob hosted checkout
+                        window.location.href = response.data.data.paymentUrl;
+                    } else {
+                        throw new Error('لم يتم الحصول على رابط الدفع');
+                    }
+                })
+                .catch(function (error) {
+                    form.style.display = 'block';
+                    loading.classList.remove('active');
+                    button.disabled = false;
+                    alert(error.response?.data?.message || 'حدث خطأ أثناء بدء عملية الدفع. يرجى المحاولة مرة أخرى.');
+                });
+        }
+    </script>
+</body>
+
+</html>

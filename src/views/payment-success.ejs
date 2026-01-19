@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تم الدفع بنجاح - منصة تراخيص بحيرة البردويل</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+    <style>
+        .success-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+            padding: 2rem;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
+            color: white;
+            padding: 3rem 2rem;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon i {
+            font-size: 3rem;
+        }
+
+        .success-header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .success-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border: 2px solid #4CAF50;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box i {
+            font-size: 2rem;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+
+        .info-box p {
+            color: #1b5e20;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 600;
+        }
+
+        .order-details {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: right;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-row .label {
+            color: #757575;
+        }
+
+        .order-row .value {
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .btn-dashboard {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="success-page">
+        <div class="success-card">
+            <div class="success-header">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h1>تم الدفع بنجاح! 🎉</h1>
+                <p>شكراً لإتمام عملية الدفع</p>
+            </div>
+
+            <div class="success-body">
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <p>
+                        برجاء التوجه إلى قسم التراخيص في خلال <strong>7-12 يوم</strong> عمل لاستلام تصريحك.
+                        <br><br>
+                        شكراً لاستخدامك منصة تراخيص بحيرة البردويل! 🙏
+                    </p>
+                </div>
+
+                <% if (application) { %>
+                    <div class="order-details">
+                        <div class="order-row">
+                            <span class="label">رقم الطلب</span>
+                            <span class="value">
+                                <%= application.applicationNumber %>
+                            </span>
+                        </div>
+                        <div class="order-row">
+                            <span class="label">المبلغ المدفوع</span>
+                            <span class="value">
+                                <%= application.paymentAmount || 0 %> جنيه
+                            </span>
+                        </div>
+                        <div class="order-row">
+                            <span class="label">الحالة</span>
+                            <span class="value" style="color: #4CAF50;">✅ تم الدفع</span>
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <a href="/dashboard" class="btn-dashboard">
+                            <i class="fas fa-home"></i>
+                            الذهاب إلى لوحة التحكم
+                        </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto redirect to dashboard after 10 seconds
+        setTimeout(function () {
+            window.location.href = '/dashboard';
+        }, 10000);
+    </script>
+</body>
+
+</html>
