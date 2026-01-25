@@ -16,7 +16,7 @@
 <body>
     <%- include('../partials/spinner') %>
         <%- include('../partials/navbar') %>
-            <%- include('../partials/admin-sidebar', { currentPage: 'news' , pendingCount: 0 }) %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'news' , pendingCount: pendingCount || 0 }) %>
 
                 <div class="admin-page">
                     <div class="container">

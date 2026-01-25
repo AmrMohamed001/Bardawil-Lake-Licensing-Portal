@@ -288,7 +288,7 @@
 <body>
   <%- include('../partials/spinner') %>
     <%- include('../partials/navbar') %>
-      <%- include('../partials/admin-sidebar', { currentPage: 'audit' , pendingCount: 0 }) %>
+      <%- include('../partials/admin-sidebar', { currentPage: 'audit' , pendingCount: pendingCount || 0 }) %>
 
         <div class="audit-page">
           <div class="container">

@@ -319,7 +319,7 @@
 <body>
     <%- include('../partials/spinner') %>
         <%- include('../partials/navbar') %>
-            <%- include('../partials/admin-sidebar', { currentPage: 'pricing' , pendingCount: 0 }) %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'pricing' , pendingCount: pendingCount || 0 }) %>
 
                 <div class="pricing-page">
                     <div class="container">

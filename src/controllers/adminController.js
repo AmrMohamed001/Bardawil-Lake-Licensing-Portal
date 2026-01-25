@@ -2,6 +2,7 @@ const catchAsync = require('../utils/catchAsync');
 const adminService = require('../services/adminService');
 const pricingService = require('../services/pricingService');
 const AppError = require('../utils/appError');
+const { User } = require('../models');
 const path = require('path');
 
 /**

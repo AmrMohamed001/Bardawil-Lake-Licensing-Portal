@@ -168,7 +168,7 @@ exports.getAdminDashboardData = async () => {
     return {
         stats,
         recentApplications: result.applications,
-        pendingCount: stats.overview.new,
+        pendingCount: stats.overview.new + stats.overview.underReview,
     };
 };
 

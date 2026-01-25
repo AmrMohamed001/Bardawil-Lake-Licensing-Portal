@@ -2,6 +2,7 @@ const catchAsync = require('../utils/catchAsync');
 const viewService = require('../services/viewService');
 const adminService = require('../services/adminService'); // Kept for some direct calls if needed, or move all to viewService
 const { Application } = require('../models'); // Some counts are still used inline in legacy code? Let's check.
+const { Op } = require('sequelize');
 
 /**
  * View Controller - Handles server-side rendering of EJS views
@@ -137,26 +138,37 @@ exports.getProfile = catchAsync(async (req, res, next) => {
 
 exports.getAdminPricing = catchAsync(async (req, res, next) => {
   const prices = await viewService.getAdminPricingData();
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
 
   res.status(200).render('admin/pricing', {
     title: 'إعدادات التسعير',
     user: req.user,
     currentPage: 'pricing',
     prices,
+    pendingCount,
   });
 });
 
 exports.getAuditLogs = catchAsync(async (req, res, next) => {
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
+
   res.status(200).render('admin/audit', {
     title: 'سجل النشاطات',
     user: req.user,
     currentPage: 'audit',
+    pendingCount,
   });
 });
 
 exports.getAdminApplications = catchAsync(async (req, res, next) => {
   const result = await adminService.getAllApplications(req.query);
-  const pendingCount = await Application.count({ where: { status: 'received' } });
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
 
   res.status(200).render('admin/applications', {
     title: 'إدارة الطلبات',
@@ -206,6 +218,9 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
 
 exports.getSuperAdminDashboard = catchAsync(async (req, res, next) => {
   const data = await viewService.getSuperAdminDashboardData();
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
 
   res.status(200).render('admin/super-dashboard', {
     title: 'لوحة الإحصائيات المتقدمة',
@@ -216,11 +231,15 @@ exports.getSuperAdminDashboard = catchAsync(async (req, res, next) => {
     totalRevenue: data.totalRevenue,
     totalUsers: data.totalUsers,
     monthlyRevenue: data.monthlyRevenue,
+    pendingCount,
   });
 });
 
 exports.getAdminUsers = catchAsync(async (req, res, next) => {
   const data = await viewService.getAdminUsersData(req.query);
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
 
   res.status(200).render('admin/users', {
     title: 'إدارة المستخدمين',
@@ -229,11 +248,15 @@ exports.getAdminUsers = catchAsync(async (req, res, next) => {
     currentPage: 'users',
     users: data.users,
     pagination: data.pagination,
+    pendingCount,
   });
 });
 
 exports.getAdminNews = catchAsync(async (req, res, next) => {
   const data = await viewService.getAdminNewsData(req.query);
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
 
   res.status(200).render('admin/news', {
     title: 'إدارة الأخبار',
@@ -242,6 +265,7 @@ exports.getAdminNews = catchAsync(async (req, res, next) => {
     news: data.news,
     stats: data.stats,
     pagination: data.pagination,
+    pendingCount,
   });
 });
 

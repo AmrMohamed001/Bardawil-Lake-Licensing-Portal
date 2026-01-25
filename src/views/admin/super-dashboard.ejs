@@ -19,7 +19,8 @@
 
 <body>
     <%- include('../partials/spinner') %> <%- include('../partials/navbar') %>
-            <%- include('../partials/admin-sidebar', { currentPage: 'super-dashboard' , pendingCount: 0 }) %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'super-dashboard' , pendingCount: pendingCount || 0
+                }) %>
 
                 <div class="super-admin-page">
                     <div class="container">

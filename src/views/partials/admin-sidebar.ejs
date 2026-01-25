@@ -16,6 +16,17 @@
   </div>
 
   <nav class="sidebar-nav">
+    <!-- Home Link -->
+    <a href="/" class="sidebar-link <%= currentPage === 'home' ? 'active' : '' %>">
+      <div class="link-icon">
+        <i class="fas fa-home"></i>
+      </div>
+      <span class="link-text">الصفحة الرئيسية</span>
+      <div class="link-arrow">
+        <i class="fas fa-chevron-left"></i>
+      </div>
+    </a>
+
     <!-- Dashboard -->
     <a href="/admin-dashboard" class="sidebar-link <%= currentPage === 'dashboard' ? 'active' : '' %>">
       <div class="link-icon">
@@ -174,7 +185,7 @@
     color: white;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
     position: fixed;
     right: 0;
     top: 0;
@@ -252,6 +263,8 @@
     flex: 1;
     padding: 1.25rem 1rem;
     overflow-y: auto;
+    min-height: 0;
+    /* Important for flex overflow to work */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   }
@@ -421,6 +434,8 @@
     padding: 1.25rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    /* Prevent footer from shrinking */
   }
 
   .user-info {

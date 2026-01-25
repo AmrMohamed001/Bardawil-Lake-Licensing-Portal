@@ -1,8 +1,6 @@
 require('dotenv').config({ path: './src/config/config.env' });
 const app = require('./app');
 const { connectDB } = require('./config/db');
-
-// Import models to register associations
 require('./models');
 
 let server;

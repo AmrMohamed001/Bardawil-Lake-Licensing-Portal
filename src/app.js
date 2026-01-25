@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -5,13 +6,18 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-
 const AppError = require('./utils/appError');
 const globalErrorHandlingMiddleware = require('./middlewares/globalErrorHandlingMiddleware');
-
-const path = require('path');
-
-// ... (imports)
+/////////////////////////////////////////////////////////////////
+// ROUTE IMPORTS
+const viewRoutes = require('./routes/viewRoute');
+const authRoutes = require('./routes/authRoute');
+const applicationRoutes = require('./routes/applicationRoute');
+const adminRoutes = require('./routes/adminRoute');
+const notificationRoutes = require('./routes/notificationRoute');
+const userRoutes = require('./routes/userRoute');
+const publicRoutes = require('./routes/publicRoute');
+const paymentRoutes = require('./routes/paymentRoute');
 
 const app = express();
 
@@ -73,21 +79,6 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-
-/////////////////////////////////////////////////////////////////
-// ROUTE IMPORTS
-const viewRoutes = require('./routes/viewRoute');
-const authRoutes = require('./routes/authRoute');
-const applicationRoutes = require('./routes/applicationRoute');
-const adminRoutes = require('./routes/adminRoute');
-const notificationRoutes = require('./routes/notificationRoute');
-const userRoutes = require('./routes/userRoute');
-const publicRoutes = require('./routes/publicRoute');
-const paymentRoutes = require('./routes/paymentRoute');
-
-/////////////////////////////////////////////////////////////////
-// API ROOT (Optional: keep or remove depending on preference)
-// ...
 
 /////////////////////////////////////////////////////////////////
 // ROUTE MOUNTING

@@ -18,7 +18,7 @@
 <body>
     <%- include('../partials/spinner') %>
 
-        <%- include('../partials/admin-sidebar', { currentPage: 'users' , pendingCount: 0 }) %>
+        <%- include('../partials/admin-sidebar', { currentPage: 'users' , pendingCount: pendingCount || 0 }) %>
 
             <main class="admin-main">
                 <div class="admin-users-page">
@@ -199,6 +199,27 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- User Details Modal -->
+                <div class="modal-overlay" id="userModal" style="display: none;">
+                    <div class="modal" style="max-width: 550px;">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-user"></i> تفاصيل المستخدم</h3>
+                            <button class="modal-close" onclick="closeModal('userModal')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="userModalBody">
+                            <div class="user-detail-loading">
+                                <i class="fas fa-spinner fa-spin"></i> جاري التحميل...
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-secondary" onclick="closeModal('userModal')">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+
 
                 <%- include('../partials/footer') %>
 
@@ -503,7 +524,7 @@
 
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
                     <script>
-                        const currentUser = <% - JSON.stringify({ id: currentUser.id, role: currentUser.role }) %>;
+                        const currentUser = <%- JSON.stringify({ id: currentUser.id, role: currentUser.role }) %>;
 
                         function filterUsers() {
                             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -526,8 +547,52 @@
                         }
 
                         function viewUser(userId) {
-                            // Could navigate to user details page
-                            window.location.href = `/admin/users/${userId}`;
+                            // Find user data from the table row
+                            const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+                            if (!row) return;
+
+                            const name = row.querySelector('.user-info strong')?.textContent?.trim() || 'غير متوفر';
+                            const phone = row.querySelector('td:nth-child(3)')?.textContent?.trim() || 'غير متوفر';
+                            const nationalId = row.querySelector('td:nth-child(2)')?.textContent?.trim() || 'غير متوفر';
+                            const role = row.dataset.role;
+                            const status = row.dataset.status;
+                            const createdAt = row.querySelector('td:nth-child(6)')?.textContent?.trim() || 'غير متوفر';
+
+                            const roleText = role === 'citizen' ? 'مستخدم عادي' : (role === 'admin' ? 'مسؤول' : 'مسؤول عام');
+                            const statusText = status === 'active' ? 'نشط' : 'معلق';
+                            const statusClass = status === 'active' ? 'active' : 'suspended';
+
+                            document.getElementById('userModalBody').innerHTML = `
+                                <div class="user-detail-card">
+                                    <div class="user-detail-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <h4 class="user-detail-name">${name}</h4>
+                                    <div class="user-detail-info">
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-id-card"></i> الرقم القومي</span>
+                                            <span class="detail-value" dir="ltr">${nationalId}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-phone"></i> رقم الهاتف</span>
+                                            <span class="detail-value" dir="ltr">${phone}</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-user-tag"></i> الصلاحية</span>
+                                            <span class="detail-value"><span class="role-badge ${role}">${roleText}</span></span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-toggle-on"></i> الحالة</span>
+                                            <span class="detail-value"><span class="status-badge ${statusClass}">${statusText}</span></span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label"><i class="fas fa-calendar"></i> تاريخ التسجيل</span>
+                                            <span class="detail-value">${createdAt}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            document.getElementById('userModal').style.display = 'flex';
                         }
 
                         function editUserRole(userId, currentRole) {
