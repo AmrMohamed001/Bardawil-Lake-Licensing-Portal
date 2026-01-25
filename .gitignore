@@ -2,5 +2,5 @@
 /node_modules
 /src/config/config.env
 /src/public/uploads/
-/migrations/
+/src/migrations/
 /src/scripts/
