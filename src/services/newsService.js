@@ -1,6 +1,7 @@
 const { News, User } = require('../models');
 const { Op } = require('sequelize');
 const AppError = require('../utils/appError');
+const cache = require('./cacheService');
 
 /**
  * Get all news (admin)
@@ -89,6 +90,9 @@ exports.createNews = async (data, userId, fileFilename) => {
         imagePath: fileFilename || null,
     });
 
+    // Invalidate news cache
+    cache.invalidateNews();
+
     return news;
 };
 
@@ -114,6 +118,9 @@ exports.updateNews = async (id, data, fileFilename) => {
         imagePath: fileFilename || news.imagePath,
     });
 
+    // Invalidate news cache
+    cache.invalidateNews();
+
     return news;
 };
 
@@ -128,6 +135,9 @@ exports.deleteNews = async (id) => {
     }
 
     await news.destroy();
+
+    // Invalidate news cache
+    cache.invalidateNews();
 };
 
 /**
@@ -145,6 +155,9 @@ exports.togglePublish = async (id) => {
         isPublished,
         publishedAt: isPublished ? new Date() : null,
     });
+
+    // Invalidate news cache (publish state affects public listings)
+    cache.invalidateNews();
 
     return { news, isPublished };
 };

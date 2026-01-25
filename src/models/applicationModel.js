@@ -190,6 +190,11 @@ const Application = sequelize.define(
       { fields: ['status'] },
       { fields: ['application_type'] },
       { fields: ['application_number'] },
+      { fields: ['status_id'] },
+      // Composite indexes for dashboard queries
+      { fields: ['user_id', 'status'] },
+      { fields: ['status', 'created_at'] },
+      { fields: ['application_type', 'status'] },
     ],
     validate: {
       // Custom model-level validation

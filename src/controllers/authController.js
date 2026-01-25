@@ -93,26 +93,34 @@ exports.refreshAccessToken = catchAsync(async (req, res, next) => {
   const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
 
   if (!refreshToken) {
+    console.error('[Auth] Refresh token missing in request');
     return next(new AppError(400, 'رمز التحديث مطلوب'));
   }
 
-  const result = await authService.refreshAccessToken(refreshToken);
+  try {
+    const result = await authService.refreshAccessToken(refreshToken);
 
-  // Set new cookies
-  res.cookie('accessToken', result.accessToken, {
-    ...cookieOptions,
-    maxAge: 2 * 60 * 60 * 1000, // 2 hours
-  });
+    // Set new cookies
+    // ...
+    res.cookie('accessToken', result.accessToken, {
+      ...cookieOptions,
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    });
 
-  res.cookie('refreshToken', result.refreshToken, {
-    ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
 
-  res.status(200).json({
-    status: 'success',
-    data: result,
-  });
+    res.cookie('refreshToken', result.refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: result,
+    });
+  } catch (err) {
+    console.error(`[Auth] Refresh failed: ${err.message}`);
+    return next(err);
+  }
 });
 
 // @desc    Logout user

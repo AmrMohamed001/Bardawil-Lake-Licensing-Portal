@@ -40,16 +40,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /////////////////////////////////////////////////////////////////
 // SECURITY MIDDLEWARES
-// Disable CSP for development - allows inline scripts and event handlers
+
+// Content Security Policy - Protect against XSS and other attacks
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        "script-src": [
+          "'self'",
+          "'unsafe-inline'", // Allow inline scripts (EJS templates)
+          "https://cdnjs.cloudflare.com", // Axios, Font Awesome
+        ],
+        "script-src-attr": [
+          "'unsafe-inline'", // Allow inline event handlers (onclick, etc.)
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'", // For inline styles
+          "https://fonts.googleapis.com",
+          "https://cdnjs.cloudflare.com",
+        ],
+        "font-src": [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "https://cdnjs.cloudflare.com",
+        ],
+        "img-src": ["'self'", "data:", "blob:"],
+        "connect-src": [
+          "'self'",
+          "http://localhost:*",
+          "ws://localhost:*",
+          "https://cdnjs.cloudflare.com", // Allow fetching source maps
+          process.env.NODE_ENV === 'production' ? '' : 'http://127.0.0.1:*'
+        ].filter(Boolean),
+        "frame-src": ["'none'"],
+        "object-src": ["'none'"],
+        upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Allow loading external fonts/scripts
   })
 );
 
+// CORS - Restrict origins in production
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: process.env.NODE_ENV === 'production'
+      ? process.env.CORS_ORIGIN // Must be set in production
+      : true, // Allow all in development
     credentials: true,
   })
 );

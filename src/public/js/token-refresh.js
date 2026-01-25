@@ -1,19 +1,23 @@
 /**
  * Token Refresh Utility
  * Automatically refreshes access token before expiry to keep user logged in
+ * 
+ * NOTE: This script is only included on pages for logged-in users (via EJS conditional).
+ * Since cookies are httpOnly, we cannot check their presence via JavaScript.
+ * We trust that if this script is loaded, the user was authenticated at page load.
  */
 
 (function () {
-    const REFRESH_INTERVAL = 14 * 60 * 1000; // Refresh every 14 minutes (before 15 min expiry)
+    // Refresh ~1 minute before the 2-hour expiry (every 119 minutes)
+    // Or more conservatively, every 30 minutes to handle potential clock drift
+    const REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
-    // Check if user is logged in (has access token cookie)
-    const isLoggedIn = () => {
-        return document.cookie.includes('accessToken') || document.cookie.includes('refreshToken');
-    };
+    let isRefreshing = false;
 
     // Refresh the access token
     const refreshToken = async () => {
-        if (!isLoggedIn()) return;
+        if (isRefreshing) return;
+        isRefreshing = true;
 
         try {
             const response = await fetch('/api/v1/auth/refresh-token', {
@@ -25,25 +29,33 @@
             });
 
             if (!response.ok) {
-                // If refresh fails, user may need to login again
-                console.log('Token refresh failed, session may have expired');
+                // If refresh fails, the session has expired
+                console.warn('[TokenRefresh] Refresh failed, session may have expired');
+                // Don't immediately redirect - let the next page navigation handle it
+                // User might be on a page they can still view
                 return;
             }
 
-            console.log('Access token refreshed successfully');
+            const data = await response.json();
+            if (data.status === 'success') {
+                console.log('[TokenRefresh] Access token refreshed successfully');
+            }
         } catch (error) {
-            console.error('Error refreshing token:', error);
+            console.error('[TokenRefresh] Error refreshing token:', error);
+        } finally {
+            isRefreshing = false;
         }
     };
 
     // Set up automatic refresh interval
     const startAutoRefresh = () => {
-        if (!isLoggedIn()) return;
+        // Refresh periodically (every 30 minutes)
+        // Access token lasts 2 hours, so 30m is plenty safe
+        // NOTE: We don't refresh immediately on load because the server just validated
+        // the token to render this page (if it's a protected route).
+        // This prevents race conditions with multiple tabs causing 401s due to token rotation.
 
-        // Refresh immediately on page load if logged in
-        setTimeout(refreshToken, 5000); // Wait 5 seconds after page load
-
-        // Then refresh every 14 minutes
+        console.log('[TokenRefresh] Starting auto-refresh scheduler (30m interval)');
         setInterval(refreshToken, REFRESH_INTERVAL);
     };
 

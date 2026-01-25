@@ -76,6 +76,14 @@ const News = sequelize.define(
     tableName: 'news',
     timestamps: true,
     underscored: true,
+    indexes: [
+      { fields: ['is_published'] },
+      { fields: ['category'] },
+      { fields: ['published_at'] },
+      { fields: ['created_by'] },
+      // Composite for public news listing
+      { fields: ['is_published', 'published_at'] },
+    ],
   }
 );
 

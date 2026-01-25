@@ -1,5 +1,6 @@
 const { LicensePrice } = require('../models');
 const AppError = require('../utils/appError');
+const cache = require('./cacheService');
 
 /**
  * Pricing Service - Handles license pricing management
@@ -95,6 +96,9 @@ exports.createPrice = async (priceData, adminId) => {
     isActive: true,
   });
 
+  // Invalidate prices cache
+  cache.invalidatePrices();
+
   return newPrice;
 };
 
@@ -136,6 +140,9 @@ exports.updatePrice = async (priceId, updateData, adminId) => {
 
   await price.save();
 
+  // Invalidate prices cache
+  cache.invalidatePrices();
+
   return price;
 };
 
@@ -152,6 +159,9 @@ exports.deletePrice = async priceId => {
 
   price.isActive = false;
   await price.save();
+
+  // Invalidate prices cache
+  cache.invalidatePrices();
 
   return { message: 'تم حذف السعر' };
 };

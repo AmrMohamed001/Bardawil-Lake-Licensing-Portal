@@ -1,44 +1,158 @@
 const { Sequelize } = require('sequelize');
 
-// Create Sequelize instance
+/**
+ * Database Configuration
+ * Optimized for production with connection pooling, retry logic, and conditional logging
+ */
+
+// Determine if we should log queries (development only)
+const shouldLogQueries = process.env.NODE_ENV === 'development' && process.env.DB_LOGGING === 'true';
+
+// Custom logging function
+const queryLogger = shouldLogQueries
+  ? (msg) => console.log(`[DB Query] ${msg}`)
+  : false;
+
+// Create Sequelize instance with optimized settings
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 5432,
     dialect: 'postgres',
-    logging: false, // Disable logging
+    logging: queryLogger,
+
+    // Connection pool configuration
     pool: {
-      max: 10,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
+      max: parseInt(process.env.DB_POOL_MAX) || 20,      // Maximum connections
+      min: parseInt(process.env.DB_POOL_MIN) || 2,       // Minimum connections
+      acquire: 30000,  // Maximum time (ms) to acquire connection
+      idle: 10000,     // Maximum time (ms) connection can be idle
+      evict: 1000,     // Time interval (ms) to check for idle connections
     },
+
+    // Retry configuration for connection failures
+    retry: {
+      max: 5,          // Maximum retry attempts
+      backoffBase: 1000,
+      backoffExponent: 1.5,
+    },
+
+    // Model defaults
     define: {
       timestamps: true,
       underscored: true, // Use snake_case for column names
+      freezeTableName: true, // Don't pluralize table names automatically
     },
+
+    // Timezone handling
+    timezone: '+02:00', // Egypt timezone
+
+    // Query optimization
+    benchmark: process.env.NODE_ENV === 'development', // Log query execution time in dev
   }
 );
 
-// Test database connection
-const connectDB = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('✅ PostgreSQL connected successfully');
+/**
+ * Connect to database with retry logic
+ * @param {number} retries - Number of retry attempts
+ * @param {number} delay - Delay between retries in ms
+ */
+const connectDB = async (retries = 5, delay = 3000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await sequelize.authenticate();
+      console.log('✅ PostgreSQL connected successfully');
+      console.log(`   Host: ${process.env.DB_HOST}`);
+      console.log(`   Database: ${process.env.DB_NAME}`);
+      console.log(`   Pool: max=${sequelize.options.pool.max}, min=${sequelize.options.pool.min}`);
 
-    // Sync models (in development, use { alter: true } for schema updates)
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('✅ Database models synchronized');
-    } else {
-      await sequelize.sync();
+      // Sync models based on environment
+      if (process.env.NODE_ENV === 'development') {
+        await sequelize.sync({ alter: true });
+        console.log('✅ Database models synchronized (alter mode)');
+      } else if (process.env.NODE_ENV === 'test') {
+        // For tests, just sync without altering
+        await sequelize.sync();
+        console.log('✅ Database models synchronized (test mode)');
+      } else {
+        // Production - only sync without changes
+        await sequelize.sync();
+        console.log('✅ Database models synchronized');
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`❌ Database connection attempt ${attempt}/${retries} failed:`, error.message);
+
+      if (attempt < retries) {
+        console.log(`   Retrying in ${delay / 1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 1.5; // Exponential backoff
+      } else {
+        console.error('❌ All database connection attempts failed');
+        throw error;
+      }
     }
-  } catch (error) {
-    console.error('❌ Unable to connect to PostgreSQL:', error.message);
-    throw error;
   }
 };
 
-module.exports = { sequelize, connectDB };
+/**
+ * Check database health
+ * @returns {Promise<{status: string, latency: number}>}
+ */
+const checkHealth = async () => {
+  const start = Date.now();
+  try {
+    await sequelize.query('SELECT 1');
+    return {
+      status: 'healthy',
+      latency: Date.now() - start,
+    };
+  } catch (error) {
+    return {
+      status: 'unhealthy',
+      error: error.message,
+      latency: Date.now() - start,
+    };
+  }
+};
+
+/**
+ * Get connection pool statistics
+ * @returns {Object} Pool statistics
+ */
+const getPoolStats = () => {
+  const pool = sequelize.connectionManager.pool;
+  if (!pool) return { message: 'Pool not initialized' };
+
+  return {
+    size: pool.size,
+    available: pool.available,
+    pending: pool.pending,
+    max: sequelize.options.pool.max,
+    min: sequelize.options.pool.min,
+  };
+};
+
+/**
+ * Graceful shutdown - close all connections
+ */
+const closeDB = async () => {
+  try {
+    await sequelize.close();
+    console.log('✅ Database connections closed gracefully');
+  } catch (error) {
+    console.error('❌ Error closing database connections:', error.message);
+  }
+};
+
+module.exports = {
+  sequelize,
+  connectDB,
+  checkHealth,
+  getPoolStats,
+  closeDB,
+};

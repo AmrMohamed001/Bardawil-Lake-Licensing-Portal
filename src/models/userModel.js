@@ -48,14 +48,6 @@ const User = sequelize.define(
       field: 'password_hash',
     },
     role: {
-      type: DataTypes.ENUM('citizen', 'admin', 'super_admin'),
-      defaultValue: 'citizen',
-    },
-    department: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
-    role: {
       type: DataTypes.ENUM('citizen', 'admin', 'super_admin', 'financial_officer'),
       defaultValue: 'citizen',
     },
@@ -102,6 +94,17 @@ const User = sequelize.define(
   {
     tableName: 'users',
     timestamps: true,
+    indexes: [
+      // Unique indexes (already enforced by unique: true on field, but explicit for clarity)
+      { unique: true, fields: ['national_id'] },
+      { unique: true, fields: ['phone'] },
+      // Non-unique indexes for common queries
+      { fields: ['role'] },
+      { fields: ['status'] },
+      { fields: ['last_login'] },
+      // Composite index for admin user listings
+      { fields: ['role', 'status'] },
+    ],
     hooks: {
       // Hash password before creating user
       beforeCreate: async user => {
