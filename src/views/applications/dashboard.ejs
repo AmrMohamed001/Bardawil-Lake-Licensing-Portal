@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - منصة تراخيص بحيرة البردويل</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+
+<body>
+  <%- include('../partials/spinner') %>
+    <%- include('../partials/navbar') %>
+
+      <div class="dashboard-page">
+        <div class="container">
+
+          <!-- Welcome Header -->
+          <div class="dashboard-header">
+            <div class="welcome-text">
+              <h1>مرحباً، <%= user.firstNameAr %> 👋</h1>
+              <p>إليك نظرة عامة على طلباتك وحالتها</p>
+            </div>
+            <a href="/apply" class="btn btn-primary">
+              <i class="fas fa-plus-circle"></i>
+              تقديم طلب جديد
+            </a>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-icon" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <div class="stat-card-content">
+                <h3>
+                  <%= stats?.total || 0 %>
+                </h3>
+                <p>إجمالي الطلبات</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-icon" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="stat-card-content">
+                <h3>
+                  <%= stats?.pending || 0 %>
+                </h3>
+                <p>قيد المراجعة</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stat-card-content">
+                <h3>
+                  <%= stats?.approved || 0 %>
+                </h3>
+                <p>تم الموافقة</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-icon" style="background: linear-gradient(135deg, #00897B 0%, #00695C 100%);">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="stat-card-content">
+                <h3>
+                  <%= stats?.completed || 0 %>
+                </h3>
+                <p>مكتملة</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Applications Table -->
+          <div class="dashboard-section">
+            <div class="section-header-row">
+              <h2><i class="fas fa-list-alt"></i> طلباتي</h2>
+            </div>
+
+            <div class="table-card card">
+              <% if (applications && applications.length> 0) { %>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>رقم الطلب</th>
+                        <th>نوع الترخيص</th>
+                        <th>الفئة</th>
+                        <th>تاريخ التقديم</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% applications.forEach(app=> { %>
+                        <tr>
+                          <td><strong>
+                              <%= app.applicationNumber %>
+                            </strong></td>
+                          <td>
+                            <% if (app.applicationType==='fisherman' ) { %>
+                              <i class="fas fa-fish text-primary"></i> صياد
+                              <% } else if (app.applicationType==='boat' ) { %>
+                                <i class="fas fa-ship text-accent"></i> مركب
+                                <% } else if (app.applicationType==='vehicle' ) { %>
+                                  <i class="fas fa-truck text-warning"></i> سيارة
+                                  <% } else { %>
+                                    <%= app.applicationType %>
+                                      <% } %>
+                          </td>
+                          <td>
+                            <%= app.licenseCategory %>
+                          </td>
+                          <td>
+                            <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>
+                          </td>
+                          <td>
+                            <%- include('../partials/status-badge', { status: app.status, statusInfo: app.statusInfo }) %>
+                          </td>
+                          <td>
+                            <a href="/applications/<%= app.id %>" class="btn-icon" title="عرض التفاصيل">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                  </table>
+                </div>
+                <% } else { %>
+                  <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>لا توجد طلبات بعد</h3>
+                    <p>ابدأ بتقديم طلب ترخيص جديد</p>
+                    <a href="/apply" class="btn btn-primary">
+                      <i class="fas fa-plus-circle"></i>
+                      تقديم طلب جديد
+                    </a>
+                  </div>
+                  <% } %>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions-section">
+            <h2><i class="fas fa-bolt"></i> إجراءات سريعة</h2>
+
+            <div class="quick-actions-grid">
+              <a href="/apply" class="quick-action-card">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                  <i class="fas fa-fish"></i>
+                </div>
+                <h4>طلب ترخيص صياد</h4>
+                <p>تقديم طلب ترخيص صياد جديد</p>
+              </a>
+
+              <a href="/apply" class="quick-action-card">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #00897B 0%, #00695C 100%);">
+                  <i class="fas fa-ship"></i>
+                </div>
+                <h4>طلب ترخيص مركب</h4>
+                <p>تسجيل مركب جديد أو تجديد</p>
+              </a>
+
+              <a href="/apply" class="quick-action-card">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">
+                  <i class="fas fa-truck"></i>
+                </div>
+                <h4>طلب ترخيص سيارة</h4>
+                <p>تسجيل سيارة نقل جديدة</p>
+              </a>
+
+              <a href="/profile" class="quick-action-card">
+                <div class="quick-action-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                  <i class="fas fa-user-edit"></i>
+                </div>
+                <h4>تعديل الملف الشخصي</h4>
+                <p>تحديث بياناتك الشخصية</p>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <%- include('../partials/footer') %>
+
+        <style>
+          .dashboard-page {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+            background: #FAFAFA;
+          }
+
+          .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .welcome-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 0.25rem;
+          }
+
+          .welcome-text p {
+            color: #757575;
+            font-size: 1.125rem;
+          }
+
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+          }
+
+          .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+          }
+
+          .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+          }
+
+          .stat-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+          }
+
+          .stat-card-content h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 0;
+          }
+
+          .stat-card-content p {
+            color: #757575;
+            font-size: 0.9375rem;
+            margin: 0;
+          }
+
+          .dashboard-section {
+            margin-bottom: 2rem;
+          }
+
+          .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          }
+
+          .section-header-row h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #212121;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          .section-header-row h2 i {
+            color: #1e3c72;
+          }
+
+          .table-card {
+            overflow: hidden;
+          }
+
+          .table-responsive {
+            overflow-x: auto;
+          }
+
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          .table th,
+          .table td {
+            padding: 1rem 1.5rem;
+            text-align: right;
+          }
+
+          .table th {
+            background: #FAFAFA;
+            font-weight: 600;
+            color: #757575;
+            font-size: 0.875rem;
+            white-space: nowrap;
+          }
+
+          .table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+          }
+
+          .table tbody tr:hover {
+            background: #FAFAFA;
+          }
+
+          .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3c72;
+            background: #E3F2FD;
+            text-decoration: none;
+            transition: all 0.2s;
+          }
+
+          .btn-icon:hover {
+            background: #1e3c72;
+            color: white;
+          }
+
+          .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #757575;
+          }
+
+          .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+          }
+
+          .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #424242;
+          }
+
+          .empty-state p {
+            margin-bottom: 1.5rem;
+          }
+
+          .quick-actions-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          .quick-actions-section h2 i {
+            color: #FF9800;
+          }
+
+          .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+          }
+
+          .quick-action-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+          }
+
+          .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+          }
+
+          .quick-action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+          }
+
+          .quick-action-card h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 0.5rem;
+          }
+
+          .quick-action-card p {
+            color: #757575;
+            font-size: 0.875rem;
+            margin: 0;
+          }
+
+          .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+          }
+
+          @media (max-width: 1024px) {
+            .stats-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+
+          @media (max-width: 768px) {
+            .dashboard-header {
+              flex-direction: column;
+              align-items: stretch;
+              text-align: center;
+            }
+
+            .stats-grid {
+              grid-template-columns: 1fr;
+            }
+
+            .quick-actions-grid {
+              grid-template-columns: 1fr;
+            }
+
+            .table th,
+            .table td {
+              padding: 0.75rem 1rem;
+              font-size: 0.875rem;
+            }
+          }
+        </style>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+</body>
+
+</html>

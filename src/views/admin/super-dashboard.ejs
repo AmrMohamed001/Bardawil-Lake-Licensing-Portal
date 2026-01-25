@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= title %> - منصة تراخيص بحيرة البردويل
+    </title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <%- include('../partials/spinner') %> <%- include('../partials/navbar') %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'super-dashboard' , pendingCount: 0 }) %>
+
+                <div class="super-admin-page">
+                    <div class="container">
+                        <!-- Page Header -->
+                        <div class="page-header">
+                            <div class="header-content">
+                                <h1><i class="fas fa-chart-line"></i> لوحة الإحصائيات المتقدمة</h1>
+                                <p>نظرة شاملة على أداء المنصة والإحصائيات التفصيلية</p>
+                            </div>
+                            <div class="header-actions">
+                                <button class="btn btn-outline-primary" onclick="refreshData()">
+                                    <i class="fas fa-sync-alt"></i> تحديث البيانات
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card primary">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="totalApplications">
+                                        <%= stats.overview.total || 0 %>
+                                    </h3>
+                                    <p>إجمالي الطلبات</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card success">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="completedApplications">
+                                        <%= stats.overview.approved || 0 %>
+                                    </h3>
+                                    <p>الطلبات المكتملة</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card warning">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="pendingApplications">
+                                        <%= stats.overview.new + stats.overview.underReview || 0 %>
+                                    </h3>
+                                    <p>الطلبات المعلقة</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card danger">
+                                <div class="stat-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="rejectedApplications">
+                                        <%= stats.overview.rejected || 0 %>
+                                    </h3>
+                                    <p>الطلبات المرفوضة</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card info">
+                                <div class="stat-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="totalRevenue">
+                                        <%= totalRevenue ? totalRevenue.toLocaleString('ar-EG') : '0' %> ج.م
+                                    </h3>
+                                    <p>إجمالي الإيرادات</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card purple">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="totalUsers">
+                                        <%= totalUsers || 0 %>
+                                    </h3>
+                                    <p>إجمالي المستخدمين</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <h2><i class="fas fa-bolt"></i> الإجراءات السريعة</h2>
+                            <div class="actions-grid">
+                                <a href="/admin/applications" class="action-card">
+                                    <div class="action-icon primary"><i class="fas fa-folder-open"></i></div>
+                                    <h4>عرض الطلبات</h4>
+                                    <p>مراجعة جميع طلبات التراخيص</p>
+                                </a>
+                                <a href="/admin/audit-logs" class="action-card">
+                                    <div class="action-icon warning"><i class="fas fa-history"></i></div>
+                                    <h4>سجل التدقيق</h4>
+                                    <p>مراجعة سجلات النظام</p>
+                                </a>
+                                <a href="/admin/pricing" class="action-card">
+                                    <div class="action-icon success"><i class="fas fa-money-bill-wave"></i></div>
+                                    <h4>إدارة الأسعار</h4>
+                                    <p>تعديل أسعار التراخيص</p>
+                                </a>
+                                <a href="/api/v1/admin/applications/export/excel" class="action-card">
+                                    <div class="action-icon info"><i class="fas fa-file-excel"></i></div>
+                                    <h4>تصدير Excel</h4>
+                                    <p>تصدير جميع الطلبات</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="charts-section">
+                            <div class="chart-row">
+                                <!-- Applications by Status Pie Chart -->
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <h3><i class="fas fa-chart-pie"></i> الطلبات حسب الحالة</h3>
+                                    </div>
+                                    <div class="chart-body">
+                                        <canvas id="statusChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Applications by Type Doughnut Chart -->
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <h3><i class="fas fa-chart-pie"></i> الطلبات حسب النوع</h3>
+                                    </div>
+                                    <div class="chart-body">
+                                        <canvas id="typeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chart-row full">
+                                <!-- Monthly Trend Line Chart -->
+                                <div class="chart-card full-width">
+                                    <div class="chart-header">
+                                        <h3><i class="fas fa-chart-line"></i> الطلبات خلال الشهر الماضي</h3>
+                                    </div>
+                                    <div class="chart-body">
+                                        <canvas id="trendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chart-row full">
+                                <!-- Revenue Bar Chart -->
+                                <div class="chart-card full-width">
+                                    <div class="chart-header">
+                                        <h3><i class="fas fa-chart-bar"></i> الإيرادات الشهرية</h3>
+                                    </div>
+                                    <div class="chart-body">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity Section -->
+                        <div class="activity-section">
+                            <div class="section-header">
+                                <h2><i class="fas fa-history"></i> النشاط الأخير</h2>
+                            </div>
+                            <div class="activity-list">
+                                <% if (recentApplications && recentApplications.length> 0) { %>
+                                    <% recentApplications.forEach(app=> { %>
+                                        <div class="activity-item">
+                                            <div
+                                                class="activity-icon <%= app.status === 'completed' ? 'success' : app.status === 'rejected' ? 'danger' : 'warning' %>">
+                                                <i
+                                                    class="fas <%= app.status === 'completed' ? 'fa-check' : app.status === 'rejected' ? 'fa-times' : 'fa-clock' %>"></i>
+                                            </div>
+                                            <div class="activity-content">
+                                                <h4>
+                                                    <%= app.applicationNumber %>
+                                                </h4>
+                                                <p>
+                                                    <% if (app.applicant) { %>
+                                                        <%= app.applicant.firstNameAr %>
+                                                            <%= app.applicant.lastNameAr %>
+                                                                <% } %>
+                                                                    - <%= app.licenseCategory %>
+                                                </p>
+                                            </div>
+                                            <div class="activity-meta">
+                                                <span class="status-badge <%= app.status %>">
+                                                    <% if (app.status==='received' ) { %>تم الاستلام
+                                                        <% } else if (app.status==='under_review' ) { %>قيد المراجعة
+                                                            <% } else if (app.status==='approved_payment_pending' ) { %>
+                                                                بانتظار الدفع
+                                                                <% } else if (app.status==='completed' ) { %>مكتمل
+                                                                    <% } else if (app.status==='rejected' ) { %>مرفوض
+                                                                        <% } else { %>
+                                                                            <%= app.status %>
+                                                                                <% } %>
+                                                </span>
+                                                <small>
+                                                    <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                            <% } else { %>
+                                                <div class="empty-state">
+                                                    <i class="fas fa-inbox"></i>
+                                                    <p>لا يوجد نشاط حديث</p>
+                                                </div>
+                                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <%- include('../partials/footer') %>
+
+                    <style>
+                        .super-admin-page {
+                            padding: 2rem 0;
+                            min-height: calc(100vh - 200px);
+                            background: #f5f7fa;
+                        }
+
+                        .page-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 2rem;
+                            flex-wrap: wrap;
+                            gap: 1rem;
+                        }
+
+                        .page-header h1 {
+                            font-size: 2rem;
+                            font-weight: 700;
+                            color: #212121;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                        }
+
+                        .page-header h1 i {
+                            color: #1e3c72;
+                        }
+
+                        .page-header p {
+                            color: #757575;
+                            margin-top: 0.5rem;
+                        }
+
+                        /* Stats Grid */
+                        .stats-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 1.5rem;
+                            margin-bottom: 2rem;
+                        }
+
+                        .stat-card {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                            transition: transform 0.3s ease;
+                        }
+
+                        .stat-card:hover {
+                            transform: translateY(-3px);
+                        }
+
+                        .stat-icon {
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.5rem;
+                        }
+
+                        .stat-card.primary .stat-icon {
+                            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                            color: white;
+                        }
+
+                        .stat-card.success .stat-icon {
+                            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                            color: white;
+                        }
+
+                        .stat-card.warning .stat-icon {
+                            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                            color: white;
+                        }
+
+                        .stat-card.danger .stat-icon {
+                            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+                            color: white;
+                        }
+
+                        .stat-card.info .stat-icon {
+                            background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+                            color: white;
+                        }
+
+                        .stat-card.purple .stat-icon {
+                            background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+                            color: white;
+                        }
+
+                        .stat-content h3 {
+                            font-size: 1.5rem;
+                            font-weight: 700;
+                            color: #212121;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .stat-content p {
+                            color: #757575;
+                            font-size: 0.875rem;
+                        }
+
+                        /* Quick Actions */
+                        .quick-actions {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            margin-bottom: 2rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .quick-actions h2 {
+                            font-size: 1.25rem;
+                            font-weight: 600;
+                            color: #212121;
+                            margin-bottom: 1rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+
+                        .quick-actions h2 i {
+                            color: #ff9800;
+                        }
+
+                        .actions-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                            gap: 1rem;
+                        }
+
+                        .action-card {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            text-align: center;
+                            padding: 1.5rem 1rem;
+                            background: #f8f9fa;
+                            border-radius: 12px;
+                            text-decoration: none;
+                            color: inherit;
+                            transition: all 0.3s ease;
+                            border: 2px solid transparent;
+                        }
+
+                        .action-card:hover {
+                            background: #e3f2fd;
+                            border-color: #1e3c72;
+                            transform: translateY(-3px);
+                        }
+
+                        .action-icon {
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.25rem;
+                            margin-bottom: 0.75rem;
+                        }
+
+                        .action-icon.primary {
+                            background: linear-gradient(135deg, #1e3c72, #2a5298);
+                            color: white;
+                        }
+
+                        .action-icon.success {
+                            background: linear-gradient(135deg, #4caf50, #2e7d32);
+                            color: white;
+                        }
+
+                        .action-icon.warning {
+                            background: linear-gradient(135deg, #ff9800, #f57c00);
+                            color: white;
+                        }
+
+                        .action-icon.info {
+                            background: linear-gradient(135deg, #00897b, #00695c);
+                            color: white;
+                        }
+
+                        .action-card h4 {
+                            font-size: 1rem;
+                            font-weight: 600;
+                            color: #212121;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .action-card p {
+                            font-size: 0.75rem;
+                            color: #757575;
+                        }
+
+                        /* Charts Section */
+                        .charts-section {
+                            margin-bottom: 2rem;
+                        }
+
+                        .chart-row {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 1.5rem;
+                            margin-bottom: 1.5rem;
+                        }
+
+                        .chart-row.full {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .chart-card {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .chart-card.full-width {
+                            grid-column: 1 / -1;
+                        }
+
+                        .chart-header {
+                            margin-bottom: 1rem;
+                            padding-bottom: 0.75rem;
+                            border-bottom: 1px solid #eee;
+                        }
+
+                        .chart-header h3 {
+                            font-size: 1rem;
+                            font-weight: 600;
+                            color: #424242;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+
+                        .chart-header h3 i {
+                            color: #1e3c72;
+                        }
+
+                        .chart-body {
+                            position: relative;
+                            height: 300px;
+                        }
+
+                        .chart-body canvas {
+                            max-height: 100%;
+                        }
+
+                        /* Activity Section */
+                        .activity-section {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .section-header {
+                            margin-bottom: 1.5rem;
+                            padding-bottom: 0.75rem;
+                            border-bottom: 1px solid #eee;
+                        }
+
+                        .section-header h2 {
+                            font-size: 1.25rem;
+                            font-weight: 600;
+                            color: #212121;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+
+                        .section-header h2 i {
+                            color: #1e3c72;
+                        }
+
+                        .activity-list {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1rem;
+                        }
+
+                        .activity-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            padding: 1rem;
+                            background: #fafafa;
+                            border-radius: 12px;
+                            transition: background 0.3s ease;
+                        }
+
+                        .activity-item:hover {
+                            background: #f5f5f5;
+                        }
+
+                        .activity-icon {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 10px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+
+                        .activity-icon.success {
+                            background: #e8f5e9;
+                            color: #4caf50;
+                        }
+
+                        .activity-icon.warning {
+                            background: #fff3e0;
+                            color: #ff9800;
+                        }
+
+                        .activity-icon.danger {
+                            background: #ffebee;
+                            color: #f44336;
+                        }
+
+                        .activity-content {
+                            flex: 1;
+                        }
+
+                        .activity-content h4 {
+                            font-size: 1rem;
+                            font-weight: 600;
+                            color: #212121;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .activity-content p {
+                            color: #757575;
+                            font-size: 0.875rem;
+                        }
+
+                        .activity-meta {
+                            text-align: left;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-end;
+                            gap: 0.25rem;
+                        }
+
+                        .activity-meta small {
+                            color: #9e9e9e;
+                            font-size: 0.75rem;
+                        }
+
+                        .status-badge {
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.75rem;
+                            font-weight: 600;
+                        }
+
+                        .status-badge.received {
+                            background: #e3f2fd;
+                            color: #1976d2;
+                        }
+
+                        .status-badge.under_review {
+                            background: #fff3e0;
+                            color: #f57c00;
+                        }
+
+                        .status-badge.approved_payment_pending {
+                            background: #fff8e1;
+                            color: #ff8f00;
+                        }
+
+                        .status-badge.completed {
+                            background: #e8f5e9;
+                            color: #2e7d32;
+                        }
+
+                        .status-badge.rejected {
+                            background: #ffebee;
+                            color: #c62828;
+                        }
+
+                        .empty-state {
+                            text-align: center;
+                            padding: 3rem;
+                            color: #9e9e9e;
+                        }
+
+                        .empty-state i {
+                            font-size: 3rem;
+                            margin-bottom: 1rem;
+                        }
+
+                        @media (max-width: 768px) {
+                            .super-admin-page {
+                                padding-bottom: 5rem;
+                                /* Space for mobile sidebar toggle */
+                            }
+
+                            .chart-row {
+                                grid-template-columns: 1fr;
+                            }
+
+                            .stats-grid {
+                                grid-template-columns: 1fr;
+                                /* Single column for stats on mobile */
+                            }
+
+                            .activity-item {
+                                flex-wrap: wrap;
+                            }
+
+                            .activity-meta {
+                                width: 100%;
+                                flex-direction: row;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-top: 0.5rem;
+                            }
+                        }
+                    </style>
+
+                    <script>
+                        // Chart.js Arabic RTL support
+                        Chart.defaults.font.family = 'Cairo, sans-serif';
+
+                        // Status labels mapping
+                        const statusLabels = {
+                            received: 'تم الاستلام',
+                            under_review: 'قيد المراجعة',
+                            approved_payment_pending: 'بانتظار الدفع',
+                            approved_payment_required: 'مطلوب الدفع',
+                            payment_verified: 'تم التحقق',
+                            completed: 'مكتمل',
+                            rejected: 'مرفوض',
+                            ready: 'جاهز'
+                        };
+
+                        // Type labels mapping
+                        const typeLabels = {
+                            fisherman: 'ترخيص صياد',
+                            boat: 'ترخيص مركب',
+                            vehicle: 'ترخيص سيارة',
+                            trade: 'ترخيص تجارة',
+                            entry: 'ترخيص دخول',
+                            other: 'أخرى'
+                        };
+
+                        // Status colors (object mapping for accurate color matching)
+                        const statusColors = {
+                            received: '#2196f3',
+                            under_review: '#ff9800',
+                            approved_payment_pending: '#ffc107',
+                            approved_payment_required: '#ff5722',
+                            payment_verified: '#00bcd4',
+                            completed: '#4caf50',
+                            rejected: '#f44336',
+                            ready: '#8bc34a'
+                        };
+
+                        // Type colors
+                        const typeColors = ['#2196f3', '#00897b', '#ff9800', '#9c27b0'];
+
+                        // Parse data from server
+                        const byStatusData = <%- JSON.stringify(stats.byStatus || []) %>;
+                        const byTypeData = <%- JSON.stringify(stats.byType || []) %>;
+                        const monthlyTrendData = <%- JSON.stringify(stats.monthlyTrend || []) %>;
+                        const revenueData = <%- JSON.stringify(monthlyRevenue || []) %>;
+
+                        console.log('=== DEBUG DATA ===');
+                        console.log('byStatusData:', byStatusData);
+                        console.log('byTypeData:', byTypeData);
+                        console.log('monthlyTrendData:', monthlyTrendData);
+                        console.log('revenueData:', revenueData);
+
+                        // Status Pie Chart
+                        const statusCtx = document.getElementById('statusChart').getContext('2d');
+                        console.log('Status Chart Data:', byStatusData);
+                        if (byStatusData && byStatusData.length > 0) {
+                            new Chart(statusCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: byStatusData.map(item => statusLabels[item.status] || item.status),
+                                    datasets: [{
+                                        data: byStatusData.map(item => parseInt(item.count)),
+                                        backgroundColor: byStatusData.map(item => statusColors[item.status] || '#9e9e9e'),
+                                        borderWidth: 2,
+                                        borderColor: '#fff'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            rtl: true,
+                                            labels: {
+                                                usePointStyle: true,
+                                                padding: 15
+                                            }
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) {
+                                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                    const percentage = ((context.raw / total) * 100).toFixed(1);
+                                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            console.log('No status data available for chart');
+                        }
+
+                        // Type Doughnut Chart
+                        const typeCtx = document.getElementById('typeChart').getContext('2d');
+                        new Chart(typeCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: byTypeData.map(item => typeLabels[item.applicationType] || item.applicationType),
+                                datasets: [{
+                                    data: byTypeData.map(item => parseInt(item.count)),
+                                    backgroundColor: typeColors,
+                                    borderWidth: 2,
+                                    borderColor: '#fff'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        rtl: true,
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 15
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Monthly Trend Line Chart
+                        const trendCtx = document.getElementById('trendChart').getContext('2d');
+                        const sortedTrend = monthlyTrendData.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        new Chart(trendCtx, {
+                            type: 'line',
+                            data: {
+                                labels: sortedTrend.map(item => new Date(item.date).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })),
+                                datasets: [{
+                                    label: 'الطلبات',
+                                    data: sortedTrend.map(item => parseInt(item.count)),
+                                    borderColor: '#1e3c72',
+                                    backgroundColor: 'rgba(30, 60, 114, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointBackgroundColor: '#1e3c72',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        // Revenue Bar Chart
+                        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                        new Chart(revenueCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: revenueData.map(item => item.month),
+                                datasets: [{
+                                    label: 'الإيرادات (جنيه)',
+                                    data: revenueData.map(item => parseFloat(item.amount) || 0),
+                                    backgroundColor: 'rgba(0, 137, 123, 0.8)',
+                                    borderColor: '#00897b',
+                                    borderWidth: 1,
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function (value) {
+                                                return value.toLocaleString('ar-EG') + ' ج.م';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        function refreshData() {
+                            window.location.reload();
+                        }
+                    </script>
+</body>
+
+</html>

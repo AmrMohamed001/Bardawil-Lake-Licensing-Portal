@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+    <title>
+        <%= title %> - بوابة بحيرة البردويل
+    </title>
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Header -->
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="fas fa-coins"></i>
+                        لوحة القسم المالي
+                    </h1>
+                    <p class="page-subtitle">
+                        إدارة ومراجعة المدفوعات المقدمة من المتقدمين
+                    </p>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card pending">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value">
+                                <%= stats.pending %>
+                            </h3>
+                            <p class="stat-label">في انتظار التحقق</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card verified">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value">
+                                <%= stats.todayVerified %>
+                            </h3>
+                            <p class="stat-label">تم التحقق اليوم</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card monthly">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value">
+                                <%= stats.monthlyVerified %>
+                            </h3>
+                            <p class="stat-label">تحقق هذا الشهر</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card revenue">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value">
+                                <%= stats.todayTotal.toLocaleString('ar-EG') %>
+                            </h3>
+                            <p class="stat-label">اجمالي النقدية اليوم (جنيه)</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card revenue" style="background-color: #f8f9fa;">
+                        <div class="stat-icon" style="background-color: #6c757d;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-value">
+                                <%= stats.monthlyTotal.toLocaleString('ar-EG') %>
+                            </h3>
+                            <p class="stat-label">إجمالي الشهر (جنيه)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Requests Section -->
+                <div class="admin-section mb-5" style="margin-bottom: 2rem;">
+                    <div class="applications-header">
+                        <div class="page-title-section">
+                            <h1 class="page-title">
+                                <i class="fas fa-list"></i>
+                                آخر الطلبات
+                            </h1>
+                        </div>
+
+                        <div class="search-filter-section">
+                            <form class="search-form" method="GET" action="/financial/dashboard">
+                                <div class="search-input-wrapper">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" name="search" class="search-input"
+                                        placeholder="بحث برقم الطلب، الاسم، أو الرقم القومي..."
+                                        value="<%= typeof query !== 'undefined' ? query.search : '' %>">
+                                    <% if (typeof query !=='undefined' && query.search) { %>
+                                        <a href="/financial/dashboard" class="clear-search"
+                                            style="text-decoration: none;">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        <% } %>
+                                </div>
+                                <button type="submit" class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                    <span>بحث</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="applications-table-wrapper">
+                        <div class="table-responsive">
+                            <table class="applications-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم الطلب</th>
+                                        <th>مقدم الطلب</th>
+                                        <th>نوع الترخيص</th>
+                                        <th>تاريخ التقديم</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% const getStatusName=(status)=> {
+                                        const statusMap = {
+                                        'received': 'تم الاستلام',
+                                        'under_review': 'قيد المراجعة',
+                                        'approved_payment_pending': 'بانتظار الدفع',
+                                        'payment_submitted': 'تم الدفع (بانتظار التحقق)',
+                                        'payment_verified': 'تم التحقق من الدفع',
+                                        'ready': 'جاهز للاستلام',
+                                        'completed': 'مكتمل',
+                                        'rejected': 'مرفوض'
+                                        };
+                                        return statusMap[status] || status;
+                                        };
+
+                                        const getStatusClass = (status) => {
+                                        const classMap = {
+                                        'ready': 'status-ready',
+                                        'completed': 'status-ready',
+                                        'payment_verified': 'status-verified',
+                                        'approved_payment_pending': 'status-pending',
+                                        'payment_submitted': 'status-under-review',
+                                        'under_review': 'status-under-review',
+                                        'rejected': 'status-rejected'
+                                        };
+                                        return classMap[status] || 'status-pending';
+                                        };
+                                        %>
+                                        <% if (recentApplications && recentApplications.length> 0) { %>
+                                            <% recentApplications.forEach(app=> { %>
+                                                <tr>
+                                                    <td><span class="app-number">
+                                                            <%= app.applicationNumber %>
+                                                        </span></td>
+                                                    <td>
+                                                        <%= app.applicant ? (app.applicant.firstNameAr + ' ' +
+                                                            app.applicant.lastNameAr) : 'غير معروف' %>
+                                                    </td>
+                                                    <td><span class="license-badge">
+                                                            <%= app.applicationType==='fisherman' ? 'صياد' :
+                                                                app.applicationType %>
+                                                        </span></td>
+                                                    <td>
+                                                        <%= new Date(app.updatedAt).toLocaleDateString('ar-EG') %>
+                                                    </td>
+                                                    <td><span class="status-badge <%= getStatusClass(app.status) %>">
+                                                            <%= getStatusName(app.status) %>
+                                                        </span></td>
+                                                    <td>
+                                                        <button class="action-btn view-btn"
+                                                            onclick="viewPaymentDetails('<%= app.id %>')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="6" class="text-center text-muted py-4">لا توجد
+                                                                طلبات حديثة</td>
+                                                        </tr>
+                                                        <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <% if (typeof pagination !=='undefined' && pagination.pages> 1) { %>
+                            <div class="pagination-container d-flex justify-content-center mt-3"
+                                style="padding: 1rem; border-top: 1px solid #eee; display: flex; justify-content: center;">
+                                <% let url=(p)=> {
+                                    let queryStr = '?page=' + p;
+                                    if(typeof query !== 'undefined' && query.search) queryStr += '&search=' +
+                                    query.search;
+                                    return queryStr;
+                                    }
+                                    %>
+                                    <div class="pagination" style="display: flex; gap: 5px;">
+                                        <% if (pagination.page> 1) { %>
+                                            <a href="<%= url(pagination.page - 1) %>" class="btn btn-sm"
+                                                style="border:1px solid #dee2e6; padding: 0.25rem 0.5rem; color:#6c757d; text-decoration:none;">السابق</a>
+                                            <% } %>
+
+                                                <% for(let i=1; i <=pagination.pages; i++) { %>
+                                                    <% if (i===1 || i===pagination.pages || (i>= pagination.page - 2 &&
+                                                        i <= pagination.page + 2)) { %>
+                                                            <a href="<%= url(i) %>" class="btn btn-sm"
+                                                                style="<%= i === pagination.page ? 'background:#0d6efd; color:white; border:1px solid #0d6efd;' : 'border:1px solid #dee2e6; color:#6c757d;' %> padding: 0.25rem 0.75rem; text-decoration:none;">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } else if (i===pagination.page - 3 || i===pagination.page
+                                                                + 3) { %>
+                                                                <span class="btn btn-sm"
+                                                                    style="color:#6c757d;">...</span>
+                                                                <% } %>
+                                                                    <% } %>
+
+                                                                        <% if (pagination.page < pagination.pages) { %>
+                                                                            <a href="<%= url(pagination.page + 1) %>"
+                                                                                class="btn btn-sm"
+                                                                                style="border:1px solid #dee2e6; padding: 0.25rem 0.5rem; color:#6c757d; text-decoration:none;">التالي</a>
+                                                                            <% } %>
+                                    </div>
+                            </div>
+                            <% } %>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="/financial/pending-payments" class="action-card primary">
+                        <i class="fas fa-receipt"></i>
+                        <span>المدفوعات المعلقة (<%= stats.pending %>)</span>
+                    </a>
+                    <a href="/financial/payment-history" class="action-card secondary">
+                        <i class="fas fa-history"></i>
+                        <span>سجل المدفوعات</span>
+                    </a>
+                    <a href="/financial/export-report" class="action-card success">
+                        <i class="fas fa-file-excel"></i>
+                        <span>تصدير تقرير</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <style>
+            .main-content {
+                padding: 2rem 0;
+                min-height: 80vh;
+                background: #f8f9fa;
+            }
+
+            .page-header {
+                margin-bottom: 2rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+                color: #2c3e50;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .page-title i {
+                color: #2980b9;
+            }
+
+            .page-subtitle {
+                color: #7f8c8d;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .stat-card {
+                background: white;
+                border-radius: 12px;
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                transition: transform 0.2s;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                color: white;
+            }
+
+            .stat-content h3 {
+                margin: 0;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2c3e50;
+            }
+
+            .stat-content p {
+                margin: 0;
+                color: #7f8c8d;
+                font-size: 0.9rem;
+            }
+
+            .stat-card.pending .stat-icon {
+                background: #f39c12;
+            }
+
+            .stat-card.verified .stat-icon {
+                background: #27ae60;
+            }
+
+            .stat-card.monthly .stat-icon {
+                background: #8e44ad;
+            }
+
+            .stat-card.revenue .stat-icon {
+                background: #2980b9;
+            }
+
+            .quick-actions {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .action-card {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 12px;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                transition: all 0.2s;
+                color: #2c3e50;
+                text-align: center;
+            }
+
+            .action-card i {
+                font-size: 2rem;
+            }
+
+            .action-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .action-card.primary i {
+                color: #e67e22;
+            }
+
+            .action-card.secondary i {
+                color: #34495e;
+            }
+
+            .action-card.success i {
+                color: #27ae60;
+            }
+
+            /* Status Badges */
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.375rem;
+                padding: 0.375rem 0.75rem;
+                border-radius: 999px;
+                font-size: 0.8125rem;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            .status-badge i {
+                font-size: 0.75rem;
+            }
+
+            .badge-received {
+                background: #E3F2FD;
+                color: #1565C0;
+            }
+
+            .badge-under-review {
+                background: #FFF3E0;
+                color: #EF6C00;
+            }
+
+            .badge-approved-payment-pending,
+            .badge-payment-submitted {
+                background: #FFF8E1;
+                color: #F9A825;
+            }
+
+            .badge-approved-payment-required {
+                background: #FFF8E1;
+                color: #F9A825;
+            }
+
+            .badge-payment-verified {
+                background: #E8F5E9;
+                color: #2E7D32;
+            }
+
+            .badge-ready {
+                background: #E0F2F1;
+                color: #00695C;
+            }
+
+            .badge-completed {
+                background: #E8F5E9;
+                color: #1B5E20;
+            }
+
+            .badge-rejected {
+                background: #FFEBEE;
+                color: #C62828;
+            }
+
+            .badge-default {
+                background: #F5F5F5;
+                color: #616161;
+            }
+
+            /* New Status Badge Classes */
+            .status-ready {
+                background: #c8e6c9;
+                color: #2e7d32;
+            }
+
+            .status-verified {
+                background: #c8e6c9;
+                color: #2e7d32;
+            }
+
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+
+            .status-under-review {
+                background: #cfe2ff;
+                color: #084298;
+            }
+
+            .status-rejected {
+                background: #f8d7da;
+                color: #842029;
+            }
+
+            .status-badge::before {
+                content: '';
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+            /* Applications Header */
+            .applications-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 2rem;
+                margin-bottom: 2rem;
+                flex-wrap: wrap;
+            }
+
+            .page-title-section {
+                flex: 0 0 auto;
+            }
+
+            .search-filter-section {
+                flex: 1;
+                max-width: 600px;
+                min-width: 300px;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .search-input-wrapper {
+                flex: 1;
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .search-icon {
+                position: absolute;
+                right: 1rem;
+                color: #666;
+                font-size: 1rem;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 0.875rem 3rem 0.875rem 1rem;
+                border: 2px solid #e0e0e0;
+                border-radius: 12px;
+                font-size: 0.9375rem;
+                font-family: inherit;
+                color: #333;
+                background: white;
+                transition: all 0.3s;
+                direction: rtl;
+            }
+
+            .search-input::placeholder {
+                color: #999;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #2E9B9F;
+                box-shadow: 0 0 0 4px rgba(46, 155, 159, 0.1);
+            }
+
+            .clear-search {
+                position: absolute;
+                left: 1rem;
+                background: #f5f5f5;
+                border: none;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: #666;
+                transition: all 0.2s;
+                z-index: 1;
+            }
+
+            .clear-search:hover {
+                background: #e0e0e0;
+                color: #333;
+                transform: scale(1.1);
+            }
+
+            .search-btn {
+                padding: 0.875rem 1.5rem;
+                background: linear-gradient(135deg, #2E9B9F 0%, #1F4788 100%);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                font-size: 0.9375rem;
+                font-weight: 600;
+                font-family: inherit;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s;
+                white-space: nowrap;
+            }
+
+            .search-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(46, 155, 159, 0.3);
+            }
+
+            /* Applications Table */
+            .applications-table-wrapper {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+            }
+
+            .applications-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.9375rem;
+            }
+
+            .applications-table thead {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            }
+
+            .applications-table th {
+                padding: 1rem 1.25rem;
+                text-align: right;
+                font-weight: 600;
+                color: #1F4788;
+                border-bottom: 2px solid #dee2e6;
+                white-space: nowrap;
+            }
+
+            .applications-table td {
+                padding: 1rem 1.25rem;
+                text-align: right;
+                border-bottom: 1px solid #f0f0f0;
+                vertical-align: middle;
+            }
+
+            .applications-table tbody tr {
+                transition: background 0.2s;
+            }
+
+            .applications-table tbody tr:hover {
+                background: #f8f9fa;
+            }
+
+            .applications-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            /* App Number & Badge Styles */
+            .app-number {
+                font-weight: 600;
+                color: #2E9B9F;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9375rem;
+            }
+
+            .license-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.375rem 0.875rem;
+                background: #e3f2fd;
+                color: #1976d2;
+                border-radius: 20px;
+                font-size: 0.8125rem;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
+            .action-btn {
+                width: 40px;
+                height: 40px;
+                border: none;
+                border-radius: 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-size: 1rem;
+            }
+
+            .view-btn {
+                background: #e3f2fd;
+                color: #1976d2;
+            }
+
+            .view-btn:hover {
+                background: #1976d2;
+                color: white;
+                transform: scale(1.1);
+            }
+
+            /* Pagination */
+            .pagination-container {
+                padding: 1rem;
+                border-top: 1px solid #f0f0f0;
+                display: flex;
+                justify-content: center;
+            }
+
+            .pagination {
+                display: flex;
+                gap: 5px;
+            }
+
+            .page-btn {
+                border: 1px solid #dee2e6;
+                padding: 0.25rem 0.75rem;
+                color: #6c757d;
+                text-decoration: none;
+                border-radius: 6px;
+                transition: all 0.2s;
+            }
+
+            .page-btn:hover {
+                background: #e9ecef;
+            }
+
+            .page-btn.active {
+                background: linear-gradient(135deg, #2E9B9F 0%, #1F4788 100%);
+                color: white;
+                border: none;
+            }
+
+            .page-dots {
+                color: #6c757d;
+                padding: 0.25rem 0.5rem;
+            }
+
+            /* Modal Styles */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+            .modal-container {
+                background: white;
+                width: 90%;
+                max-width: 800px;
+                border-radius: 12px;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .modal-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .modal-title {
+                margin: 0;
+                font-size: 1.25rem;
+            }
+
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #7f8c8d;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+                overflow-y: auto;
+            }
+
+            .details-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                margin-bottom: 2rem;
+                background: #f8f9fa;
+                padding: 1rem;
+                border-radius: 8px;
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .detail-item label {
+                color: #7f8c8d;
+                font-size: 0.85rem;
+            }
+
+            .detail-item span {
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .document-preview {
+                margin-bottom: 2rem;
+                text-align: center;
+            }
+
+            .receipt-image {
+                max-width: 100%;
+                max-height: 400px;
+                border-radius: 8px;
+                cursor: zoom-in;
+                border: 1px solid #ddd;
+            }
+
+            .verification-actions {
+                border-top: 1px solid #eee;
+                padding-top: 1.5rem;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .action-buttons button {
+                flex: 1;
+            }
+        </style>
+
+        <div id="paymentModal" class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2 class="modal-title">تفاصيل الدفع</h2>
+                    <button class="modal-close" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <div class="text-center p-4">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                        <p class="mt-2">جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Auto-search on blur (when leaving the field)
+            document.addEventListener('DOMContentLoaded', function () {
+                const searchInput = document.querySelector('.search-input');
+                const searchForm = document.querySelector('.search-form');
+
+                if (searchInput && searchForm) {
+                    let originalValue = searchInput.value;
+
+                    // Search on blur if value changed
+                    searchInput.addEventListener('blur', function () {
+                        if (this.value.trim() !== originalValue.trim()) {
+                            originalValue = this.value.trim();
+                            if (this.value.trim().length >= 2 || this.value.trim().length === 0) {
+                                searchForm.submit();
+                            }
+                        }
+                    });
+
+                    // Also search on Enter key
+                    searchInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            searchForm.submit();
+                        }
+                    });
+                }
+            });
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+        <script src="/js/financial.js"></script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

@@ -1,8 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const adminService = require('../services/adminService');
 const pricingService = require('../services/pricingService');
-const pdfService = require('../services/pdfService');
-const { Application, User } = require('../models');
 const AppError = require('../utils/appError');
 const path = require('path');
 
@@ -223,28 +221,7 @@ exports.deletePrice = catchAsync(async (req, res, next) => {
 // @route   GET /api/v1/admin/applications/:id/supply-order
 // @access  Private/Admin
 exports.getSupplyOrderPdf = catchAsync(async (req, res, next) => {
-  const application = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'applicant' }],
-  });
-
-  if (!application) {
-    return next(new AppError(404, 'الطلب غير موجود'));
-  }
-
-  if (!application.supplyOrderId) {
-    return next(
-      new AppError(
-        400,
-        'لم يتم إنشاء أمر التوريد بعد. يجب الموافقة على الطلب أولاً'
-      )
-    );
-  }
-
-  // Generate Data for Frontend
-  const data = await pdfService.generateSupplyOrder(
-    application,
-    application.applicant
-  );
+  const data = await adminService.getSupplyOrderData(req.params.id);
 
   res.status(200).json({
     status: 'success',
@@ -256,25 +233,7 @@ exports.getSupplyOrderPdf = catchAsync(async (req, res, next) => {
 // @route   GET /api/v1/admin/applications/:id/license-pdf
 // @access  Private/Admin
 exports.getLicensePdf = catchAsync(async (req, res, next) => {
-  const application = await Application.findByPk(req.params.id, {
-    include: [{ model: User, as: 'applicant' }],
-  });
-
-  if (!application) {
-    return next(new AppError(404, 'الطلب غير موجود'));
-  }
-
-  if (application.status !== 'completed') {
-    return next(
-      new AppError(400, 'لا يمكن إصدار الرخصة. يجب إتمام الطلب أولاً')
-    );
-  }
-
-  // Generate Data for Frontend
-  const data = await pdfService.generateLicenseCertificate(
-    application,
-    application.applicant
-  );
+  const data = await adminService.getLicenseData(req.params.id);
 
   res.status(200).json({
     status: 'success',
@@ -324,7 +283,7 @@ exports.updateUserRole = catchAsync(async (req, res, next) => {
 // @access  Private/SuperAdmin
 exports.updateUserStatus = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { isActive } = req.body;
+  const { status } = req.body;
 
   const user = await User.findByPk(id);
 
@@ -337,10 +296,10 @@ exports.updateUserStatus = catchAsync(async (req, res, next) => {
     return next(new AppError(400, 'لا يمكنك تعليق حسابك'));
   }
 
-  user.isActive = isActive;
+  user.status = status;
   await user.save();
 
-  const statusMessage = isActive ? 'تم تفعيل الحساب بنجاح' : 'تم تعليق الحساب بنجاح';
+  const statusMessage = status === 'active' ? 'تم تفعيل الحساب بنجاح' : 'تم تعليق الحساب بنجاح';
 
   res.status(200).json({
     status: 'success',
@@ -348,7 +307,7 @@ exports.updateUserStatus = catchAsync(async (req, res, next) => {
     data: {
       user: {
         id: user.id,
-        isActive: user.isActive,
+        status: user.status,
       },
     },
   });

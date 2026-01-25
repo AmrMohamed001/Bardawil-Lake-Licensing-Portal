@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الأسعار - منصة تراخيص بحيرة البردويل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+    <style>
+        .pricing-page {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3c72;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-back,
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #757575, #424242);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            box-shadow: 0 4px 6px rgba(30, 60, 114, 0.2);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(30, 60, 114, 0.3);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #1976d2;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pricing-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            color: white;
+            font-weight: 700;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header.blue {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .section-header.teal {
+            background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+        }
+
+        .section-header.purple {
+            background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+        }
+
+        .section-header.gray {
+            background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+        }
+
+        .section-header.orange {
+            background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+        }
+
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .price-table th {
+            padding: 1rem;
+            text-align: right;
+            color: #424242;
+            font-weight: 700;
+            background: #f5f5f5;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .price-table td {
+            padding: 1rem;
+            text-align: right;
+            color: #424242;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .price-amount {
+            font-weight: 700;
+            color: #00897b;
+            font-size: 1.1rem;
+        }
+
+        .duration-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .duration-badge.monthly {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .duration-badge.quarterly {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .duration-badge.six-months {
+            background: #ede7f6;
+            color: #512da8;
+        }
+
+        .duration-badge.seasonal {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .btn-edit {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-edit:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn-delete:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e3c72;
+            margin: 0;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #757575;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #424242;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #1a237e;
+            outline: none;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            padding: 0.75rem 1.5rem;
+            background: #f5f5f5;
+            color: #616161;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/spinner') %>
+        <%- include('../partials/navbar') %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'pricing' , pendingCount: 0 }) %>
+
+                <div class="pricing-page">
+                    <div class="container">
+                        <div class="page-header">
+                            <div>
+                                <h1><i class="fas fa-tags"></i> إدارة الأسعار</h1>
+                                <p>أسعار موسم 2026 للصيد ببحيرة البردويل</p>
+                            </div>
+                            <div class="header-actions">
+                                <button onclick="openAddModal()" class="btn-add">
+                                    <i class="fas fa-plus"></i> إضافة سعر جديد
+                                </button>
+                                <a href="/admin-dashboard" class="btn-back">
+                                    <i class="fas fa-arrow-right"></i> العودة
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <p>يتم استخدام هذه الأسعار عند احتساب رسوم التراخيص. يمكنك تعديل أو حذف أي سعر.</p>
+                        </div>
+
+                        <% const typeMap={ fisherman: { label: 'تراخيص الصيد' , icon: 'fa-fish' , color: 'blue' }, boat:
+                            { label: 'تراخيص المراكب' , icon: 'fa-ship' , color: 'teal' }, trade: {
+                            label: 'تراخيص التجارة' , icon: 'fa-store' , color: 'purple' }, entry: {
+                            label: 'تراخيص الدخول' , icon: 'fa-door-open' , color: 'gray' }, vehicle: {
+                            label: 'تراخيص المركبات' , icon: 'fa-truck' , color: 'orange' } }; const groupedPrices={};
+                            if (prices && prices.length> 0) {
+                            prices.forEach(p => {
+                            if (p.isActive) {
+                            if (!groupedPrices[p.licenseType]) groupedPrices[p.licenseType] = [];
+                            groupedPrices[p.licenseType].push(p);
+                            }
+                            });
+                            }
+
+                            const durationLabels = {
+                            '1_month': 'شهر',
+                            '3_months': '3 شهور',
+                            '6_months': '6 شهور',
+                            'season': 'الموسم'
+                            };
+
+                            const durationClasses = {
+                            '1_month': 'monthly',
+                            '3_months': 'quarterly',
+                            '6_months': 'six-months',
+                            'season': 'seasonal'
+                            };
+                            %>
+
+                            <% Object.keys(typeMap).forEach(type=> { %>
+                                <% if (groupedPrices[type] && groupedPrices[type].length> 0) { %>
+                                    <div class="pricing-section">
+                                        <div class="section-header <%= typeMap[type].color %>">
+                                            <i class="fas <%= typeMap[type].icon %>"></i>
+                                            <%= typeMap[type].label %>
+                                        </div>
+                                        <table class="price-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>الفئة</th>
+                                                    <th>السعر</th>
+                                                    <th>المدة</th>
+                                                    <th style="width: 120px;">إجراءات</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% groupedPrices[type].forEach(price=> { %>
+                                                    <tr>
+                                                        <td><strong>
+                                                                <%= price.category %>
+                                                            </strong></td>
+                                                        <td><span class="price-amount">
+                                                                <%= parseFloat(price.price).toLocaleString('ar-EG') %>
+                                                                    ج.م
+                                                            </span></td>
+                                                        <td>
+                                                            <span
+                                                                class="duration-badge <%= durationClasses[price.duration] %>">
+                                                                <%= durationLabels[price.duration] %>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <button
+                                                                onclick='openEditModal(<%= JSON.stringify({id: price.id, category: price.category, price: price.price, duration: price.duration, licenseType: price.licenseType}) %>)'
+                                                                class="action-btn btn-edit" title="تعديل">
+                                                                <i class="fas fa-pen"></i>
+                                                            </button>
+                                                            <button onclick="deletePrice('<%= price.id %>')"
+                                                                class="action-btn btn-delete" title="حذف">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <% }); %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <% } %>
+                                        <% }); %>
+
+                    </div>
+                </div>
+
+                <!-- Add/Edit Modal -->
+                <div class="modal-overlay" id="priceModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modalTitle">إضافة سعر جديد</h3>
+                            <button class="btn-close" onclick="closeModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="priceForm" onsubmit="handleSubmit(event)">
+                            <div class="modal-body">
+                                <input type="hidden" id="priceId">
+
+                                <div class="form-group">
+                                    <label class="form-label">نوع الترخيص</label>
+                                    <select class="form-control" id="licenseType" required>
+                                        <option value="fisherman">صيد</option>
+                                        <option value="boat">مراكب</option>
+                                        <option value="trade">تجارة</option>
+                                        <option value="entry">دخول</option>
+                                        <option value="vehicle">مركبات</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">الفئة</label>
+                                    <input type="text" class="form-control" id="category"
+                                        placeholder="مثال: صياد مؤمن عليه" required onchange="updateBaseDuration()">
+                                    <small style="color: #757575; margin-top: 0.25rem; display: block;">اختر الفئة
+                                        لتحديد المدة الأساسية تلقائياً</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">المدة الأساسية</label>
+                                    <input type="text" class="form-control" id="baseDurationDisplay" readonly
+                                        style="background: #f5f5f5; cursor: not-allowed;">
+                                    <input type="hidden" id="baseDuration" name="baseDuration">
+                                    <small style="color: #757575; margin-top: 0.25rem; display: block;">المدة الأساسية
+                                        يتم تحديدها تلقائياً بناءً على الفئة</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">السعر الأساسي (ج.م)</label>
+                                    <input type="number" class="form-control" id="price" step="0.01" min="0" required
+                                        onchange="calculatePrices()">
+                                    <small style="color: #757575; margin-top: 0.25rem; display: block;">أدخل سعر المدة
+                                        الأساسية فقط - سيتم حساب باقي المدد تلقائياً</small>
+                                </div>
+
+                                <!-- Price Preview Section -->
+                                <div id="pricePreview"
+                                    style="display: none; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 2px solid #4caf50; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                                    <h4
+                                        style="margin: 0 0 0.75rem 0; color: #1b5e20; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fas fa-calculator"></i>
+                                        معاينة الأسعار المحسوبة
+                                    </h4>
+                                    <div id="calculatedPrices"
+                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-cancel" onclick="closeModal()">إلغاء</button>
+                                <button type="submit" class="btn-save">حفظ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <%- include('../partials/footer') %>
+
+                    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                    <script>
+                        let isEditing = false;
+
+                        // Category to base duration mapping (matching backend model)
+                        const CATEGORY_BASE_DURATIONS = {
+                            // 1 month base
+                            'تاجر': '1_month',
+                            'مندوب': '1_month',
+                            'تاجر خارج المحافظة': '1_month',
+                            'سيارة': '1_month',
+                            'نجار': '1_month',
+                            'ميكانيكي': '1_month',
+                            // 3 months base
+                            'صياد مؤمن عليه': '3_months',
+                            'صياد غير مؤمن عليه': '3_months',
+                            'صياد تحت السن': '3_months',
+                            'صيد رجلي': '3_months',
+                            'عامل تاجر': '3_months',
+                            'بياع': '3_months',
+                            'شيال': '3_months',
+                            'تروسيكل': '3_months',
+                            'أفراد شركات': '3_months',
+                            // Season only
+                            'تجديد مركب': 'season',
+                            'مركب جديد': 'season',
+                            'مركب جهاز': 'season',
+                            'تغيير مرسي': 'season',
+                            'تغيير موتور': 'season'
+                        };
+
+                        const DURATION_LABELS = {
+                            '1_month': 'شهر',
+                            '3_months': '3 شهور',
+                            '6_months': '6 شهور',
+                            'season': 'الموسم (9 شهور)'
+                        };
+
+                        const DURATION_MONTHS = {
+                            '1_month': 1,
+                            '3_months': 3,
+                            '6_months': 6,
+                            'season': 9
+                        };
+
+                        // Update base duration when category changes
+                        function updateBaseDuration() {
+                            const category = document.getElementById('category').value.trim();
+                            const baseDuration = CATEGORY_BASE_DURATIONS[category];
+
+                            if (baseDuration) {
+                                document.getElementById('baseDuration').value = baseDuration;
+                                document.getElementById('baseDurationDisplay').value = DURATION_LABELS[baseDuration];
+                                calculatePrices(); // Trigger price recalculation
+                            } else {
+                                document.getElementById('baseDuration').value = '';
+                                document.getElementById('baseDurationDisplay').value = 'غير معروف - تحقق من اسم الفئة';
+                                document.getElementById('pricePreview').style.display = 'none';
+                            }
+                        }
+
+                        // Calculate and display prices for all durations
+                        function calculatePrices() {
+                            const basePrice = parseFloat(document.getElementById('price').value);
+                            const baseDuration = document.getElementById('baseDuration').value;
+
+                            if (!basePrice || !baseDuration || basePrice <= 0) {
+                                document.getElementById('pricePreview').style.display = 'none';
+                                return;
+                            }
+
+                            const baseMonths = DURATION_MONTHS[baseDuration];
+                            let validDurations = [];
+
+                            // Determine valid durations based on base
+                            if (baseDuration === '1_month') {
+                                validDurations = ['1_month', '3_months', '6_months', 'season'];
+                            } else if (baseDuration === '3_months') {
+                                validDurations = ['3_months', '6_months', 'season'];
+                            } else if (baseDuration === 'season') {
+                                validDurations = ['season'];
+                            }
+
+                            // Calculate prices
+                            let html = '';
+                            validDurations.forEach(duration => {
+                                const months = DURATION_MONTHS[duration];
+                                const calculatedPrice = basePrice * (months / baseMonths);
+                                const isBase = duration === baseDuration;
+
+                                html += `
+                                    <div style="background: white; padding: 0.75rem; border-radius: 8px; border: ${isBase ? '2px solid #1b5e20' : '1px solid #e0e0e0'};">
+                                        <div style="font-size: 0.875rem; color: #616161; margin-bottom: 0.25rem;">
+                                            ${DURATION_LABELS[duration]} ${isBase ? '(أساسي)' : ''}
+                                        </div>
+                                        <div style="font-size: 1.25rem; font-weight: 700; color: #1b5e20;">
+                                            ${calculatedPrice.toLocaleString('ar-EG')} ج.م
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                            document.getElementById('calculatedPrices').innerHTML = html;
+                            document.getElementById('pricePreview').style.display = 'block';
+                        }
+
+                        function openAddModal() {
+                            isEditing = false;
+                            document.getElementById('priceId').value = '';
+                            document.getElementById('priceForm').reset();
+                            document.getElementById('baseDuration').value = '';
+                            document.getElementById('baseDurationDisplay').value = '';
+                            document.getElementById('pricePreview').style.display = 'none';
+                            document.getElementById('modalTitle').textContent = 'إضافة سعر جديد';
+                            document.getElementById('priceModal').classList.add('active');
+                        }
+
+                        function openEditModal(data) {
+                            isEditing = true;
+                            document.getElementById('priceId').value = data.id;
+                            document.getElementById('category').value = data.category;
+                            document.getElementById('price').value = data.price;
+                            document.getElementById('licenseType').value = data.licenseType;
+
+                            // Set base duration
+                            const baseDuration = data.baseDuration || data.duration; // Fallback to duration if baseDuration not set yet
+                            document.getElementById('baseDuration').value = baseDuration;
+                            document.getElementById('baseDurationDisplay').value = DURATION_LABELS[baseDuration] || baseDuration;
+
+                            document.getElementById('modalTitle').textContent = 'تعديل السعر';
+                            document.getElementById('priceModal').classList.add('active');
+
+                            // Show calculated prices
+                            calculatePrices();
+                        }
+
+                        function closeModal() {
+                            document.getElementById('priceModal').classList.remove('active');
+                        }
+
+                        async function handleSubmit(e) {
+                            e.preventDefault();
+
+                            const baseDuration = document.getElementById('baseDuration').value;
+                            if (!baseDuration) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: 'يرجى التأكد من اختيار فئة صحيحة لتحديد المدة الأساسية'
+                                });
+                                return;
+                            }
+
+                            const formData = {
+                                licenseType: document.getElementById('licenseType').value,
+                                category: document.getElementById('category').value,
+                                price: parseFloat(document.getElementById('price').value),
+                                baseDuration: baseDuration,
+                                duration: baseDuration // Keep duration same as baseDuration for compatibility
+                            };
+
+                            try {
+                                if (isEditing) {
+                                    const id = document.getElementById('priceId').value;
+                                    await axios.put(`/api/v1/admin/prices/${id}`, formData);
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'تم التحديث بنجاح',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    }).then(() => location.reload());
+                                } else {
+                                    await axios.post('/api/v1/admin/prices', formData);
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'تم الإضافة بنجاح',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    }).then(() => location.reload());
+                                }
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'حدث خطأ',
+                                    text: error.response?.data?.message || 'فشل حفظ البيانات'
+                                });
+                            }
+                        }
+
+                        async function deletePrice(id) {
+                            const result = await Swal.fire({
+                                title: 'هل أنت متأكد؟',
+                                text: "سيتم إلغاء تفعيل هذا السعر",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#3085d6',
+                                confirmButtonText: 'نعم، احذف',
+                                cancelButtonText: 'إلغاء'
+                            });
+
+                            if (result.isConfirmed) {
+                                try {
+                                    await axios.delete(`/api/v1/admin/prices/${id}`);
+                                    Swal.fire('تم الحذف!', 'تم حذف السعر بنجاح', 'success')
+                                        .then(() => location.reload());
+                                } catch (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'حدث خطأ',
+                                        text: error.response?.data?.message || 'فشل الحذف'
+                                    });
+                                }
+                            }
+                        }
+                    </script>
+</body>
+
+</html>

@@ -7,8 +7,10 @@ const Document = require('./documentModel');
 const Notification = require('./notificationModel');
 const LicensePrice = require('./licensePriceModel');
 const ApplicationStatusHistory = require('./applicationStatusHistoryModel');
+const ApplicationStatus = require('./applicationStatusModel');
 const News = require('./newsModel');
 const AuditLog = require('./auditLogModel');
+const ServiceRequiredDocument = require('./serviceRequiredDocumentModel');
 
 // ==========================================
 // Model Associations
@@ -28,6 +30,16 @@ Application.belongsTo(User, {
 Application.belongsTo(User, {
   foreignKey: 'reviewedBy',
   as: 'reviewer',
+});
+
+// Application belongs to ApplicationStatus (lookup table)
+Application.belongsTo(ApplicationStatus, {
+  foreignKey: 'statusId',
+  as: 'statusInfo',
+});
+ApplicationStatus.hasMany(Application, {
+  foreignKey: 'statusId',
+  as: 'applications',
 });
 
 // Application has many Documents
@@ -116,6 +128,8 @@ module.exports = {
   Notification,
   LicensePrice,
   ApplicationStatusHistory,
+  ApplicationStatus,
   News,
   AuditLog,
+  ServiceRequiredDocument,
 };

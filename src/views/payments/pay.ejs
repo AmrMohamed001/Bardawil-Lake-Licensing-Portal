@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %> - منصة تراخيص بحيرة البردويل
+    </title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+    <style>
+        .payment-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #00897b 100%);
+            padding: 2rem;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+        }
+
+        .payment-header img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .payment-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .amount-box {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .amount-box .label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-box .amount {
+            font-size: 3rem;
+            font-weight: 900;
+        }
+
+        .amount-box .currency {
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .payment-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: right;
+        }
+
+        .order-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-info-row .label {
+            color: #757575;
+        }
+
+        .order-info-row .value {
+            font-weight: 600;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4);
+        }
+
+        .btn-pay:disabled {
+            background: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #757575;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #1e3c72;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            color: #757575;
+            font-size: 0.875rem;
+        }
+
+        .secure-badge i {
+            color: #4CAF50;
+        }
+
+        .loading-state {
+            display: none;
+        }
+
+        .loading-state.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #1e3c72;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .paymob-logo {
+            height: 30px;
+            opacity: 0.7;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-page">
+        <div class="payment-card">
+            <div class="payment-header">
+                <img src="/imgs/logo.png" alt="البردويل">
+                <h1>دفع رسوم الترخيص</h1>
+                <p>طلب رقم <%= application.applicationNumber %>
+                </p>
+                <div class="amount-box">
+                    <div class="label">المبلغ المطلوب</div>
+                    <div class="amount">
+                        <span class="currency">ج.م</span>
+                        <%= application.paymentAmount || 0 %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-body">
+                <div class="bank-info-card"
+                    style="margin-bottom: 2rem; padding: 1.5rem; background: #e3f2fd; border-radius: 16px; border: 1px solid #90caf9; text-align: center; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);">
+                    <div style="font-weight: 700; color: #1565c0; margin-bottom: 0.75rem; font-size: 1.1rem;">
+                        <i class="fas fa-university" style="margin-left: 8px;"></i>
+                        حساب جهاز مستقبل مصر للتنمية المستدامه للتحويل
+                    </div>
+                    <div
+                        style="background: white; padding: 0.75rem 1.5rem; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 1rem; border: 2px dashed #90caf9; margin-bottom: 0.5rem; direction: ltr;">
+                        <span
+                            style="font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: 800; color: #0d47a1; letter-spacing: 1px;">5170199000001735</span>
+                        <button onclick="navigator.clipboard.writeText('5170199000001735'); alert('تم تسخ الرقم')"
+                            style="background: none; border: none; cursor: pointer; color: #1976d2;" title="نسخ">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="paymentForm">
+                    <div class="order-info">
+                        <div class="order-info-row">
+                            <span class="label">نوع الترخيص</span>
+                            <span class="value">
+                                <% if (application.applicationType==='fisherman' ) { %>صياد
+                                    <% } else if (application.applicationType==='boat' ) { %>مركب
+                                        <% } else if (application.applicationType==='vehicle' ) { %>سيارة
+                                            <% } else if (application.applicationType==='other' ) { %>أخرى
+                                                <% } else { %>
+                                                    <%= application.applicationType %>
+                                                        <% } %>
+                            </span>
+                        </div>
+                        <div class="order-info-row">
+                            <span class="label">الفئة</span>
+                            <span class="value">
+                                <%= application.licenseCategory %>
+                            </span>
+                        </div>
+                        <% if (application.duration) { %>
+                            <div class="order-info-row">
+                                <span class="label">المدة</span>
+                                <span class="value">
+                                    <% if (application.duration==='1_month' ) { %>شهر واحد
+                                        <% } else if (application.duration==='3_months' ) { %>3 شهور
+                                            <% } else if (application.duration==='season' ) { %>الموسم (9 شهور)
+                                                <% } %>
+                                </span>
+                            </div>
+                            <% } %>
+                    </div>
+
+                    <!-- Receipt Upload Section -->
+                    <div id="manualUploadTab" class="payment-tab-content" style="display: block;">
+                        <div class="manual-upload-info">
+                            <p><strong>تعليمات الدفع:</strong></p>
+                            <ol>
+                                <li>يرجى سداد المبلغ المطلوب في خزينة الجهاز أو عبر التحويل البنكي</li>
+                                <li>احتفظ بإيصال الدفع</li>
+                                <li>قم برفع صورة واضحة للإيصال هنا للمراجعة</li>
+                            </ol>
+                        </div>
+                        <form id="receiptUploadForm" enctype="multipart/form-data">
+                            <div class="upload-area" onclick="document.getElementById('receiptFile').click()">
+                                <input type="file" id="receiptFile" name="payment_receipt" accept="image/*,.pdf"
+                                    onchange="handleReceiptUpload(this)" style="display: none;">
+                                <div id="uploadPlaceholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>اضغط لرفع إيصال الدفع</p>
+                                    <small>صورة أو PDF</small>
+                                </div>
+                                <div id="uploadPreview" style="display: none;">
+                                    <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 2rem;"></i>
+                                    <p id="uploadFileName"></p>
+                                </div>
+                            </div>
+                            <button type="button" id="uploadReceiptBtn" class="btn-pay" onclick="submitReceipt()"
+                                disabled>
+                                <i class="fas fa-paper-plane"></i>
+                                إرسال إيصال الدفع
+                            </button>
+                        </form>
+                    </div>
+
+                    <a href="/applications/<%= application.id %>" class="btn-back">
+                        <i class="fas fa-arrow-right"></i>
+                        العودة لتفاصيل الطلب
+                    </a>
+                </div>
+
+                <div id="loadingState" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #424242; font-weight: 600;">جاري تحويلك لبوابة الدفع...</p>
+                    <p style="color: #757575; font-size: 0.875rem;">يرجى الانتظار</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script>
+        var applicationId = '<%= application.id %>';
+
+        // Handle receipt file selection
+        function handleReceiptUpload(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('uploadPlaceholder').style.display = 'none';
+                document.getElementById('uploadPreview').style.display = 'block';
+                document.getElementById('uploadFileName').textContent = input.files[0].name;
+                document.getElementById('uploadReceiptBtn').disabled = false;
+            }
+        }
+
+        // Submit receipt
+        function submitReceipt() {
+            var formData = new FormData();
+            var fileInput = document.getElementById('receiptFile');
+
+            if (!fileInput.files[0]) {
+                alert('يرجى اختيار ملف إيصال الدفع');
+                return;
+            }
+
+            formData.append('payment_receipt', fileInput.files[0]);
+
+            var btn = document.getElementById('uploadReceiptBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+
+            axios.post('/api/v1/applications/' + applicationId + '/payment-receipt', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+                .then(function (response) {
+                    alert('تم رفع إيصال الدفع بنجاح. سيتم مراجعته قريباً.');
+                    window.location.href = '/applications/' + applicationId;
+                })
+                .catch(function (error) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال إيصال الدفع';
+                    alert(error.response?.data?.message || 'حدث خطأ أثناء رفع الإيصال');
+                });
+        }
+    </script>
+
+    <style>
+        /* Payment Tabs */
+        .payment-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #757575;
+            transition: all 0.3s;
+        }
+
+        .payment-tab:hover {
+            border-color: #1e3c72;
+            color: #1e3c72;
+        }
+
+        .payment-tab.active {
+            border-color: #1e3c72;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .payment-tab i {
+            margin-left: 0.5rem;
+        }
+
+        /* Manual Upload */
+        .manual-upload-info {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .manual-upload-info ol {
+            margin: 0.5rem 1.5rem 0 0;
+            padding: 0;
+        }
+
+        .manual-upload-info li {
+            margin-bottom: 0.25rem;
+            color: #616161;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #1e3c72;
+            background: rgba(30, 60, 114, 0.02);
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: #9e9e9e;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            margin: 0;
+            color: #616161;
+            font-weight: 600;
+        }
+
+        .upload-area small {
+            color: #9e9e9e;
+        }
+    </style>
+</body>
+
+</html>

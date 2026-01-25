@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأسعار والرسوم - منصة تراخيص بحيرة البردويل</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+</head>
+
+<body>
+    <%- include('../partials/spinner') %>
+        <%- include('../partials/navbar') %>
+
+            <div class="pricing-page">
+                <div class="container">
+
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1><i class="fas fa-coins"></i> الأسعار والرسوم</h1>
+                        <p>الرسوم الرسمية لموسم 2026 للصيد ببحيرة البردويل</p>
+                        <div class="official-badge">
+                            <i class="fas fa-stamp"></i>
+                            <span>معتمد من جهاز مستقبل مصر للتنمية المستدامة</span>
+                        </div>
+                    </div>
+
+                    <!-- Notice -->
+                    <div class="notice">
+                        <i class="fas fa-info-circle"></i>
+                        <% if (typeof pricesByType !=='undefined' && Object.keys(pricesByType).length> 0) { %>
+                            <p>الأسعار المعروضة محدثة من قاعدة البيانات. يرجى تسجيل الدخول للاطلاع على أحدث الأسعار.</p>
+                            <% } else { %>
+                                <p>الرسوم المذكورة هي الرسوم الإجبارية المقترحة لموسم 2026. يرجى مراجعة مكتب الترخيص
+                                    للحصول على
+                                    أحدث المعلومات.</p>
+                                <% } %>
+                    </div>
+
+                    <!-- Pricing Sections (SSR) -->
+                    <div id="pricing-sections-container">
+                        <% const DURATION_LABELS={ '1_month' : 'شهر' , '3_months' : '3 شهور' , '6_months' : '6 شهور'
+                            , 'season' : 'الموسم (9 شهور)' }; const TYPE_CONFIG={ fisherman: { label: 'تراخيص الصيد' ,
+                            icon: 'fa-fish' , iconClass: 'fisherman' }, boat: { label: 'تراخيص المراكب' ,
+                            icon: 'fa-ship' , iconClass: 'boat' }, trade: { label: 'تراخيص التجارة' , icon: 'fa-store' ,
+                            iconClass: 'trade' }, vehicle: { label: 'تراخيص المركبات' , icon: 'fa-car' ,
+                            iconClass: 'entry' }, entry: { label: 'تراخيص الدخول' , icon: 'fa-door-open' ,
+                            iconClass: 'entry' } }; %>
+
+                            <% if (typeof pricesByType !=='undefined' && Object.keys(pricesByType).length> 0) { %>
+                                <% Object.keys(pricesByType).forEach(type=> { %>
+                                    <% const config=TYPE_CONFIG[type]; %>
+                                        <% if (config) { %>
+                                            <div class="pricing-section">
+                                                <h2><i class="fas <%= config.icon %>"></i>
+                                                    <%= config.label %>
+                                                </h2>
+                                                <div class="pricing-grid">
+                                                    <% pricesByType[type].forEach((pr, idx)=> { %>
+                                                        <div class="pricing-card <%= idx === 0 ? 'featured' : '' %>">
+                                                            <div class="pricing-icon <%= config.iconClass %>">
+                                                                <i class="fas <%= config.icon %>"></i>
+                                                            </div>
+                                                            <h3>
+                                                                <%= pr.category %>
+                                                            </h3>
+                                                            <div class="pricing-duration">
+                                                                <%= DURATION_LABELS[pr.baseDuration] || pr.baseDuration
+                                                                    %>
+                                                            </div>
+                                                            <div class="pricing-amount">
+                                                                <%= pr.basePrice ? pr.basePrice.toLocaleString('ar-EG')
+                                                                    : '0' %> <span>جنيه</span>
+                                                            </div>
+                                                        </div>
+                                                        <% }); %>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <div style="text-align: center; padding: 3rem; color: #757575;">
+                                                            <i class="fas fa-exclamation-circle"
+                                                                style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                                            <p>لا توجد أسعار متاحة حالياً.</p>
+                                                        </div>
+                                                        <% } %>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="pricing-cta">
+                        <h3>جاهز للتقديم؟</h3>
+                        <p>قدم طلبك الآن واحصل على ترخيصك بسهولة</p>
+                        <a href="/apply" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus-circle"></i> تقديم طلب جديد
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <%- include('../partials/footer') %>
+
+                <style>
+                    .pricing-page {
+                        padding: 2rem 0;
+                        min-height: calc(100vh - 200px);
+                        background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+                    }
+
+                    .page-header {
+                        text-align: center;
+                        margin-bottom: 2rem;
+                    }
+
+                    .page-header h1 {
+                        font-size: 2.5rem;
+                        font-weight: 700;
+                        color: #1e3c72;
+                        margin-bottom: 0.5rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.75rem;
+                    }
+
+                    .page-header p {
+                        color: #757575;
+                        font-size: 1.125rem;
+                    }
+
+                    .official-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+                        color: white;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 50px;
+                        margin-top: 1rem;
+                        font-size: 0.875rem;
+                    }
+
+                    .notice {
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        background: #fff3e0;
+                        border: 1px solid #ffb74d;
+                        padding: 1rem 1.5rem;
+                        border-radius: 12px;
+                        margin-bottom: 2rem;
+                    }
+
+                    .notice i {
+                        color: #f57c00;
+                        font-size: 1.5rem;
+                    }
+
+                    .notice p {
+                        margin: 0;
+                        color: #e65100;
+                    }
+
+                    .pricing-section {
+                        margin-bottom: 2.5rem;
+                    }
+
+                    .pricing-section h2 {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: #212121;
+                        margin-bottom: 1.5rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        padding-bottom: 0.75rem;
+                        border-bottom: 2px solid #e0e0e0;
+                    }
+
+                    .pricing-section h2 i {
+                        color: #1e3c72;
+                    }
+
+                    .pricing-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                        gap: 1.5rem;
+                    }
+
+                    .pricing-card {
+                        background: white;
+                        border-radius: 16px;
+                        padding: 1.5rem;
+                        text-align: center;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        transition: all 0.3s ease;
+                        border: 2px solid transparent;
+                    }
+
+                    .pricing-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .pricing-card.featured {
+                        border-color: #1e3c72;
+                    }
+
+                    .pricing-card.premium {
+                        background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+                        border-color: #ff9800;
+                    }
+
+                    .pricing-icon {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 16px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 1rem;
+                        font-size: 1.5rem;
+                    }
+
+                    .pricing-icon.boat {
+                        background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+                        color: white;
+                    }
+
+                    .pricing-icon.fisherman {
+                        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                        color: white;
+                    }
+
+                    .pricing-icon.trade {
+                        background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                        color: white;
+                    }
+
+                    .pricing-icon.entry {
+                        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                        color: white;
+                    }
+
+                    .pricing-card h3 {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        color: #212121;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .pricing-duration {
+                        font-size: 0.875rem;
+                        color: #757575;
+                        margin-bottom: 1rem;
+                    }
+
+                    .pricing-amount {
+                        font-size: 2rem;
+                        font-weight: 700;
+                        color: #1e3c72;
+                    }
+
+                    .pricing-amount span {
+                        font-size: 1rem;
+                        font-weight: 400;
+                    }
+
+                    .pricing-cta {
+                        text-align: center;
+                        background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+                        padding: 3rem;
+                        border-radius: 20px;
+                        color: white;
+                    }
+
+                    .pricing-cta h3 {
+                        font-size: 1.75rem;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .pricing-cta p {
+                        opacity: 0.9;
+                        margin-bottom: 1.5rem;
+                    }
+
+                    .pricing-cta .btn {
+                        background: white;
+                        color: #1e3c72;
+                        padding: 1rem 2rem;
+                        font-size: 1.125rem;
+                    }
+
+                    .pricing-cta .btn:hover {
+                        background: rgba(255, 255, 255, 0.9);
+                    }
+
+                    @media (max-width: 768px) {
+                        .page-header h1 {
+                            font-size: 1.75rem;
+                        }
+
+                        .pricing-grid {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .notice {
+                            flex-direction: column;
+                            text-align: center;
+                        }
+                    }
+                </style>
+
+                <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</body>
+
+</html>

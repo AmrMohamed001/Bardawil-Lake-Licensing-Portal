@@ -29,7 +29,7 @@ const Application = sequelize.define(
       field: 'user_id',
     },
     applicationType: {
-      type: DataTypes.ENUM('fisherman', 'boat', 'vehicle', 'other'),
+      type: DataTypes.ENUM('fisherman', 'boat', 'vehicle', 'trade', 'entry', 'other'),
       allowNull: false,
       field: 'application_type',
     },
@@ -47,11 +47,35 @@ const Application = sequelize.define(
       defaultValue: false,
       field: 'is_renewal',
     },
+    // License duration: 1 month, 3 months, 6 months, or season (9 months)
+    duration: {
+      type: DataTypes.ENUM('1_month', '3_months', '6_months', 'season'),
+      allowNull: false,
+      defaultValue: '3_months',
+    },
+    // For boat applications: private or agency boat
+    boatType: {
+      type: DataTypes.ENUM('private', 'agency'),
+      allowNull: true,
+      field: 'boat_type',
+    },
+    // Status - using lookup table for translations and metadata
+    statusId: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // Temporarily nullable for migration
+      references: {
+        model: 'application_statuses',
+        key: 'id',
+      },
+      field: 'status_id',
+    },
+    // Legacy status field - kept for backward compatibility
+    // TODO: Remove after full migration to statusId
     status: {
       type: DataTypes.ENUM(
         'received',
         'under_review',
-        'approved_payment_pending', // New status for Paymob integration
+        'approved_payment_pending',
         'approved_payment_required',
         'payment_pending',
         'payment_submitted',
@@ -90,6 +114,25 @@ const Application = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: true,
       field: 'paymob_order_id',
+    },
+    paymentVerifiedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
+      field: 'payment_verified_by',
+    },
+    paymentVerifiedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'payment_verified_at',
+    },
+    paymentVerificationNotes: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'payment_verification_notes',
     },
     paymobTransactionId: {
       type: DataTypes.STRING(50),
@@ -154,15 +197,17 @@ const Application = sequelize.define(
         const data = this.data || {};
 
         // Validate licenseCategory based on applicationType
-        // Updated for separated fisherman and 'other' types
+        // Updated to match new categories
         const fishermanCategories = [
           'صياد مؤمن عليه',
           'صياد غير مؤمن عليه',
           'صياد تحت السن',
+          'صيد رجلي',
         ];
-        const otherCategories = ['مندوب', 'تاجر', 'عامل تاجر', 'شيال'];
-        const boatCategories = ['مركب'];
-        const vehicleCategories = ['مركبة', 'تروسيكل'];
+        const tradeCategories = ['تاجر', 'مندوب', 'عامل تاجر', 'تاجر خارج المحافظة', 'بياع'];
+        const entryCategories = ['شيال', 'نجار', 'ميكانيكي', 'أفراد شركات'];
+        const boatCategories = ['مركب خاص', 'مركب الجهاز', 'تغيير مرسي', 'تغيير موتور'];
+        const vehicleCategories = ['سيارة', 'تروسيكل'];
 
         if (
           this.applicationType === 'fisherman' &&
@@ -171,10 +216,16 @@ const Application = sequelize.define(
           throw new Error('فئة الصياد غير صالحة');
         }
         if (
-          this.applicationType === 'other' &&
-          !otherCategories.includes(this.licenseCategory)
+          this.applicationType === 'trade' &&
+          !tradeCategories.includes(this.licenseCategory)
         ) {
-          throw new Error('فئة الترخيص غير صالحة');
+          throw new Error('فئة التجارة غير صالحة');
+        }
+        if (
+          this.applicationType === 'entry' &&
+          !entryCategories.includes(this.licenseCategory)
+        ) {
+          throw new Error('فئة الدخول غير صالحة');
         }
         if (
           this.applicationType === 'boat' &&

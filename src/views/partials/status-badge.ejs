@@ -1,92 +1,89 @@
-<%
-const statusLabels = {
-  received: 'تم الاستلام',
-  under_review: 'قيد المراجعة',
-  approved_payment_required: 'بانتظار الدفع',
-  payment_verified: 'تم التحقق من الدفع',
-  ready: 'جاهز للاستلام',
-  completed: 'مكتمل',
-  rejected: 'مرفوض'
-};
+<% var hasStatusInfo=(typeof statusInfo !='undefined' ) && statusInfo && statusInfo.nameAr; if (hasStatusInfo) { %>
+  <span class="status-badge" style="background-color: <%= statusInfo.color %>20; color: <%= statusInfo.color %>;">
+    <i class="fas <%= statusInfo.icon %>"></i>
+    <%= statusInfo.nameAr %>
+  </span>
+  <% } else { var labels={ received: 'تم الاستلام' , under_review: 'قيد المراجعة' ,
+    approved_payment_pending: 'بانتظار الدفع' , approved_payment_required: 'مطلوب الدفع' ,
+    payment_pending: 'جاري معالجة الدفع' , payment_submitted: 'تم تقديم إيصال الدفع' ,
+    payment_verified: 'تم التحقق من الدفع' , processing: 'جاري إصدار الترخيص' , ready: 'جاهز للاستلام' ,
+    completed: 'مكتمل' , rejected: 'مرفوض' }; var classes={ received: 'badge-received' ,
+    under_review: 'badge-under-review' , approved_payment_pending: 'badge-payment-required' ,
+    approved_payment_required: 'badge-payment-required' , payment_pending: 'badge-payment-processing' ,
+    payment_submitted: 'badge-payment-processing' , payment_verified: 'badge-payment-verified' ,
+    processing: 'badge-processing' , ready: 'badge-ready' , completed: 'badge-completed' , rejected: 'badge-rejected' };
+    var icons={ received: 'inbox' , under_review: 'search' , approved_payment_pending: 'credit-card' ,
+    approved_payment_required: 'credit-card' , payment_pending: 'hourglass-half' , payment_submitted: 'receipt' ,
+    payment_verified: 'check-double' , processing: 'cogs' , ready: 'gift' , completed: 'trophy' ,
+    rejected: 'times-circle' }; var s=status || 'unknown' ; var c=classes[s] || 'badge-default' ; var i=icons[s]
+    || 'circle' ; var l=labels[s] || s; %>
+    <span class="status-badge <%= c %>">
+      <i class="fas fa-<%= i %>"></i>
+      <%= l %>
+    </span>
+    <% } %>
+      <style>
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          border-radius: 999px;
+          font-size: 0.8125rem;
+          font-weight: 600
+        }
 
-const statusClasses = {
-  received: 'badge-received',
-  under_review: 'badge-under-review',
-  approved_payment_required: 'badge-payment-required',
-  payment_verified: 'badge-payment-verified',
-  ready: 'badge-ready',
-  completed: 'badge-completed',
-  rejected: 'badge-rejected'
-};
+        .status-badge i {
+          font-size: 0.75rem
+        }
 
-const statusIcons = {
-  received: 'inbox',
-  under_review: 'search',
-  approved_payment_required: 'credit-card',
-  payment_verified: 'check-double',
-  ready: 'gift',
-  completed: 'trophy',
-  rejected: 'times-circle'
-};
-%>
+        .badge-received {
+          background: #E3F2FD;
+          color: #1565C0
+        }
 
-<span class="status-badge <%= statusClasses[status] || 'badge-default' %>">
-  <i class="fas fa-<%= statusIcons[status] || 'circle' %>"></i>
-  <%= statusLabels[status] || status %>
-</span>
+        .badge-under-review {
+          background: #FFF3E0;
+          color: #EF6C00
+        }
 
-<style>
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
+        .badge-payment-required {
+          background: #FCE4EC;
+          color: #C2185B
+        }
 
-.status-badge i {
-  font-size: 0.75rem;
-}
+        .badge-payment-processing {
+          background: #EDE7F6;
+          color: #512DA8
+        }
 
-.badge-received {
-  background: #E3F2FD;
-  color: #1565C0;
-}
+        .badge-payment-verified {
+          background: #E8F5E9;
+          color: #2E7D32
+        }
 
-.badge-under-review {
-  background: #FFF3E0;
-  color: #EF6C00;
-}
+        .badge-processing {
+          background: #E0F7FA;
+          color: #00838F
+        }
 
-.badge-payment-required {
-  background: #FFF8E1;
-  color: #F9A825;
-}
+        .badge-ready {
+          background: #E0F2F1;
+          color: #00695C
+        }
 
-.badge-payment-verified {
-  background: #E8F5E9;
-  color: #2E7D32;
-}
+        .badge-completed {
+          background: #F1F8E9;
+          color: #33691E
+        }
 
-.badge-ready {
-  background: #E0F2F1;
-  color: #00695C;
-}
+        .badge-rejected {
+          background: #FFEBEE;
+          color: #C62828
+        }
 
-.badge-completed {
-  background: #E8F5E9;
-  color: #1B5E20;
-}
-
-.badge-rejected {
-  background: #FFEBEE;
-  color: #C62828;
-}
-
-.badge-default {
-  background: #F5F5F5;
-  color: #616161;
-}
-</style>
+        .badge-default {
+          background: #F5F5F5;
+          color: #616161
+        }
+      </style>

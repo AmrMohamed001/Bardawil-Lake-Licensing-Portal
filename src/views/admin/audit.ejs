@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سجل التدقيق - منصة تراخيص بحيرة البردويل</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="icon" type="image/png" href="/imgs/logo.png" />
+  <style>
+    .audit-page {
+      padding: 2rem 0;
+      min-height: calc(100vh - 200px);
+      background: #f5f7fa;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #212121;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .page-header h1 i {
+      color: #1e3c72;
+    }
+
+    .page-header p {
+      color: #757575;
+      margin-top: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .filters-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .filters-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #424242;
+      margin-bottom: 0.5rem;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    .audit-table th,
+    .audit-table td {
+      padding: 1rem;
+      text-align: right;
+      border-bottom: 1px solid #eee;
+    }
+
+    .audit-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #424242;
+      position: sticky;
+      top: 0;
+    }
+
+    .audit-table tbody tr:hover {
+      background: #f8f9fa;
+      cursor: pointer;
+    }
+
+    .action-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .action-badge.login {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .action-badge.logout {
+      background: #f5f5f5;
+      color: #616161;
+    }
+
+    .action-badge.create {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .action-badge.update {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .action-badge.delete {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .action-badge.approve {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .action-badge.reject {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .action-badge.status {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .action-badge.default {
+      background: #f5f5f5;
+      color: #616161;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .page-link {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: white;
+      color: #424242;
+      text-decoration: none;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .page-link:hover,
+    .page-link.active {
+      background: #1e3c72;
+      color: white;
+      border-color: #1e3c72;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #9e9e9e;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #757575;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .detail-row .label {
+      color: #757575;
+    }
+
+    .detail-row .value {
+      font-weight: 600;
+    }
+
+    .code-block {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: white;
+    }
+
+    .btn-success:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('../partials/spinner') %>
+    <%- include('../partials/navbar') %>
+      <%- include('../partials/admin-sidebar', { currentPage: 'audit' , pendingCount: 0 }) %>
+
+        <div class="audit-page">
+          <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+              <div>
+                <h1><i class="fas fa-history"></i> سجل التدقيق</h1>
+                <p>عرض جميع الإجراءات والعمليات في النظام</p>
+              </div>
+              <div class="header-actions">
+                <a href="/api/v1/admin/audit/export/excel" class="btn btn-success btn-sm">
+                  <i class="fas fa-file-excel"></i> Excel
+                </a>
+                <a href="/api/v1/admin/audit/export/csv" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-file-csv"></i> CSV
+                </a>
+                <a href="/admin-dashboard" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-arrow-right"></i> العودة
+                </a>
+              </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+              <form id="filterForm" class="filters-row">
+                <div class="filter-group">
+                  <label><i class="fas fa-bolt"></i> نوع الإجراء</label>
+                  <select name="action" id="actionFilter" class="form-control">
+                    <option value="">جميع الإجراءات</option>
+                  </select>
+                </div>
+                <div class="filter-group">
+                  <label><i class="fas fa-database"></i> نوع الكيان</label>
+                  <select name="entityType" id="entityTypeFilter" class="form-control">
+                    <option value="">جميع الكيانات</option>
+                  </select>
+                </div>
+                <div class="filter-group">
+                  <label><i class="fas fa-calendar"></i> من تاريخ</label>
+                  <input type="date" name="startDate" id="startDate" class="form-control" />
+                </div>
+                <div class="filter-group">
+                  <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
+                  <input type="date" name="endDate" id="endDate" class="form-control" />
+                </div>
+                <div class="filter-group">
+                  <label>&nbsp;</label>
+                  <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-search"></i> بحث
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Audit Logs Table -->
+            <div class="table-container">
+              <div class="table-scroll">
+                <table class="audit-table">
+                  <thead>
+                    <tr>
+                      <th>التاريخ</th>
+                      <th>المستخدم</th>
+                      <th>الإجراء</th>
+                      <th>الكيان</th>
+                      <th>الوصف</th>
+                      <th>IP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="logsTableBody">
+                    <tr>
+                      <td colspan="6" class="empty-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>جاري التحميل...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="paginationContainer" class="pagination"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Modal -->
+        <div id="detailsModal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3><i class="fas fa-info-circle"></i> تفاصيل السجل</h3>
+              <button class="close-btn" onclick="hideDetailsModal()">&times;</button>
+            </div>
+            <div id="detailsContent"></div>
+          </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+          <script>
+            const api = axios.create({ baseURL: '/api/v1', withCredentials: true });
+
+            let actionTypes = [];
+            let entityTypes = [];
+
+            const actionLabels = {
+              LOGIN: 'تسجيل دخول',
+              LOGOUT: 'تسجيل خروج',
+              REGISTER: 'تسجيل حساب',
+              CREATE: 'إنشاء',
+              UPDATE: 'تعديل',
+              DELETE: 'حذف',
+              STATUS_CHANGE: 'تغيير حالة',
+              APPROVE: 'موافقة',
+              REJECT: 'رفض',
+              VERIFY_PAYMENT: 'تأكيد دفع',
+              PRICE_UPDATE: 'تحديث سعر',
+            };
+
+            const entityLabels = {
+              user: 'مستخدم',
+              application: 'طلب',
+              price: 'سعر',
+              notification: 'إشعار',
+              document: 'مستند',
+            };
+
+            const getActionClass = action => {
+              const map = {
+                LOGIN: 'login', LOGOUT: 'logout', REGISTER: 'create',
+                CREATE: 'create', UPDATE: 'update', DELETE: 'delete',
+                STATUS_CHANGE: 'status', APPROVE: 'approve', REJECT: 'reject',
+                VERIFY_PAYMENT: 'approve', PRICE_UPDATE: 'update',
+              };
+              return map[action] || 'default';
+            };
+
+            const loadLogs = async (page = 1) => {
+              const params = new URLSearchParams();
+              params.append('page', page);
+
+              const action = document.getElementById('actionFilter').value;
+              const entityType = document.getElementById('entityTypeFilter').value;
+              const startDate = document.getElementById('startDate').value;
+              const endDate = document.getElementById('endDate').value;
+
+              if (action) params.append('action', action);
+              if (entityType) params.append('entityType', entityType);
+              if (startDate) params.append('startDate', startDate);
+              if (endDate) params.append('endDate', endDate);
+
+              try {
+                const res = await api.get('/admin/audit-logs?' + params.toString());
+                const data = res.data.data || res.data;
+
+                if (!actionTypes.length && data.actionTypes) {
+                  actionTypes = data.actionTypes;
+                  entityTypes = data.entityTypes;
+                  populateFilters();
+                }
+
+                renderLogs(data.logs || []);
+                renderPagination(res.data.pagination || { page: 1, pages: 1 });
+              } catch (err) {
+                console.error('Error loading logs:', err);
+                document.getElementById('logsTableBody').innerHTML =
+                  '<tr><td colspan="6" class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>خطأ في تحميل البيانات</p></td></tr>';
+              }
+            };
+
+            const populateFilters = () => {
+              const actionSelect = document.getElementById('actionFilter');
+              const entitySelect = document.getElementById('entityTypeFilter');
+
+              actionTypes.forEach(action => {
+                const option = document.createElement('option');
+                option.value = action;
+                option.textContent = actionLabels[action] || action;
+                actionSelect.appendChild(option);
+              });
+
+              entityTypes.forEach(entity => {
+                const option = document.createElement('option');
+                option.value = entity;
+                option.textContent = entityLabels[entity] || entity;
+                entitySelect.appendChild(option);
+              });
+            };
+
+            const renderLogs = logs => {
+              const tbody = document.getElementById('logsTableBody');
+
+              if (!logs.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-inbox"></i><p>لا توجد سجلات</p></td></tr>';
+                return;
+              }
+
+              tbody.innerHTML = logs.map(log => `
+        <tr onclick='showDetails(${JSON.stringify(log).replace(/'/g, "&#39;")})'>
+          <td>${new Date(log.createdAt).toLocaleString('ar-EG')}</td>
+          <td>${log.user ? log.user.firstNameAr + ' ' + log.user.lastNameAr : '<span style="color:#9e9e9e;">النظام</span>'}</td>
+          <td><span class="action-badge ${getActionClass(log.action)}">${actionLabels[log.action] || log.action}</span></td>
+          <td>${entityLabels[log.entityType] || log.entityType || '-'}</td>
+          <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${log.description || '-'}</td>
+          <td style="font-size: 0.75rem; color: #9e9e9e;">${log.ipAddress || '-'}</td>
+        </tr>
+      `).join('');
+            };
+
+            const renderPagination = pagination => {
+              const container = document.getElementById('paginationContainer');
+              if (!pagination || pagination.pages <= 1) {
+                container.innerHTML = '';
+                return;
+              }
+
+              let html = '';
+              if (pagination.page > 1) {
+                html += `<button class="page-link" onclick="loadLogs(${pagination.page - 1})">السابق</button>`;
+              }
+              for (let i = 1; i <= Math.min(pagination.pages, 5); i++) {
+                html += `<button class="page-link ${i === pagination.page ? 'active' : ''}" onclick="loadLogs(${i})">${i}</button>`;
+              }
+              if (pagination.page < pagination.pages) {
+                html += `<button class="page-link" onclick="loadLogs(${pagination.page + 1})">التالي</button>`;
+              }
+              container.innerHTML = html;
+            };
+
+            const showDetails = log => {
+              const content = document.getElementById('detailsContent');
+              content.innerHTML = `
+        <div class="detail-row"><span class="label">التاريخ</span><span class="value">${new Date(log.createdAt).toLocaleString('ar-EG')}</span></div>
+        <div class="detail-row"><span class="label">المستخدم</span><span class="value">${log.user ? log.user.firstNameAr + ' ' + log.user.lastNameAr : 'النظام'}</span></div>
+        <div class="detail-row"><span class="label">الإجراء</span><span class="value">${actionLabels[log.action] || log.action}</span></div>
+        <div class="detail-row"><span class="label">الكيان</span><span class="value">${entityLabels[log.entityType] || log.entityType || '-'}</span></div>
+        <div class="detail-row"><span class="label">الوصف</span><span class="value">${log.description || '-'}</span></div>
+        <div class="detail-row"><span class="label">IP</span><span class="value">${log.ipAddress || '-'}</span></div>
+        ${log.previousData ? '<div style="margin-top: 1rem;"><strong>البيانات السابقة:</strong><div class="code-block">' + JSON.stringify(log.previousData, null, 2) + '</div></div>' : ''}
+        ${log.newData ? '<div style="margin-top: 1rem;"><strong>البيانات الجديدة:</strong><div class="code-block">' + JSON.stringify(log.newData, null, 2) + '</div></div>' : ''}
+      `;
+              document.getElementById('detailsModal').classList.add('show');
+            };
+
+            const hideDetailsModal = () => {
+              document.getElementById('detailsModal').classList.remove('show');
+            };
+
+            document.getElementById('filterForm').addEventListener('submit', e => {
+              e.preventDefault();
+              loadLogs(1);
+            });
+
+            document.getElementById('detailsModal').addEventListener('click', e => {
+              if (e.target.classList.contains('modal')) hideDetailsModal();
+            });
+
+            // Load logs on page load
+            loadLogs();
+          </script>
+</body>
+
+</html>

@@ -4,10 +4,13 @@ const {
   User,
   Document,
   ApplicationStatusHistory,
+  ApplicationStatus,
   LicensePrice,
   Notification,
 } = require('../models');
 const AppError = require('../utils/appError');
+const auditLogService = require('./auditLogService');
+const pdfService = require('./pdfService'); // Add pdfService
 
 /**
  * Admin Service - Handles admin panel business logic
@@ -26,12 +29,18 @@ exports.getDashboardStats = async () => {
     newApplications,
     underReview,
     approved,
+    completed,
     rejected,
     monthlyStats,
   ] = await Promise.all([
     Application.count(),
     Application.count({ where: { status: 'received' } }),
     Application.count({ where: { status: 'under_review' } }),
+    Application.count({
+      where: {
+        status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
+      }
+    }),
     Application.count({ where: { status: 'completed' } }),
     Application.count({ where: { status: 'rejected' } }),
     Application.findAll({
@@ -78,6 +87,7 @@ exports.getDashboardStats = async () => {
       new: newApplications,
       underReview,
       approved,
+      completed,
       rejected,
     },
     byType,
@@ -122,6 +132,11 @@ exports.getAllApplications = async (query = {}) => {
         model: Document,
         as: 'documents',
         attributes: ['id', 'documentType', 'fileName'],
+      },
+      {
+        model: ApplicationStatus,
+        as: 'statusInfo',
+        attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon'],
       },
     ],
     order: [['createdAt', 'DESC']],
@@ -174,6 +189,11 @@ exports.getApplicationForReview = async applicationId => {
         as: 'reviewer',
         attributes: ['id', 'firstNameAr', 'lastNameAr'],
       },
+      {
+        model: ApplicationStatus,
+        as: 'statusInfo',
+        attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon', 'description'],
+      },
     ],
   });
 
@@ -224,6 +244,17 @@ exports.startReview = async (applicationId, adminId) => {
     applicationId: application.id,
   });
 
+  // Audit log
+  await auditLogService.logAction({
+    userId: adminId,
+    action: 'STATUS_CHANGE',
+    entityType: 'application',
+    entityId: application.id,
+    description: `بدء مراجعة الطلب ${application.applicationNumber}`,
+    previousData: { status: oldStatus },
+    newData: { status: 'under_review' },
+  });
+
   return { message: 'تم بدء مراجعة الطلب', application };
 };
 
@@ -241,19 +272,22 @@ exports.approveApplication = async (applicationId, adminId) => {
   }
 
   if (!['received', 'under_review'].includes(application.status)) {
-    throw new AppError(400, 'لا يمكن الموافقة على هذا الطلب في حالته الحالية');
+    throw new AppError(400, `لا يمكن الموافقة على هذا الطلب في حالته الحالية: ${application.status}`);
   }
 
-  // Get price for this license type
-  const price = await LicensePrice.getCurrentPrice(
+  // Get price from database
+  const priceRecord = await LicensePrice.getCurrentPrice(
     application.applicationType,
     application.licenseCategory,
-    application.isRenewal
+    application.isRenewal,
+    application.duration || 'season'
   );
 
-  if (!price) {
-    throw new AppError(400, 'لم يتم العثور على سعر لهذا النوع من التراخيص');
+  if (!priceRecord) {
+    throw new AppError(400, `لم يتم العثور على سعر لهذا النوع من التراخيص: ${application.licenseCategory} (${application.duration})`);
   }
+
+  const finalPrice = parseFloat(priceRecord.price);
 
   // Generate Supply Order ID
   const supplyOrderId = `SO-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
@@ -261,7 +295,7 @@ exports.approveApplication = async (applicationId, adminId) => {
   const oldStatus = application.status;
   // Use approved_payment_pending for Paymob online payment flow
   application.status = 'approved_payment_pending';
-  application.paymentAmount = price.price;
+  application.paymentAmount = finalPrice;
   application.supplyOrderId = supplyOrderId;
   application.approvedAt = new Date();
   application.reviewedBy = adminId;
@@ -273,7 +307,7 @@ exports.approveApplication = async (applicationId, adminId) => {
     oldStatus,
     newStatus: 'approved_payment_pending',
     changedBy: adminId,
-    notes: `تمت الموافقة - المبلغ المطلوب: ${price.price} جنيه - بانتظار الدفع الإلكتروني`,
+    notes: `تمت الموافقة - المبلغ المطلوب: ${finalPrice} جنيه - بانتظار الدفع الإلكتروني`,
   });
 
   // Notify user - include payment link info
@@ -281,8 +315,19 @@ exports.approveApplication = async (applicationId, adminId) => {
     userId: application.userId,
     type: 'application_approved',
     title: 'تمت الموافقة على طلبك - بانتظار الدفع',
-    message: `تمت الموافقة على طلبك رقم ${application.applicationNumber}. المبلغ المطلوب: ${price.price} جنيه مصري. يرجى إتمام الدفع إلكترونياً للمتابعة.`,
+    message: `تمت الموافقة على طلبك رقم ${application.applicationNumber}. المبلغ المطلوب: ${priceRecord.price} جنيه مصري. يرجى إتمام الدفع إلكترونياً للمتابعة.`,
     applicationId: application.id,
+  });
+
+  // Audit log
+  await auditLogService.logAction({
+    userId: adminId,
+    action: 'APPROVE',
+    entityType: 'application',
+    entityId: application.id,
+    description: `الموافقة على الطلب ${application.applicationNumber} - المبلغ: ${priceRecord.price} جنيه`,
+    previousData: { status: oldStatus },
+    newData: { status: 'approved_payment_pending', paymentAmount: priceRecord.price },
   });
 
   return {
@@ -338,6 +383,17 @@ exports.rejectApplication = async (applicationId, adminId, reason) => {
     title: 'تم رفض طلبك',
     message: `تم رفض طلبك رقم ${application.applicationNumber}. السبب: ${reason}`,
     applicationId: application.id,
+  });
+
+  // Audit log
+  await auditLogService.logAction({
+    userId: adminId,
+    action: 'REJECT',
+    entityType: 'application',
+    entityId: application.id,
+    description: `رفض الطلب ${application.applicationNumber} - السبب: ${reason}`,
+    previousData: { status: oldStatus },
+    newData: { status: 'rejected', rejectionReason: reason },
   });
 
   return { message: 'تم رفض الطلب' };
@@ -459,4 +515,44 @@ exports.completeApplication = async (applicationId, adminId) => {
   });
 
   return { message: 'تم إتمام الطلب بنجاح' };
+};
+
+/**
+ * Get Supply Order Data
+ */
+exports.getSupplyOrderData = async (applicationId) => {
+  const application = await Application.findOne({
+    where: { id: applicationId },
+    include: [{ model: User, as: 'applicant' }],
+  });
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  if (!application.supplyOrderId) {
+    throw new AppError(400, 'لم يتم إنشاء أمر التوريد بعد. يجب الموافقة على الطلب أولاً');
+  }
+
+  return await pdfService.generateSupplyOrder(application, application.applicant);
+};
+
+/**
+ * Get License Certificate Data
+ */
+exports.getLicenseData = async (applicationId) => {
+  const application = await Application.findOne({
+    where: { id: applicationId },
+    include: [{ model: User, as: 'applicant' }],
+  });
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  if (application.status !== 'completed') {
+    throw new AppError(400, 'لا يمكن إصدار الرخصة. يجب إتمام الطلب أولاً');
+  }
+
+  return await pdfService.generateLicenseCertificate(application, application.applicant);
 };

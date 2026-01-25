@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/imgs/logo.png">
+    <title>
+        <%= title %> - بوابة بحيرة البردويل
+    </title>
+</head>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Header -->
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="page-title">
+                            <i class="fas fa-history"></i>
+                            سجل المدفوعات
+                        </h1>
+                        <p class="page-subtitle">
+                            عرض سجل المدفوعات التي تم التحقق منها
+                        </p>
+                    </div>
+                    <a href="/financial/dashboard" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-right"></i> لوحة التحكم
+                    </a>
+                </div>
+
+                <!-- Pro Filters -->
+                <div class="filters-container mb-4">
+                    <div class="filter-card">
+                        <div class="filter-header">
+                            <i class="fas fa-filter text-primary"></i>
+                            <span>تصفية بحسب الفترة</span>
+                        </div>
+                        <form method="GET" class="filter-form">
+                            <div class="date-group">
+                                <label class="filter-label">من تاريخ</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="date" name="startDate" class="filter-input" placeholder="من"
+                                        value="<%= typeof startDate !== 'undefined' ? startDate : '' %>">
+                                </div>
+                            </div>
+
+                            <div class="date-group">
+                                <label class="filter-label">إلى تاريخ</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <input type="date" name="endDate" class="filter-input" placeholder="إلى"
+                                        value="<%= typeof endDate !== 'undefined' ? endDate : '' %>">
+                                </div>
+                            </div>
+
+                            <div class="filter-actions">
+                                <button type="submit" class="btn-filter btn-apply">
+                                    <i class="fas fa-search"></i> عرض النتائج
+                                </button>
+                                <% if((typeof startDate !=='undefined' && startDate) || (typeof endDate !=='undefined'
+                                    && endDate)) { %>
+                                    <a href="/financial/payment-history" class="btn-filter btn-reset">
+                                        <i class="fas fa-undo"></i> إعادة تعيين
+                                    </a>
+                                    <% } %>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <style>
+                    .filters-container {
+                        background: white;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        padding: 1.5rem;
+                        border: 1px solid rgba(0, 0, 0, 0.05);
+                    }
+
+                    .filter-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        margin-bottom: 1.5rem;
+                        font-size: 1.1rem;
+                        font-weight: 700;
+                        color: #2c3e50;
+                        padding-bottom: 0.75rem;
+                        border-bottom: 1px solid #f0f0f0;
+                    }
+
+                    .filter-form {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 1.5rem;
+                        align-items: end;
+                    }
+
+                    .date-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+                    }
+
+                    .filter-label {
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        color: #546e7a;
+                    }
+
+                    .input-wrapper {
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .input-wrapper i {
+                        position: absolute;
+                        right: 12px;
+                        color: #1e3c72;
+                        z-index: 1;
+                    }
+
+                    .filter-input {
+                        width: 100%;
+                        padding: 0.75rem 1rem 0.75rem 2.5rem;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 10px;
+                        font-family: inherit;
+                        font-size: 0.95rem;
+                        transition: all 0.3s ease;
+                        background: #f8f9fa;
+                    }
+
+                    .filter-input:focus {
+                        border-color: #1e3c72;
+                        background: white;
+                        outline: none;
+                        box-shadow: 0 0 0 4px rgba(30, 60, 114, 0.1);
+                    }
+
+                    .filter-actions {
+                        display: flex;
+                        gap: 0.75rem;
+                    }
+
+                    .btn-filter {
+                        flex: 1;
+                        padding: 0.6rem 1.5rem;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        text-decoration: none;
+                        border: none;
+                        font-size: 0.95rem;
+                    }
+
+                    .btn-apply {
+                        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                        color: white;
+                        box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+                    }
+
+                    .btn-apply:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 20px rgba(30, 60, 114, 0.4);
+                    }
+
+                    .btn-reset {
+                        background: #f1f3f5;
+                        color: #495057;
+                    }
+
+                    .btn-reset:hover {
+                        background: #e9ecef;
+                        color: #212529;
+                    }
+                </style>
+
+                <!-- Payments Table -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h3 class="card-title h5 mb-0">السجل (<%= pagination.total %>)</h3>
+                        <div class="badge bg-success">الإجمالي: <%= totalAmount.toLocaleString('ar-EG') %> ج.م</div>
+                    </div>
+                    <div class="card-body p-0">
+                        <% if (payments.length===0) { %>
+                            <div class="empty-state text-center p-5">
+                                <i class="fas fa-history text-muted" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <h3>لا توجد سجلات</h3>
+                                <p class="text-muted">لا توجد مدفوعات مطابقة للفترة المحددة</p>
+                            </div>
+                            <% } else { %>
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th>رقم الطلب</th>
+                                                <th>اسم المتقدم</th>
+                                                <th>تاريخ التحقق</th>
+                                                <th>المبلغ</th>
+                                                <th>الحالة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% payments.forEach(payment=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= payment.applicationNumber %>
+                                                    </td>
+                                                    <td>
+                                                        <%= payment.applicant.firstNameAr %>
+                                                            <%= payment.applicant.lastNameAr %>
+                                                    </td>
+                                                    <td>
+                                                        <%= new
+                                                            Date(payment.paymentVerifiedAt).toLocaleDateString('ar-EG')
+                                                            %>
+                                                    </td>
+                                                    <td>
+                                                        <%= payment.paymentAmount %> ج.م
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-success">تم التحقق</span>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Pagination -->
+                                <% if (pagination.pages> 1) { %>
+                                    <div class="card-footer bg-white">
+                                        <nav>
+                                            <ul class="pagination justify-content-center mb-0">
+                                                <% for(let i=1; i <=pagination.pages; i++) { %>
+                                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                                        <a class="page-link" href="?page=<%= i %>">
+                                                            <%= i %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                    <% } %>
+                                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <style>
+            .main-content {
+                padding: 2rem 0;
+                background: #f8f9fa;
+                min-height: 100vh;
+            }
+        </style>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

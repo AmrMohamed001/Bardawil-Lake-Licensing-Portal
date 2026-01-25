@@ -4,6 +4,7 @@ const {
   Document,
   User,
   ApplicationStatusHistory,
+  ApplicationStatus,
   LicensePrice,
   Notification,
 } = require('../models');
@@ -20,7 +21,7 @@ const AppError = require('../utils/appError');
  * @param {string} userId - User ID
  */
 exports.createApplication = async (applicationData, userId, files) => {
-  const { applicationType, licenseCategory, isRenewal } = applicationData;
+  const { applicationType, licenseCategory, isRenewal, duration, boatType } = applicationData;
 
   // Prepare dynamic data
   const data = applicationData.data || {};
@@ -52,8 +53,27 @@ exports.createApplication = async (applicationData, userId, files) => {
     }
   });
 
+  // Get price based on license type, category, duration, and boatType
+  const selectedDuration = duration || '3_months';
+  const selectedBoatType = applicationType === 'boat' ? (boatType || 'private') : null;
+  const isRenewalFlag = isRenewal === 'true' || isRenewal === true;
+
+  const priceRecord = await LicensePrice.getCurrentPrice(
+    applicationType,
+    licenseCategory,
+    isRenewalFlag,
+    selectedDuration,
+    selectedBoatType
+  );
+
+  const paymentAmount = priceRecord ? parseFloat(priceRecord.price) : null;
+
   // Generate application number
   const applicationNumber = await Application.generateApplicationNumber();
+
+  // Get initial status from lookup table
+  const initialStatus = await ApplicationStatus.getByCode('received');
+  const statusId = initialStatus ? initialStatus.id : null;
 
   // Create application
   const application = await Application.create({
@@ -61,8 +81,12 @@ exports.createApplication = async (applicationData, userId, files) => {
     userId,
     applicationType,
     licenseCategory,
-    isRenewal: isRenewal === 'true' || isRenewal === true,
+    isRenewal: isRenewalFlag,
+    duration: selectedDuration,
+    boatType: selectedBoatType,
     status: 'received',
+    statusId,
+    paymentAmount,
     data: data,
     submittedAt: new Date(),
   });
@@ -170,6 +194,11 @@ exports.getUserApplications = async (userId, query = {}) => {
         as: 'documents',
         attributes: ['id', 'documentType', 'fileName', 'uploadedAt'],
       },
+      {
+        model: ApplicationStatus,
+        as: 'statusInfo',
+        attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon'],
+      },
     ],
     order: [['createdAt', 'DESC']],
     limit: parseInt(limit),
@@ -225,6 +254,11 @@ exports.getApplicationById = async (applicationId, userId) => {
         model: User,
         as: 'applicant',
         attributes: ['id', 'nationalId', 'firstNameAr', 'lastNameAr', 'phone'],
+      },
+      {
+        model: ApplicationStatus,
+        as: 'statusInfo',
+        attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon', 'description'],
       },
     ],
   });
@@ -294,9 +328,9 @@ exports.uploadPaymentReceipt = async (applicationId, userId, receiptPath) => {
     throw new AppError(403, 'ليس لديك صلاحية للوصول إلى هذا الطلب');
   }
 
-  // Check if application is in correct status
+  // Check if application is in correct status (user can upload receipt when approved)
   if (
-    !['approved_payment_required', 'payment_pending'].includes(
+    !['approved_payment_pending', 'approved_payment_required', 'payment_pending'].includes(
       application.status
     )
   ) {

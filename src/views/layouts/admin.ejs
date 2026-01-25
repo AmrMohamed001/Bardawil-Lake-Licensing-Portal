@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= title %>
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .bg-primary {
+      background-color: #1F4788;
+    }
+
+    .text-primary {
+      color: #1F4788;
+    }
+
+    .border-primary {
+      border-color: #1F4788;
+    }
+
+    .bg-accent {
+      background-color: #2E9B9F;
+    }
+
+    .text-accent {
+      color: #2E9B9F;
+    }
+
+    .border-accent {
+      border-color: #2E9B9F;
+    }
+
+    .bg-gold {
+      background-color: #C9A961;
+    }
+
+    .text-gold {
+      color: #C9A961;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1F4788;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+  <div class="min-h-screen flex">
+    <!-- Sidebar -->
+    <%- include('../partials/admin-sidebar', { currentPage: currentPage || 'dashboard' }) %>
+
+      <!-- Main Content -->
+      <div class="flex-1">
+        <%- body %>
+      </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js" defer></script>
+  <script src="/js/main.js" defer></script>
+</body>
+
+</html>

@@ -15,9 +15,21 @@ const MAX_FILE_SIZE = parseInt(process.env.UPLOAD_MAX_SIZE) || 5 * 1024 * 1024; 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Use src/public/uploads folder
-    const uploadPath = process.env.UPLOAD_PATH || './src/public/uploads';
-    cb(null, uploadPath);
+    const basePath = process.env.UPLOAD_PATH || './src/public/uploads';
+    let subDir = 'temp';
+
+    // Determine sub-directory based on route and field name
+    if (req.originalUrl.includes('/news')) {
+      subDir = 'news';
+    } else if (req.originalUrl.includes('/users') || file.fieldname === 'picture') {
+      subDir = 'profiles';
+    } else if (file.fieldname === 'payment_receipt') {
+      subDir = 'payments';
+    } else if (req.originalUrl.includes('/applications')) {
+      subDir = 'applications';
+    }
+
+    cb(null, path.join(basePath, subDir));
   },
   filename: (req, file, cb) => {
     // Generate filename: reqid-timestamp-random.ext

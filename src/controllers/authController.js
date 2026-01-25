@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const authService = require('../services/authService');
+const auditLogService = require('../services/auditLogService');
 const AppError = require('../utils/appError');
 
 /**
@@ -20,10 +21,20 @@ const cookieOptions = {
 exports.signup = catchAsync(async (req, res, next) => {
   const result = await authService.register(req.body);
 
+  // Audit log
+  await auditLogService.logAction({
+    userId: result.user.id,
+    action: 'REGISTER',
+    entityType: 'user',
+    entityId: result.user.id,
+    description: `تسجيل مستخدم جديد: ${result.user.nationalId}`,
+    req,
+  });
+
   // Set access token cookie (15 minutes)
   res.cookie('accessToken', result.accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
 
   // Set refresh token cookie (7 days)
@@ -47,10 +58,20 @@ exports.login = catchAsync(async (req, res, next) => {
     req.body.password
   );
 
+  // Audit log
+  await auditLogService.logAction({
+    userId: result.user.id,
+    action: 'LOGIN',
+    entityType: 'user',
+    entityId: result.user.id,
+    description: `تسجيل دخول: ${result.user.nationalId}`,
+    req,
+  });
+
   // Set access token cookie (15 minutes)
   res.cookie('accessToken', result.accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
 
   // Set refresh token cookie (7 days)
@@ -80,7 +101,7 @@ exports.refreshAccessToken = catchAsync(async (req, res, next) => {
   // Set new cookies
   res.cookie('accessToken', result.accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
 
   res.cookie('refreshToken', result.refreshToken, {
@@ -100,6 +121,16 @@ exports.refreshAccessToken = catchAsync(async (req, res, next) => {
 exports.logout = catchAsync(async (req, res, next) => {
   const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
   const result = await authService.logout(req.user.id, refreshToken);
+
+  // Audit log
+  await auditLogService.logAction({
+    userId: req.user.id,
+    action: 'LOGOUT',
+    entityType: 'user',
+    entityId: req.user.id,
+    description: `تسجيل خروج: ${req.user.nationalId}`,
+    req,
+  });
 
   // Clear cookies
   res.clearCookie('accessToken');
@@ -158,7 +189,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // Set new cookies
   res.cookie('accessToken', result.accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000,
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
   });
 
   res.cookie('refreshToken', result.refreshToken, {

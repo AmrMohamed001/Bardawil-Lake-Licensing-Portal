@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة تراخيص بحيرة البردويل</title>
+
+  <!-- Google Fonts - Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/css/main.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/imgs/logo.png">
+
+  <!-- Preload Hero Image for LCP -->
+  <link rel="preload" as="image" href="/imgs/hero.png">
+</head>
+
+<body>
+  <%- include('../partials/spinner') %>
+
+    <!-- Navbar -->
+    <%- include('../partials/navbar') %>
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="container">
+            <div class="hero-text">
+              <img src="/imgs/logo.png" alt="بحيرة البردويل" class="hero-logo animate-float" width="120" height="120">
+              <h1 class="hero-title">منصة تراخيص بحيرة البردويل</h1>
+              <p class="hero-subtitle">Bardawil Lake Licensing Portal - Egypt's Future Authority</p>
+              <p class="hero-description">
+                نحو مستقبل مستدام لمصر الحديثة<br>
+                Towards a Sustainable Future for Modern Egypt
+              </p>
+
+              <div class="hero-actions">
+                <% if (locals.user) { %>
+                  <a href="/dashboard" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i>
+                    لوحة التحكم
+                  </a>
+                  <a href="/apply" class="btn btn-outline btn-lg">
+                    <i class="fas fa-plus-circle"></i>
+                    تقديم طلب جديد
+                  </a>
+                  <% } else { %>
+                    <a href="/register" class="btn btn-primary btn-lg">
+                      <i class="fas fa-user-plus"></i>
+                      إنشاء حساب جديد
+                    </a>
+                    <a href="/login" class="btn btn-outline btn-lg">
+                      <i class="fas fa-sign-in-alt"></i>
+                      تسجيل الدخول
+                    </a>
+                    <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Services Section -->
+      <section class="services-section section" id="services">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">خدماتنا</h2>
+            <p class="section-subtitle">16 خدمة متاحة لموسم 2026</p>
+          </div>
+
+          <div class="services-grid">
+            <!-- Boats -->
+            <div class="service-card">
+              <div class="service-icon boats-icon">
+                <i class="fas fa-ship"></i>
+              </div>
+              <h3 class="service-title">المراكب والقوارب</h3>
+              <p class="service-description">
+                تجديد مركب، مركب جديد، تغيير مرسي، تغيير موتور
+              </p>
+              <div class="service-tags">
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> تجديد سريع
+                </span>
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> 4 خدمات
+                </span>
+              </div>
+              <a href="/services?category=boats" class="service-btn boats-btn">
+                عرض التفاصيل
+                <i class="fas fa-arrow-left"></i>
+              </a>
+            </div>
+
+            <!-- Fishing -->
+            <div class="service-card">
+              <div class="service-icon fishing-icon">
+                <i class="fas fa-fish"></i>
+              </div>
+              <h3 class="service-title">تراخيص الصيد</h3>
+              <p class="service-description">
+                بطاقة صيد، صياد تحت السن، صيد رجلي
+              </p>
+              <div class="service-tags">
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> مدد متنوعة
+                </span>
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> 4 فئات
+                </span>
+              </div>
+              <a href="/services?category=fishing" class="service-btn fishing-btn">
+                عرض التفاصيل
+                <i class="fas fa-arrow-left"></i>
+              </a>
+            </div>
+
+            <!-- Trade -->
+            <div class="service-card">
+              <div class="service-icon trade-icon">
+                <i class="fas fa-store"></i>
+              </div>
+              <h3 class="service-title">التجارة والتداول</h3>
+              <p class="service-description">
+                تاجر، مندوب، عامل تاجر، بياع
+              </p>
+              <div class="service-tags">
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> تراخيص تجارية
+                </span>
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> 5 فئات
+                </span>
+              </div>
+              <a href="/services?category=trade" class="service-btn trade-btn">
+                عرض التفاصيل
+                <i class="fas fa-arrow-left"></i>
+              </a>
+            </div>
+
+            <!-- Entry -->
+            <div class="service-card">
+              <div class="service-icon entry-icon">
+                <i class="fas fa-door-open"></i>
+              </div>
+              <h3 class="service-title">تراخيص الدخول</h3>
+              <p class="service-description">
+                سيارة، تروسيكل، شيال، نجار، أفراد شركات
+              </p>
+              <div class="service-tags">
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> تصاريح دخول
+                </span>
+                <span class="service-tag">
+                  <i class="fas fa-check-circle"></i> 5 أنواع
+                </span>
+              </div>
+              <a href="/services?category=entry" class="service-btn entry-btn">
+                عرض التفاصيل
+                <i class="fas fa-arrow-left"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="services-cta">
+            <% if (locals.user) { %>
+              <a href="/pricing" class="btn btn-outline btn-lg">
+                <i class="fas fa-coins"></i>
+                <span>عرض جميع الأسعار</span>
+              </a>
+              <% } else { %>
+                <a href="/login" class="btn btn-outline btn-lg">
+                  <i class="fas fa-sign-in-alt"></i>
+                  <span>سجل الدخول للاطلاع على الأسعار</span>
+                </a>
+                <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Section -->
+      <section class="stats-section">
+        <div class="stats-overlay"></div>
+        <div class="container">
+          <div class="grid grid-cols-4">
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <h3 class="stat-number">1,247</h3>
+              <p class="stat-label">إجمالي التراخيص</p>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <h3 class="stat-number">987</h3>
+              <p class="stat-label">تراخيص نشطة</p>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <h3 class="stat-number">89</h3>
+              <p class="stat-label">طلبات جديدة</p>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="fas fa-ship"></i>
+              </div>
+              <h3 class="stat-number">324</h3>
+              <p class="stat-label">مراكب مسجلة</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="features-section section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">لماذا تختار منصتنا؟</h2>
+            <p class="section-subtitle">Why Choose Our Platform?</p>
+          </div>
+
+          <div class="features-grid">
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <h4>سريع وفعال</h4>
+              <p>معالجة الطلبات في أسرع وقت ممكن مع نظام آلي متطور</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h4>آمن ومحمي</h4>
+              <p>حماية كاملة لبياناتك الشخصية مع أعلى معايير الأمان</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <h4>سهل الاستخدام</h4>
+              <p>واجهة بسيطة وسهلة الاستخدام من أي جهاز</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-headset"></i>
+              </div>
+              <h4>دعم فني متميز</h4>
+              <p>فريق دعم متاح على مدار الساعة لمساعدتك</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <h4>إشعارات فورية</h4>
+              <p>تلقى تحديثات فورية حول حالة طلبك</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-file-download"></i>
+              </div>
+              <h4>تحميل سهل</h4>
+              <p>تحميل التراخيص والمستندات بكل سهولة</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- News Section -->
+      <section class="news-section section" id="news">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">آخر الأخبار والتحديثات</h2>
+            <p class="section-subtitle">Latest News & Updates</p>
+          </div>
+
+          <div class="grid grid-cols-3">
+
+            <!-- News Item 1 -->
+            <article class="news-card card">
+              <div class="news-image">
+                <img src="/imgs/news1.png" alt="افتتاح موسم الصيد" width="400" height="250" loading="lazy">
+                <div class="news-badge">جديد</div>
+              </div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span><i class="fas fa-calendar"></i> ٢٥ أكتوبر ٢٠٢٥</span>
+                </div>
+                <h3 class="news-title">افتتاح موسم الصيد الجديد في بحيرة البردويل</h3>
+                <p class="news-excerpt">
+                  يسر جهاز مستقبل مصر الإعلان عن افتتاح موسم الصيد الجديد...
+                </p>
+                <a href="#" class="news-link">
+                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                </a>
+              </div>
+            </article>
+
+            <!-- News Item 2 -->
+            <article class="news-card card">
+              <div class="news-image">
+                <img src="/imgs/news2.png" alt="تحديث النظام" width="400" height="250" loading="lazy">
+              </div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span><i class="fas fa-calendar"></i> ٢٣ أكتوبر ٢٠٢٥</span>
+                </div>
+                <h3 class="news-title">تحديث نظام التراخيص الإلكترونية</h3>
+                <p class="news-excerpt">
+                  تم تحديث نظام التراخيص ليصبح أسرع وأسهل...
+                </p>
+                <a href="#" class="news-link">
+                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                </a>
+              </div>
+            </article>
+
+            <!-- News Item 3 -->
+            <article class="news-card card">
+              <div class="news-image">
+                <img src="/imgs/news3.png" alt="ورشة عمل" width="400" height="250" loading="lazy">
+              </div>
+              <div class="news-content">
+                <div class="news-meta">
+                  <span><i class="fas fa-calendar"></i> ٢٠ أكتوبر ٢٠٢٥</span>
+                </div>
+                <h3 class="news-title">ورشة عمل حول الصيد المستدام</h3>
+                <p class="news-excerpt">
+                  ينظم الجهاز ورشة عمل حول ممارسات الصيد المستدام...
+                </p>
+                <a href="#" class="news-link">
+                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                </a>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="cta-section">
+        <div class="cta-overlay"></div>
+        <div class="container">
+          <div class="cta-content">
+            <h2>هل أنت مستعد للبدء؟</h2>
+            <p>انضم إلى آلاف الصيادين الذين يستخدمون منصتنا لإدارة تراخيصهم بكل سهولة</p>
+            <div class="cta-buttons">
+              <% if (!locals.user) { %>
+                <a href="/register" class="btn btn-primary btn-lg">
+                  <i class="fas fa-user-plus"></i>
+                  ابدأ الآن - مجانًا
+                </a>
+                <a href="#services" class="btn btn-outline btn-lg">
+                  <i class="fas fa-info-circle"></i>
+                  تعرف على المزيد
+                </a>
+                <% } else { %>
+                  <a href="/apply" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle"></i>
+                    تقديم طلب جديد
+                  </a>
+                  <% } %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <%- include('../partials/footer') %>
+
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+        <script src="/js/main.js"></script>
+
+        <style>
+          /* Hero Section */
+          .hero-section {
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            background-image: url('/imgs/hero.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+          }
+
+          .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.95) 0%, rgba(0, 137, 123, 0.9) 100%);
+          }
+
+          .hero-content {
+            position: relative;
+            z-index: 1;
+            padding: 4rem 0;
+            width: 100%;
+          }
+
+          .hero-text {
+            text-align: center;
+            color: white;
+          }
+
+          .hero-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+            border-radius: 50%;
+            background: white;
+            padding: 10px;
+          }
+
+          .hero-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          }
+
+          .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            opacity: 0.95;
+          }
+
+          .hero-description {
+            font-size: 1.125rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+            opacity: 0.9;
+          }
+
+          .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+
+          .hero-actions .btn {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          }
+
+          /* Animations */
+          @keyframes float {
+
+            0%,
+            100% {
+              transform: translateY(0);
+            }
+
+            50% {
+              transform: translateY(-10px);
+            }
+          }
+
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+
+          /* ============================================
+             Services Section
+             ============================================ */
+
+          .services-section {
+            padding: 4rem 0;
+            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+          }
+
+          /* Services Grid */
+          .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+          }
+
+          /* Responsive Grid */
+          @media (max-width: 1200px) {
+            .services-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+
+          @media (max-width: 768px) {
+            .services-grid {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+            }
+          }
+
+          /* Service Card */
+          .service-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+          }
+
+          .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2E9B9F 0%, #1F4788 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+          }
+
+          .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: #2E9B9F;
+          }
+
+          .service-card:hover::before {
+            opacity: 1;
+          }
+
+          /* Service Icon */
+          .service-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            transition: transform 0.3s ease;
+          }
+
+          .service-card:hover .service-icon {
+            transform: scale(1.1) rotate(5deg);
+          }
+
+          .boats-icon {
+            background: linear-gradient(135deg, #00897B 0%, #00695C 100%);
+          }
+
+          .fishing-icon {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+          }
+
+          .trade-icon {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+          }
+
+          .entry-icon {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+          }
+
+          /* Service Title */
+          .service-title {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: #1F4788;
+            margin-bottom: 1rem;
+            text-align: center;
+            line-height: 1.4;
+          }
+
+          /* Service Description */
+          .service-description {
+            font-size: 0.9375rem;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            flex-grow: 1;
+            min-height: 60px;
+          }
+
+          /* Service Tags */
+          .service-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+          }
+
+          .service-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: #f0f8ff;
+            color: #2E75B6;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            border: 1px solid #d4e9f7;
+          }
+
+          .service-tag i {
+            font-size: 0.75rem;
+          }
+
+          /* Service Button */
+          .service-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: auto;
+          }
+
+          .service-btn i {
+            transition: transform 0.3s ease;
+          }
+
+          .service-btn:hover i {
+            transform: translateX(-4px);
+          }
+
+          .boats-btn {
+            background: linear-gradient(135deg, #00897B 0%, #00695C 100%);
+          }
+
+          .boats-btn:hover {
+            background: linear-gradient(135deg, #00695C 0%, #004D40 100%);
+            box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
+          }
+
+          .fishing-btn {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+          }
+
+          .fishing-btn:hover {
+            background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+          }
+
+          .trade-btn {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+          }
+
+          .trade-btn:hover {
+            background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+          }
+
+          .entry-btn {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+          }
+
+          .entry-btn:hover {
+            background: linear-gradient(135deg, #F57C00 0%, #EF6C00 100%);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+          }
+
+          /* Services CTA */
+          .services-cta {
+            text-align: center;
+            margin-top: 3rem;
+          }
+
+          .service-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+            flex-grow: 1;
+          }
+
+          .service-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            color: #424242;
+          }
+
+          .service-features i {
+            color: #4CAF50;
+            font-size: 1.125rem;
+          }
+
+          /* Stats Section */
+          .stats-section {
+            position: relative;
+            padding: 4rem 0;
+            background-image: url('/imgs/hero.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+          }
+
+          .stats-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.92) 0%, rgba(0, 137, 123, 0.88) 100%);
+          }
+
+          .stats-section .container {
+            position: relative;
+            z-index: 1;
+          }
+
+          .stat-item {
+            text-align: center;
+            color: white;
+          }
+
+          .stat-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+          }
+
+          .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+          }
+
+          .stat-label {
+            font-size: 1.125rem;
+            opacity: 0.95;
+          }
+
+          /* Features Section */
+          .features-section {
+            padding: 5rem 0;
+            background: #FAFAFA;
+          }
+
+          .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+          }
+
+          .feature-item {
+            text-align: center;
+            padding: 2rem;
+          }
+
+          .feature-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #2196F3 0%, #00897B 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+          }
+
+          .feature-item h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #212121;
+          }
+
+          .feature-item p {
+            color: #616161;
+            line-height: 1.6;
+          }
+
+          /* News Section */
+          .news-section {
+            padding: 5rem 0;
+            background: white;
+          }
+
+          .news-card {
+            overflow: hidden;
+          }
+
+          .news-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+          }
+
+          .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+          }
+
+          .news-card:hover .news-image img {
+            transform: scale(1.1);
+          }
+
+          .news-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #FF9800;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+          }
+
+          .news-content {
+            padding: 1.5rem;
+          }
+
+          .news-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            color: #9E9E9E;
+            font-size: 0.875rem;
+          }
+
+          .news-meta i {
+            margin-left: 0.25rem;
+          }
+
+          .news-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #212121;
+            line-height: 1.4;
+          }
+
+          .news-excerpt {
+            color: #616161;
+            font-size: 0.9375rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+          }
+
+          .news-link {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+          }
+
+          .news-link:hover {
+            color: #1976D2;
+            gap: 0.75rem;
+          }
+
+          /* CTA Section */
+          .cta-section {
+            position: relative;
+            padding: 5rem 0;
+            background-image: url('/imgs/hero.png');
+            background-size: cover;
+            background-position: center;
+          }
+
+          .cta-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.95) 0%, rgba(0, 137, 123, 0.9) 100%);
+          }
+
+          .cta-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+          }
+
+          .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+          }
+
+          .cta-content p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+          }
+
+          .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+          }
+
+          @media (max-width: 768px) {
+            .hero-title {
+              font-size: 2rem;
+            }
+
+            .hero-subtitle {
+              font-size: 1.125rem;
+            }
+
+            .cta-content h2 {
+              font-size: 1.75rem;
+            }
+          }
+        </style>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const stats = document.querySelectorAll('.stat-number');
+
+            const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  const el = entry.target;
+                  const target = parseInt(el.innerText.replace(/,/g, ''));
+                  el.setAttribute('data-target', target);
+                  el.innerText = '0';
+
+                  const duration = 1000; // 2 seconds
+                  const steps = 60;
+                  const stepTime = duration / steps;
+                  const increment = target / steps;
+
+                  let current = 0;
+                  const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                      el.innerText = target.toLocaleString();
+                      clearInterval(timer);
+                    } else {
+                      el.innerText = Math.floor(current).toLocaleString();
+                    }
+                  }, stepTime);
+
+                  observer.unobserve(el);
+                }
+              });
+            }, { threshold: 0.1 }); // Trigger when 10% visible
+
+            stats.forEach(stat => observer.observe(stat));
+          });
+        </script>
+</body>
+
+</html>

@@ -8,10 +8,10 @@ const AppError = require('../utils/appError');
  * Based on SRS Section 3.1
  */
 
-// Generate access token (15 minutes)
+// Generate access token (2 hours)
 const generateAccessToken = userId => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
+    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '2h',
   });
 };
 

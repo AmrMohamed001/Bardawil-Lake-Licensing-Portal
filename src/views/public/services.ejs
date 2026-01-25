@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>خدماتنا - منصة تراخيص بحيرة البردويل</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+</head>
+
+<body>
+    <%- include('../partials/spinner') %> <%- include('../partials/navbar') %>
+
+            <div class="services-page">
+                <div class="container">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <h1><i class="fas fa-concierge-bell"></i> خدماتنا</h1>
+                        <p>جميع الخدمات المتاحة لموسم 2026 - بحيرة البردويل</p>
+                        <a href="/pricing" class="btn btn-outline btn-sm">
+                            <i class="fas fa-coins"></i> عرض الأسعار
+                        </a>
+                    </div>
+
+                    <!-- Boats & Vessels -->
+                    <div class="service-category" id="boats">
+                        <h2><i class="fas fa-ship"></i> تراخيص المراكب والقوارب</h2>
+                        <div class="services-grid">
+                            <div class="service-card" data-service="مركب خاص"
+                                data-docs="صورة بطاقة المالك|خطاب الجمعية|صورة الترخيص السابق">
+                                <div class="service-icon boat"><i class="fas fa-anchor"></i></div>
+                                <div class="service-content">
+                                    <h3>مركب خاص</h3>
+                                    <p>ترخيص مركب صيد خاص</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> الموسم</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus-circle"></i> تقديم
+                                            </a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-sign-in-alt"></i> سجّل
+                                                </a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card featured" data-service="مركب الجهاز"
+                                data-docs="صورة بطاقة المالك|خطاب الجمعية|خطاب من الجهاز">
+                                <div class="service-icon boat"><i class="fas fa-ship"></i></div>
+                                <div class="service-content">
+                                    <h3>مركب الجهاز</h3>
+                                    <p>ترخيص مركب تابع للجهاز</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> الموسم</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="تغيير مرسي"
+                                data-docs="صورة بطاقة المالك|رخصة المركب السارية|خطاب موافقة الجمعية الجديدة">
+                                <div class="service-icon boat"><i class="fas fa-exchange-alt"></i></div>
+                                <div class="service-content">
+                                    <h3>تغيير مرسي</h3>
+                                    <p>تصريح تغيير مرسي المركب</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> الموسم</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="تغيير موتور"
+                                data-docs="صورة بطاقة المالك|رخصة المركب السارية|فاتورة شراء الموتور الجديد">
+                                <div class="service-icon boat"><i class="fas fa-cog"></i></div>
+                                <div class="service-content">
+                                    <h3>تغيير موتور</h3>
+                                    <p>تصريح تغيير موتور المركب</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> الموسم</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fishing Licenses -->
+                    <div class="service-category" id="fishing">
+                        <h2><i class="fas fa-fish"></i> تراخيص الصيد</h2>
+                        <div class="services-grid">
+                            <div class="service-card" data-service="بطاقة صيد"
+                                data-docs="فيش جنائي موجه للجهاز|صورة البطاقة الشخصية سارية|موقف التجنيد|صورة شخصية 4×6|صورة التأمين (للمؤمن عليه)">
+                                <div class="service-icon fisherman"><i class="fas fa-id-card"></i></div>
+                                <div class="service-content">
+                                    <h3>بطاقة صيد</h3>
+                                    <p>تصريح بطاقة صيد للصياد</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="صياد تحت السن"
+                                data-docs="صورة البطاقة الشخصية أو شهادة الميلاد|صورة شخصية 4×6|موافقة ولي الأمر">
+                                <div class="service-icon fisherman"><i class="fas fa-child"></i></div>
+                                <div class="service-content">
+                                    <h3>صياد تحت السن</h3>
+                                    <p>تصريح صياد تحت السن القانوني</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="صيد رجلي"
+                                data-docs="فيش جنائي موجه للجهاز|صورة البطاقة الشخصية سارية|صورة شخصية 4×6">
+                                <div class="service-icon fisherman"><i class="fas fa-walking"></i></div>
+                                <div class="service-content">
+                                    <h3>صيد رجلي</h3>
+                                    <p>رخصة صيد رجلي</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trade Licenses -->
+                    <div class="service-category" id="trade">
+                        <h2><i class="fas fa-store"></i> تراخيص التجارة والتداول</h2>
+                        <div class="services-grid">
+                            <div class="service-card" data-service="تاجر / مندوب"
+                                data-docs="فيش جنائي موجه للجهاز|صورة البطاقة الشخصية سارية|السجل التجاري|البطاقة الضريبية">
+                                <div class="service-icon trade"><i class="fas fa-user-tie"></i></div>
+                                <div class="service-content">
+                                    <h3>تاجر / مندوب</h3>
+                                    <p>تصريح دخول تاجر أو مندوب</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> شهر</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="عامل تاجر"
+                                data-docs="صورة البطاقة الشخصية سارية|خطاب من التاجر|صورة شخصية 4×6">
+                                <div class="service-icon trade"><i class="fas fa-user-friends"></i></div>
+                                <div class="service-content">
+                                    <h3>عامل تاجر</h3>
+                                    <p>تصريح دخول عامل تاجر</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card featured" data-service="تاجر خارج المحافظة"
+                                data-docs="فيش جنائي موجه للجهاز|صورة البطاقة الشخصية سارية|السجل التجاري|البطاقة الضريبية|خطاب من الغرفة التجارية">
+                                <div class="service-icon trade"><i class="fas fa-globe"></i></div>
+                                <div class="service-content">
+                                    <h3>تاجر خارج المحافظة</h3>
+                                    <p>تصريح دخول تاجر من خارج المحافظة</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> شهر</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="بياع"
+                                data-docs="صورة البطاقة الشخصية سارية|صورة شخصية 4×6">
+                                <div class="service-icon trade"><i class="fas fa-store-alt"></i></div>
+                                <div class="service-content">
+                                    <h3>بياع</h3>
+                                    <p>تصريح دخول بياع</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entry Licenses -->
+                    <div class="service-category" id="entry">
+                        <h2><i class="fas fa-door-open"></i> تراخيص الدخول</h2>
+                        <div class="services-grid">
+                            <div class="service-card featured" data-service="سيارة"
+                                data-docs="رخصة السيارة سارية|رخصة القيادة سارية|صورة البطاقة الشخصية">
+                                <div class="service-icon entry"><i class="fas fa-car"></i></div>
+                                <div class="service-content">
+                                    <h3>سيارة</h3>
+                                    <p>تصريح دخول سيارة</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> شهر</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="تروسيكل"
+                                data-docs="رخصة التروسيكل|صورة البطاقة الشخصية سارية">
+                                <div class="service-icon entry"><i class="fas fa-motorcycle"></i></div>
+                                <div class="service-content">
+                                    <h3>تروسيكل</h3>
+                                    <p>تصريح دخول تروسيكل</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="شيال"
+                                data-docs="صورة البطاقة الشخصية سارية|صورة شخصية 4×6">
+                                <div class="service-icon entry"><i class="fas fa-hard-hat"></i></div>
+                                <div class="service-content">
+                                    <h3>شيال</h3>
+                                    <p>تصريح دخول شيال</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="نجار / ميكانيكي"
+                                data-docs="صورة البطاقة الشخصية سارية|صورة شخصية 4×6|شهادة خبرة أو مزاولة مهنة">
+                                <div class="service-icon entry"><i class="fas fa-tools"></i></div>
+                                <div class="service-content">
+                                    <h3>نجار / ميكانيكي</h3>
+                                    <p>تصريح دخول نجار أو ميكانيكي</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> شهر</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="service-card" data-service="أفراد شركات"
+                                data-docs="صورة البطاقة الشخصية سارية|خطاب من الشركة|صورة شخصية 4×6">
+                                <div class="service-icon entry"><i class="fas fa-building"></i></div>
+                                <div class="service-content">
+                                    <h3>أفراد شركات</h3>
+                                    <p>تصريح دخول أفراد شركات</p>
+                                    <div class="service-meta">
+                                        <span class="duration"><i class="fas fa-calendar"></i> 3 شهور</span>
+                                    </div>
+                                    <div class="service-actions">
+                                        <button class="btn btn-sm btn-docs" onclick="showDocs(this)">
+                                            <i class="fas fa-file-alt"></i> الأوراق المطلوبة
+                                        </button>
+                                        <% if (user) { %>
+                                            <a href="/apply" class="btn btn-primary btn-sm"><i
+                                                    class="fas fa-plus-circle"></i> تقديم</a>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-outline btn-sm"><i
+                                                        class="fas fa-sign-in-alt"></i> سجّل</a>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Process -->
+                    <div class="process-section">
+                        <h2><i class="fas fa-tasks"></i> كيفية التقديم</h2>
+                        <div class="process-steps">
+                            <div class="process-step">
+                                <div class="step-number">1</div>
+                                <h4>إنشاء حساب</h4>
+                                <p>سجل على المنصة باستخدام بياناتك الشخصية</p>
+                            </div>
+                            <div class="process-arrow"><i class="fas fa-arrow-left"></i></div>
+                            <div class="process-step">
+                                <div class="step-number">2</div>
+                                <h4>تقديم الطلب</h4>
+                                <p>اختر نوع الترخيص وأرفق المستندات المطلوبة</p>
+                            </div>
+                            <div class="process-arrow"><i class="fas fa-arrow-left"></i></div>
+                            <div class="process-step">
+                                <div class="step-number">3</div>
+                                <h4>المراجعة</h4>
+                                <p>تتم مراجعة طلبك من قبل قسم التراخيص</p>
+                            </div>
+                            <div class="process-arrow"><i class="fas fa-arrow-left"></i></div>
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <h4>الدفع والاستلام</h4>
+                                <p>بعد الموافقة، ادفع الرسوم واستلم الترخيص</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Modal -->
+            <div class="modal-overlay" id="docsModal" onclick="closeDocs(event)">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-file-alt"></i> الأوراق المطلوبة</h3>
+                        <button class="modal-close" onclick="closeDocs()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <h4 id="modalServiceName"></h4>
+                    <ul id="modalDocsList"></ul>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="closeDocs()">حسناً</button>
+                    </div>
+                </div>
+            </div>
+
+            <%- include('../partials/footer') %>
+
+                <style>
+                    .services-page {
+                        padding: 2rem 0;
+                        min-height: calc(100vh - 200px);
+                        background: #fafafa;
+                    }
+
+                    .page-header {
+                        text-align: center;
+                        margin-bottom: 3rem;
+                    }
+
+                    .page-header h1 {
+                        font-size: 2rem;
+                        font-weight: 700;
+                        color: #212121;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.75rem;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .page-header h1 i {
+                        color: #1e3c72;
+                    }
+
+                    .page-header p {
+                        color: #757575;
+                        font-size: 1.125rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .service-category {
+                        margin-bottom: 3rem;
+                    }
+
+                    .service-category h2 {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: #212121;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        margin-bottom: 1.5rem;
+                        padding-bottom: 0.75rem;
+                        border-bottom: 2px solid #e0e0e0;
+                    }
+
+                    .service-category h2 i {
+                        color: #1e3c72;
+                    }
+
+                    .services-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                        gap: 1.5rem;
+                    }
+
+                    .service-card {
+                        background: white;
+                        border-radius: 16px;
+                        padding: 1.5rem;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        transition: all 0.3s ease;
+                        border: 2px solid transparent;
+                    }
+
+                    .service-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .service-card.featured {
+                        border-color: #ff9800;
+                        background: linear-gradient(135deg, #fff8e1 0%, #fff 100%);
+                    }
+
+                    .service-icon {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 16px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .service-icon.boat {
+                        background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+                        color: white;
+                    }
+
+                    .service-icon.fisherman {
+                        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                        color: white;
+                    }
+
+                    .service-icon.trade {
+                        background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+                        color: white;
+                    }
+
+                    .service-icon.entry {
+                        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+                        color: white;
+                    }
+
+                    .service-content h3 {
+                        font-size: 1.125rem;
+                        font-weight: 700;
+                        color: #212121;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .service-content>p {
+                        color: #757575;
+                        font-size: 0.875rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .service-meta {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                        padding: 0.75rem;
+                        background: #f5f5f5;
+                        border-radius: 8px;
+                    }
+
+                    .service-meta .duration {
+                        color: #616161;
+                        font-size: 0.875rem;
+                    }
+
+                    .service-meta .duration i {
+                        margin-left: 0.25rem;
+                        color: #9e9e9e;
+                    }
+
+                    .service-actions {
+                        display: flex;
+                        gap: 0.5rem;
+                    }
+
+                    .service-actions .btn {
+                        flex: 1;
+                    }
+
+                    .btn-docs {
+                        background: #e3f2fd;
+                        color: #1976d2;
+                        border: none;
+                    }
+
+                    .btn-docs:hover {
+                        background: #bbdefb;
+                    }
+
+                    /* Modal */
+                    .modal-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.5);
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 9999;
+                    }
+
+                    .modal-overlay.show {
+                        display: flex;
+                    }
+
+                    .modal-content {
+                        background: white;
+                        border-radius: 16px;
+                        padding: 2rem;
+                        max-width: 500px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        animation: modalSlide 0.3s ease;
+                    }
+
+                    @keyframes modalSlide {
+                        from {
+                            transform: translateY(-20px);
+                            opacity: 0;
+                        }
+
+                        to {
+                            transform: translateY(0);
+                            opacity: 1;
+                        }
+                    }
+
+                    .modal-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                        padding-bottom: 1rem;
+                        border-bottom: 1px solid #eee;
+                    }
+
+                    .modal-header h3 {
+                        font-size: 1.25rem;
+                        color: #1e3c72;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+
+                    .modal-close {
+                        background: none;
+                        border: none;
+                        font-size: 1.25rem;
+                        color: #757575;
+                        cursor: pointer;
+                    }
+
+                    .modal-content h4 {
+                        font-size: 1.125rem;
+                        color: #212121;
+                        margin-bottom: 1rem;
+                    }
+
+                    .modal-content ul {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0 0 1.5rem 0;
+                    }
+
+                    .modal-content li {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        padding: 0.75rem;
+                        background: #f5f5f5;
+                        border-radius: 8px;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .modal-content li::before {
+                        content: '\f058';
+                        font-family: 'Font Awesome 6 Free';
+                        font-weight: 900;
+                        color: #4caf50;
+                    }
+
+                    .modal-footer {
+                        text-align: center;
+                    }
+
+                    /* Process Section */
+                    .process-section {
+                        background: white;
+                        border-radius: 16px;
+                        padding: 2rem;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .process-section h2 {
+                        text-align: center;
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: #212121;
+                        margin-bottom: 2rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                    }
+
+                    .process-section h2 i {
+                        color: #1e3c72;
+                    }
+
+                    .process-steps {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                        gap: 1rem;
+                    }
+
+                    .process-step {
+                        text-align: center;
+                        flex: 1;
+                        min-width: 150px;
+                        max-width: 200px;
+                    }
+
+                    .step-number {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background: linear-gradient(135deg, #1e3c72 0%, #00897b 100%);
+                        color: white;
+                        font-size: 1.25rem;
+                        font-weight: 700;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 1rem;
+                    }
+
+                    .process-step h4 {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        color: #212121;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .process-step p {
+                        color: #757575;
+                        font-size: 0.875rem;
+                    }
+
+                    .process-arrow {
+                        color: #1e3c72;
+                        font-size: 1.25rem;
+                    }
+
+                    @media (max-width: 768px) {
+                        .services-grid {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .process-steps {
+                            flex-direction: column;
+                        }
+
+                        .process-arrow {
+                            transform: rotate(-90deg);
+                        }
+
+                        .process-step {
+                            max-width: 100%;
+                        }
+                    }
+                </style>
+
+                <script>
+                    function showDocs(btn) {
+                        const card = btn.closest('.service-card');
+                        const serviceName = card.dataset.service;
+                        const docs = card.dataset.docs.split('|');
+
+                        document.getElementById('modalServiceName').textContent = serviceName;
+                        const docsList = document.getElementById('modalDocsList');
+                        docsList.innerHTML = docs.map(doc => `<li>${doc}</li>`).join('');
+
+                        document.getElementById('docsModal').classList.add('show');
+                        document.body.style.overflow = 'hidden';
+                    }
+
+                    function closeDocs(event) {
+                        if (event && event.target !== event.currentTarget) return;
+                        document.getElementById('docsModal').classList.remove('show');
+                        document.body.style.overflow = '';
+                    }
+
+                    // Close modal on Escape key
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') closeDocs();
+                    });
+
+                    // Handle scroll to category from URL params
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const category = urlParams.get('category');
+
+                        if (category) {
+                            const element = document.getElementById(category);
+                            if (element) {
+                                // Add a small delay to ensure page layout is settled
+                                setTimeout(() => {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    // Add temporary highlight effect
+                                    element.style.transition = 'background-color 0.5s ease';
+                                    const originalBg = element.style.backgroundColor;
+                                    element.style.backgroundColor = 'rgba(30, 60, 114, 0.05)';
+                                    setTimeout(() => {
+                                        element.style.backgroundColor = originalBg;
+                                    }, 2000);
+                                }, 100);
+                            }
+                        }
+                    });
+                </script>
+</body>
+
+</html>

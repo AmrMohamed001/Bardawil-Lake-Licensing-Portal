@@ -8,7 +8,7 @@ const {
   isSuperAdmin,
 } = require('../middlewares/authMiddleware');
 const validatorMiddleware = require('../middlewares/validatorMiddleware');
-const { param, body } = require('express-validator');
+const adminValidator = require('../validators/adminValidator');
 
 /**
  * Admin Routes - Based on SRS Section 5.3
@@ -35,7 +35,7 @@ router.get('/applications', adminController.getAllApplications);
 // @route   GET /api/v1/admin/applications/:id
 router.get(
   '/applications/:id',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.getApplicationForReview
 );
@@ -43,7 +43,7 @@ router.get(
 // @route   PUT /api/v1/admin/applications/:id/review
 router.put(
   '/applications/:id/review',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.startReview
 );
@@ -51,7 +51,7 @@ router.put(
 // @route   POST /api/v1/admin/applications/:id/approve
 router.post(
   '/applications/:id/approve',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.approveApplication
 );
@@ -59,8 +59,7 @@ router.post(
 // @route   POST /api/v1/admin/applications/:id/reject
 router.post(
   '/applications/:id/reject',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
-  body('reason').notEmpty().withMessage('سبب الرفض مطلوب'),
+  adminValidator.rejectApplicationValidator,
   validatorMiddleware,
   adminController.rejectApplication
 );
@@ -68,7 +67,7 @@ router.post(
 // @route   PUT /api/v1/admin/applications/:id/verify-payment
 router.put(
   '/applications/:id/verify-payment',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.verifyPayment
 );
@@ -76,7 +75,7 @@ router.put(
 // @route   PUT /api/v1/admin/applications/:id/ready
 router.put(
   '/applications/:id/ready',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.markLicenseReady
 );
@@ -84,7 +83,7 @@ router.put(
 // @route   PUT /api/v1/admin/applications/:id/complete
 router.put(
   '/applications/:id/complete',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.completeApplication
 );
@@ -99,7 +98,7 @@ router.get('/prices', adminController.getAllPrices);
 // @route   GET /api/v1/admin/prices/:id
 router.get(
   '/prices/:id',
-  param('id').isUUID().withMessage('معرف السعر غير صالح'),
+  adminValidator.priceIdValidator,
   validatorMiddleware,
   adminController.getPrice
 );
@@ -107,25 +106,7 @@ router.get(
 // @route   POST /api/v1/admin/prices
 router.post(
   '/prices',
-  body('licenseType')
-    .notEmpty()
-    .withMessage('نوع الترخيص مطلوب')
-    .isIn(['fisherman', 'boat', 'vehicle', 'individual_float'])
-    .withMessage('نوع الترخيص غير صالح'),
-  body('category').notEmpty().withMessage('الفئة مطلوبة'),
-  body('price')
-    .notEmpty()
-    .withMessage('السعر مطلوب')
-    .isFloat({ min: 0 })
-    .withMessage('السعر يجب أن يكون رقم موجب'),
-  body('effectiveFrom')
-    .optional()
-    .isISO8601()
-    .withMessage('تاريخ البداية غير صالح'),
-  body('effectiveUntil')
-    .optional()
-    .isISO8601()
-    .withMessage('تاريخ النهاية غير صالح'),
+  adminValidator.createPriceValidator,
   validatorMiddleware,
   adminController.createPrice
 );
@@ -133,20 +114,7 @@ router.post(
 // @route   PUT /api/v1/admin/prices/:id
 router.put(
   '/prices/:id',
-  param('id').isUUID().withMessage('معرف السعر غير صالح'),
-  body('price')
-    .optional()
-    .isFloat({ min: 0 })
-    .withMessage('السعر يجب أن يكون رقم موجب'),
-  body('effectiveFrom')
-    .optional()
-    .isISO8601()
-    .withMessage('تاريخ البداية غير صالح'),
-  body('effectiveUntil')
-    .optional()
-    .isISO8601()
-    .withMessage('تاريخ النهاية غير صالح'),
-  body('isActive').optional().isBoolean().withMessage('قيمة النشاط غير صالحة'),
+  adminValidator.updatePriceValidator,
   validatorMiddleware,
   adminController.updatePrice
 );
@@ -154,7 +122,7 @@ router.put(
 // @route   DELETE /api/v1/admin/prices/:id
 router.delete(
   '/prices/:id',
-  param('id').isUUID().withMessage('معرف السعر غير صالح'),
+  adminValidator.priceIdValidator,
   validatorMiddleware,
   adminController.deletePrice
 );
@@ -166,7 +134,7 @@ router.delete(
 // @route   GET /api/v1/admin/applications/:id/supply-order
 router.get(
   '/applications/:id/supply-order',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.getSupplyOrderPdf
 );
@@ -174,7 +142,7 @@ router.get(
 // @route   GET /api/v1/admin/applications/:id/license-pdf
 router.get(
   '/applications/:id/license-pdf',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.getLicensePdf
 );
@@ -187,8 +155,7 @@ router.get(
 router.put(
   '/users/:id/role',
   isSuperAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
-  body('role').isIn(['user', 'admin', 'super_admin']).withMessage('الصلاحية غير صالحة'),
+  adminValidator.updateUserRoleValidator,
   validatorMiddleware,
   adminController.updateUserRole
 );
@@ -197,10 +164,65 @@ router.put(
 router.put(
   '/users/:id/status',
   isSuperAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
-  body('isActive').isBoolean().withMessage('حالة الحساب غير صالحة'),
+  adminValidator.updateUserStatusValidator,
   validatorMiddleware,
   adminController.updateUserStatus
+);
+
+// =============================================
+// News Management
+// =============================================
+const newsController = require('../controllers/newsController');
+const { uploadSingle, handleUploadError } = require('../middlewares/uploadMiddleware');
+
+// @route   GET /api/v1/admin/news/stats
+router.get('/news/stats', newsController.getNewsStats);
+
+// @route   GET /api/v1/admin/news
+router.get('/news', newsController.getAllNews);
+
+// @route   GET /api/v1/admin/news/:id
+router.get(
+  '/news/:id',
+  adminValidator.newsIdValidator,
+  validatorMiddleware,
+  newsController.getNewsById
+);
+
+// @route   POST /api/v1/admin/news
+router.post(
+  '/news',
+  uploadSingle('image'),
+  handleUploadError,
+  adminValidator.createNewsValidator,
+  validatorMiddleware,
+  newsController.createNews
+);
+
+// @route   PUT /api/v1/admin/news/:id
+router.put(
+  '/news/:id',
+  adminValidator.newsIdValidator,
+  uploadSingle('image'),
+  handleUploadError,
+  validatorMiddleware,
+  newsController.updateNews
+);
+
+// @route   DELETE /api/v1/admin/news/:id
+router.delete(
+  '/news/:id',
+  adminValidator.newsIdValidator,
+  validatorMiddleware,
+  newsController.deleteNews
+);
+
+// @route   PATCH /api/v1/admin/news/:id/publish
+router.patch(
+  '/news/:id/publish',
+  adminValidator.newsIdValidator,
+  validatorMiddleware,
+  newsController.togglePublish
 );
 
 // =============================================
@@ -220,7 +242,7 @@ router.get('/applications/export/excel', exportController.exportApplicationsExce
 // Export single application to PDF
 router.get(
   '/applications/:id/export/pdf',
-  param('id').isUUID().withMessage('معرف الطلب غير صالح'),
+  adminValidator.applicationIdValidator,
   validatorMiddleware,
   exportController.exportApplicationPDF
 );

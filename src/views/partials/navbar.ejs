@@ -3,7 +3,7 @@
 
     <!-- Logo and Brand -->
     <a href="/" class="navbar-brand">
-      <img src="/imgs/logo.png" alt="بحيرة البردويل" class="navbar-logo">
+      <img src="/imgs/logo.png" alt="بحيرة البردويل" class="navbar-logo" width="50" height="50">
       <div class="navbar-brand-text">
         <h1>جهاز مستقبل مصر</h1>
         <p>منصة تراخيص بحيرة البردويل</p>
@@ -23,6 +23,13 @@
         <a href="/services" class="navbar-link">
           <i class="fas fa-fish"></i>
           <span>الخدمات</span>
+        </a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="/pricing" class="navbar-link">
+          <i class="fas fa-coins"></i>
+          <span>الأسعار</span>
         </a>
       </li>
 
@@ -56,6 +63,11 @@
         <div class="navbar-notifications">
           <a href="/notifications" class="navbar-notification-btn" title="الإشعارات">
             <i class="fas fa-bell"></i>
+            <% if (locals.unreadNotificationCount && unreadNotificationCount> 0) { %>
+              <span class="notification-badge">
+                <%= unreadNotificationCount> 99 ? '99+' : unreadNotificationCount %>
+              </span>
+              <% } %>
           </a>
         </div>
 
@@ -103,24 +115,38 @@
                   <i class="fas fa-cog"></i>
                   <span>لوحة الإدارة</span>
                 </a>
-                <% } else { %>
-                  <a href="/dashboard" class="user-dropdown-item">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>لوحة التحكم</span>
-                  </a>
-                  <% } %>
-
-                    <a href="/profile" class="user-dropdown-item">
-                      <i class="fas fa-user"></i>
-                      <span>الملف الشخصي</span>
+                <% } %>
+                  <% if (user.role==='financial_officer' || user.role==='super_admin' ) { %>
+                    <a href="/financial/dashboard" class="user-dropdown-item">
+                      <i class="fas fa-coins"></i>
+                      <span>القسم المالي</span>
                     </a>
+                    <% } %>
+                      <% if (user.role==='super_admin' ) { %>
+                        <a href="/super-admin-dashboard" class="user-dropdown-item">
+                          <i class="fas fa-chart-line"></i>
+                          <span>الإحصائيات المتقدمة</span>
+                        </a>
+                        <% } %>
+                          <% if (user.role !=='admin' && user.role !=='super_admin' && user.role !=='financial_officer'
+                            ) { %>
+                            <a href="/dashboard" class="user-dropdown-item">
+                              <i class="fas fa-tachometer-alt"></i>
+                              <span>لوحة التحكم</span>
+                            </a>
+                            <% } %>
 
-                    <hr class="dropdown-divider">
+                              <a href="/profile" class="user-dropdown-item">
+                                <i class="fas fa-user"></i>
+                                <span>الملف الشخصي</span>
+                              </a>
 
-                    <a href="#" class="user-dropdown-item text-danger" id="logoutBtn">
-                      <i class="fas fa-sign-out-alt"></i>
-                      <span>تسجيل الخروج</span>
-                    </a>
+                              <hr class="dropdown-divider">
+
+                              <a href="#" class="user-dropdown-item text-danger" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>تسجيل الخروج</span>
+                              </a>
             </div>
           </div>
         </div>
@@ -136,13 +162,44 @@
           <% } %>
 
             <!-- Mobile Menu Toggle -->
-            <button class="navbar-mobile-toggle" id="mobileMenuBtn">
+            <button class="navbar-mobile-toggle" id="mobileMenuBtn" onclick="toggleMobileMenu()">
               <i class="fas fa-bars"></i>
             </button>
     </div>
 
   </div>
 </nav>
+
+<!-- Mobile Menu Drawer -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <span>القائمة</span>
+    <button class="mobile-menu-close" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="mobile-menu-links">
+    <a href="/" class="mobile-menu-link"><i class="fas fa-home"></i> الرئيسية</a>
+    <a href="/services" class="mobile-menu-link"><i class="fas fa-fish"></i> الخدمات</a>
+    <a href="/about" class="mobile-menu-link"><i class="fas fa-info-circle"></i> عن البحيرة</a>
+    <a href="/news" class="mobile-menu-link"><i class="fas fa-newspaper"></i> الأخبار</a>
+    <a href="/contact" class="mobile-menu-link"><i class="fas fa-phone"></i> اتصل بنا</a>
+    <% if (locals.user) { %>
+      <hr class="mobile-menu-divider">
+      <a href="/dashboard" class="mobile-menu-link"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+      <a href="/profile" class="mobile-menu-link"><i class="fas fa-user"></i> الملف الشخصي</a>
+      <a href="/notifications" class="mobile-menu-link"><i class="fas fa-bell"></i> الإشعارات</a>
+      <% if (user.role==='admin' || user.role==='super_admin' ) { %>
+        <a href="/admin-dashboard" class="mobile-menu-link"><i class="fas fa-cog"></i> لوحة الإدارة</a>
+        <% } %>
+          <a href="#" class="mobile-menu-link text-danger" id="mobileLogoutBtn"><i class="fas fa-sign-out-alt"></i>
+            تسجيل الخروج</a>
+          <% } else { %>
+            <hr class="mobile-menu-divider">
+            <a href="/login" class="mobile-menu-link"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
+            <a href="/register" class="mobile-menu-link"><i class="fas fa-user-plus"></i> إنشاء حساب</a>
+            <% } %>
+  </div>
+</div>
 
 <style>
   .navbar {
@@ -213,6 +270,11 @@
     font-weight: 600;
   }
 
+  .navbar-link i {
+    width: 24px;
+    text-align: center;
+  }
+
   .navbar-link:hover {
     background: rgba(255, 255, 255, 0.15);
     color: white;
@@ -238,6 +300,40 @@
 
   .navbar-notification-btn:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar-notifications {
+    position: relative;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #f44336;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    animation: pulse-badge 2s infinite;
+  }
+
+  @keyframes pulse-badge {
+
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
+    }
   }
 
   .navbar-user {
@@ -403,9 +499,116 @@
       display: none;
     }
   }
+
+  /* Mobile Menu Drawer */
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+  }
+
+  .mobile-menu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-menu.show {
+    transform: translateX(0);
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .mobile-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  .mobile-menu-links {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .mobile-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: #424242;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    margin-bottom: 0.25rem;
+  }
+
+  .mobile-menu-link:hover {
+    background: #f5f5f5;
+    color: #1e3c72;
+  }
+
+  .mobile-menu-link i {
+    width: 20px;
+    text-align: center;
+    color: #1e3c72;
+  }
+
+  .mobile-menu-link.text-danger {
+    color: #f44336;
+  }
+
+  .mobile-menu-link.text-danger i {
+    color: #f44336;
+  }
+
+  .mobile-menu-divider {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 1rem 0;
+  }
 </style>
 
+<!-- Axios for API calls (logout, etc.) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+
 <script>
+  function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('show');
+    document.getElementById('mobileMenuOverlay').classList.toggle('show');
+    document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('show') ? 'hidden' : '';
+  }
+
   document.getElementById('userMenuBtn')?.addEventListener('click', function (e) {
     e.stopPropagation();
     const dropdown = document.getElementById('userDropdown');
@@ -419,6 +622,16 @@
   });
 
   document.getElementById('logoutBtn')?.addEventListener('click', async function (e) {
+    e.preventDefault();
+    try {
+      await axios.post('/api/v1/auth/logout', {}, { withCredentials: true });
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  });
+
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async function (e) {
     e.preventDefault();
     try {
       await axios.post('/api/v1/auth/logout', {}, { withCredentials: true });

@@ -52,7 +52,7 @@ const isApiRequest = req => {
 
 // Render error page for browser requests
 const renderErrorPage = (err, req, res) => {
-  res.status(err.statusCode).render('error', {
+  res.status(err.statusCode).render('layouts/error', {
     statusCode: err.statusCode,
     message: err.message,
     error: process.env.NODE_ENV === 'development' ? err : null,

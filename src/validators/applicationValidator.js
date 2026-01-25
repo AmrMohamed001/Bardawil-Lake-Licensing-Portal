@@ -5,17 +5,30 @@ const { body, param, query } = require('express-validator');
  * Arabic validation messages
  */
 
-// Fisherman categories - only actual fisherman types
-const fishermanCategories = ['صياد مؤمن عليه', 'صياد غير مؤمن عليه', 'صياد تحت السن'];
+// Normalize Arabic text helper
+const normalizeArabic = (text) => {
+  if (!text) return '';
+  let normalized = text.trim();
+  if (normalized.normalize) {
+    normalized = normalized.normalize('NFC');
+  }
+  return normalized;
+};
 
-// Other categories - تاجر، مندوب، شيال، عامل تاجر
-const otherCategories = ['مندوب', 'تاجر', 'عامل تاجر', 'شيال'];
+// Fisherman categories
+const fishermanCategories = ['صياد مؤمن عليه', 'صياد غير مؤمن عليه', 'صياد تحت السن', 'صيد رجلي'];
+
+// Trade categories
+const tradeCategories = ['تاجر', 'مندوب', 'عامل تاجر', 'تاجر خارج المحافظة', 'بياع'];
+
+// Entry categories
+const entryCategories = ['شيال', 'نجار', 'ميكانيكي', 'أفراد شركات'];
 
 // Boat categories
-const boatCategories = ['مركب'];
+const boatCategories = ['مركب خاص', 'مركب الجهاز', 'تغيير مرسي', 'تغيير موتور'];
 
 // Vehicle categories
-const vehicleCategories = ['مركبة', 'تروسيكل'];
+const vehicleCategories = ['سيارة', 'تروسيكل'];
 
 /**
  * Create application validator
@@ -24,37 +37,73 @@ exports.createApplicationValidator = [
   body('applicationType')
     .notEmpty()
     .withMessage('نوع الطلب مطلوب')
-    .isIn(['fisherman', 'boat', 'vehicle', 'other'])
+    .isIn(['fisherman', 'boat', 'vehicle', 'trade', 'entry'])
     .withMessage('نوع الطلب غير صالح'),
 
   body('licenseCategory')
     .notEmpty()
     .withMessage('فئة الترخيص مطلوبة')
+    .customSanitizer(value => normalizeArabic(value))
     .custom((value, { req }) => {
       const { applicationType } = req.body;
-      if (
-        applicationType === 'fisherman' &&
-        !fishermanCategories.includes(value)
-      ) {
-        throw new Error('فئة الصياد غير صالحة');
+      const cleanValue = normalizeArabic(value);
+
+      // Debug logging
+      console.log('=== Category Validation Debug ===');
+      console.log('Application Type:', applicationType);
+      console.log('Received Category:', cleanValue);
+      console.log('Category CharCodes:', cleanValue.split('').map(c => c.charCodeAt(0)));
+
+      // Helper to check if value is in category list
+      const inCategory = (categories) => {
+        if (applicationType === 'boat') {
+          console.log('Checking boat categories:');
+          categories.forEach((cat, idx) => {
+            const normalizedCat = normalizeArabic(cat);
+            const match = normalizedCat === cleanValue;
+            console.log(`  [${idx}] '${cat}' => normalized='${normalizedCat}' | match=${match}`);
+            console.log(`       Codes: [${normalizedCat.split('').map(c => c.charCodeAt(0)).join(',')}]`);
+          });
+        }
+
+        const found = categories.some(cat => {
+          const normalizedCat = normalizeArabic(cat);
+          return normalizedCat === cleanValue;
+        });
+        console.log('Found match:', found);
+        return found;
+      };
+
+      // Validate based on application type
+      if (applicationType === 'fisherman') {
+        if (!inCategory(fishermanCategories)) {
+          throw new Error(`فئة الصياد غير صالحة: ${cleanValue}`);
+        }
+      } else if (applicationType === 'trade') {
+        if (!inCategory(tradeCategories)) {
+          throw new Error(`فئة التجارة غير صالحة: ${cleanValue}`);
+        }
+      } else if (applicationType === 'entry') {
+        if (!inCategory(entryCategories)) {
+          throw new Error(`فئة الدخول غير صالحة: ${cleanValue}`);
+        }
+      } else if (applicationType === 'boat') {
+        if (!inCategory(boatCategories)) {
+          throw new Error(`فئة المركب غير صالحة: ${cleanValue}`);
+        }
+      } else if (applicationType === 'vehicle') {
+        if (!inCategory(vehicleCategories)) {
+          throw new Error(`فئة السيارة غير صالحة: ${cleanValue}`);
+        }
       }
-      if (
-        applicationType === 'other' &&
-        !otherCategories.includes(value)
-      ) {
-        throw new Error('فئة الترخيص غير صالحة');
-      }
-      if (
-        applicationType === 'boat' &&
-        !boatCategories.includes(value)
-      ) {
-        throw new Error('فئة المركب غير صالحة');
-      }
-      if (applicationType === 'vehicle' && !vehicleCategories.includes(value)) {
-        throw new Error('فئة السيارة غير صالحة');
-      }
+
       return true;
     }),
+
+  body('duration')
+    .optional()
+    .isIn(['1_month', '3_months', '6_months', 'season'])
+    .withMessage('مدة الترخيص غير صالحة'),
 
   body('isRenewal')
     .optional()
@@ -69,7 +118,6 @@ exports.createApplicationValidator = [
   // ============================================
   // FISHERMAN REQUIRED FIELDS
   // ============================================
-  // For renewals: require previous license number
   body('previousLicenseNumber')
     .if(body('applicationType').equals('fisherman'))
     .if(body('isRenewal').custom(val => val === true || val === 'true'))
@@ -79,9 +127,8 @@ exports.createApplicationValidator = [
     .withMessage('رقم الرخصة السابقة غير صالح'),
 
   body('marina')
-    .if(body('applicationType').custom(val => val === 'fisherman' || val === 'other'))
-    .notEmpty()
-    .withMessage('المرسى مطلوب')
+    .if(body('applicationType').custom(val => ['fisherman', 'trade', 'entry'].includes(val)))
+    .optional({ checkFalsy: true })
     .isIn(['اغزوان', 'النصر', 'التلول'])
     .withMessage('المرسى غير صالح'),
 
@@ -98,19 +145,19 @@ exports.createApplicationValidator = [
 
   body('boatRegistration')
     .if(body('applicationType').equals('boat'))
-    .optional()
+    .optional({ checkFalsy: true })
     .isLength({ min: 1, max: 50 })
     .withMessage('رقم تسجيل المركب غير صالح'),
 
   body('boatLength')
     .if(body('applicationType').equals('boat'))
-    .optional()
+    .optional({ checkFalsy: true })
     .isNumeric()
     .withMessage('طول المركب يجب أن يكون رقماً'),
 
   body('enginePower')
     .if(body('applicationType').equals('boat'))
-    .optional()
+    .optional({ checkFalsy: true })
     .isNumeric()
     .withMessage('قوة المحرك يجب أن تكون رقماً'),
 
@@ -129,28 +176,6 @@ exports.createApplicationValidator = [
     .optional()
     .isLength({ min: 1, max: 50 })
     .withMessage('نوع السيارة غير صالح'),
-
-  body('vehicleYear')
-    .if(body('applicationType').equals('vehicle'))
-    .optional()
-    .isInt({ min: 1950, max: new Date().getFullYear() + 1 })
-    .withMessage('سنة الصنع غير صالحة'),
-
-  body('capacity')
-    .if(body('applicationType').equals('vehicle'))
-    .optional()
-    .isNumeric()
-    .withMessage('السعة يجب أن تكون رقماً'),
-
-  // ============================================
-  // RENEWAL REQUIRED FIELDS
-  // ============================================
-  body('previousBoatNumber')
-    .if(body('isRenewal').equals('true'))
-    .if(body('applicationType').equals('boat'))
-    .optional()
-    .isLength({ min: 1, max: 50 })
-    .withMessage('رقم المركب في الموسم السابق غير صالح'),
 ];
 
 /**
@@ -175,7 +200,7 @@ exports.getApplicationsValidator = [
 
   query('type')
     .optional()
-    .isIn(['fisherman', 'boat', 'vehicle', 'other'])
+    .isIn(['fisherman', 'boat', 'vehicle', 'trade', 'entry'])
     .withMessage('نوع الطلب غير صالح'),
 
   query('page').optional().isInt({ min: 1 }).withMessage('رقم الصفحة غير صالح'),

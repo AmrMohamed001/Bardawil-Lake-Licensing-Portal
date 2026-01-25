@@ -1,25 +1,21 @@
 const catchAsync = require('../utils/catchAsync');
-const {
-  Application,
-  User,
-  Document,
-  ApplicationStatusHistory,
-} = require('../models');
-const adminService = require('../services/adminService');
+const viewService = require('../services/viewService');
+const adminService = require('../services/adminService'); // Kept for some direct calls if needed, or move all to viewService
+const { Application } = require('../models'); // Some counts are still used inline in legacy code? Let's check.
 
 /**
  * View Controller - Handles server-side rendering of EJS views
  */
 
 exports.getHome = catchAsync(async (req, res, next) => {
-  res.status(200).render('home', {
+  res.status(200).render('public/home', {
     title: 'الرئيسية | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
   });
 });
 
 exports.getLogin = catchAsync(async (req, res, next) => {
-  res.status(200).render('login', {
+  res.status(200).render('auth/login', {
     title: 'تسجيل الدخول',
     nationalId: req.query.nationalId || '',
     password: req.query.password || '',
@@ -27,196 +23,104 @@ exports.getLogin = catchAsync(async (req, res, next) => {
 });
 
 exports.getRegister = catchAsync(async (req, res, next) => {
-  res.status(200).render('register', {
+  res.status(200).render('auth/register', {
     title: 'انشاء حساب جديد',
   });
 });
 
 exports.getContact = catchAsync(async (req, res, next) => {
-  res.status(200).render('contact', {
+  res.status(200).render('public/contact', {
     title: 'اتصل بنا | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
   });
 });
 
+exports.getTerms = catchAsync(async (req, res, next) => {
+  res.status(200).render('public/terms', {
+    title: 'الشروط والأحكام | بوابة تراخيص بحيرة البردويل',
+    user: req.user || null,
+  });
+});
+
 exports.getAbout = catchAsync(async (req, res, next) => {
-  res.status(200).render('about', {
+  res.status(200).render('public/about', {
     title: 'عن بحيرة البردويل | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
   });
 });
 
 exports.getServices = catchAsync(async (req, res, next) => {
-  res.status(200).render('services', {
+  res.status(200).render('public/services', {
     title: 'الخدمات | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
   });
 });
 
 exports.getNews = catchAsync(async (req, res, next) => {
-  const { News } = require('../models');
+  const data = await viewService.getNewsData(req.query);
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = 9;
-  const offset = (page - 1) * limit;
-  const category = req.query.category || '';
-  const sort = req.query.sort || 'latest';
-
-  // Build where clause
-  const where = { isPublished: true };
-  if (category) {
-    where.category = category;
-  }
-
-  // Build order clause - use isPinned for popular since viewCount doesn't exist
-  let order = [['createdAt', 'DESC']];
-  if (sort === 'popular') {
-    order = [
-      ['isPinned', 'DESC'],
-      ['createdAt', 'DESC'],
-    ];
-  } else if (sort === 'oldest') {
-    order = [['createdAt', 'ASC']];
-  }
-
-  const { count, rows: news } = await News.findAndCountAll({
-    where,
-    order,
-    limit,
-    offset,
-  });
-
-  // Get pinned/popular news for sidebar
-  const popularNews = await News.findAll({
-    where: { isPublished: true },
-    order: [
-      ['isPinned', 'DESC'],
-      ['createdAt', 'DESC'],
-    ],
-    limit: 5,
-  });
-
-  res.status(200).render('news', {
+  res.status(200).render('public/news', {
     title: 'الأخبار والتحديثات',
     user: req.user || null,
-    news,
-    popularNews,
-    currentCategory: category,
-    currentSort: sort,
-    pagination: {
-      total: count,
-      page,
-      pages: Math.ceil(count / limit),
-    },
+    news: data.news,
+    popularNews: data.popularNews,
+    currentCategory: req.query.category || '',
+    currentSort: req.query.sort || 'latest',
+    pagination: data.pagination,
   });
 });
 
 exports.getNewsDetail = catchAsync(async (req, res, next) => {
-  const { News } = require('../models');
-  const AppError = require('../utils/appError');
+  const data = await viewService.getNewsDetailData(req.params.id);
 
-  const article = await News.findOne({
-    where: {
-      id: req.params.id,
-      isPublished: true,
-    },
-  });
-
-  if (!article) {
-    return next(new AppError('لم يتم العثور على الخبر', 404));
-  }
-
-  // Increment view count
-  await article.increment('viewCount');
-
-  // Get related/popular news
-  const relatedNews = await News.findAll({
-    where: { isPublished: true },
-    order: [
-      ['isPinned', 'DESC'],
-      ['createdAt', 'DESC'],
-    ],
-    limit: 5,
-  });
-
-  res.status(200).render('news-detail', {
-    title: article.titleAr,
+  res.status(200).render('public/news-detail', {
+    title: data.article.titleAr,
     user: req.user || null,
-    article,
-    relatedNews,
+    article: data.article,
+    relatedNews: data.relatedNews,
     currentUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
   });
 });
 
 exports.getDashboard = catchAsync(async (req, res, next) => {
-  // Get user's applications with pagination
-  const page = parseInt(req.query.page) || 1;
-  const limit = 10;
-  const offset = (page - 1) * limit;
+  const data = await viewService.getUserDashboardData(req.user.id, req.query);
 
-  const { count, rows: applications } = await Application.findAndCountAll({
-    where: { userId: req.user.id },
-    order: [['createdAt', 'DESC']],
-    limit,
-    offset,
-  });
-
-  // Get stats for this user
-  const stats = {
-    total: await Application.count({ where: { userId: req.user.id } }),
-    underReview: await Application.count({
-      where: { userId: req.user.id, status: 'under_review' },
-    }),
-    completed: await Application.count({
-      where: { userId: req.user.id, status: 'completed' },
-    }),
-    rejected: await Application.count({
-      where: { userId: req.user.id, status: 'rejected' },
-    }),
-  };
-
-  res.status(200).render('dashboard', {
+  res.status(200).render('applications/dashboard', {
     title: 'لوحة التحكم',
     user: req.user,
-    applications,
-    stats,
-    pagination: {
-      total: count,
-      page,
-      pages: Math.ceil(count / limit),
-      limit,
-    },
+    applications: data.applications,
+    stats: data.stats,
+    pagination: data.pagination,
   });
 });
 
 exports.getNewLicense = catchAsync(async (req, res, next) => {
-  res.status(200).render('apply', {
+  const data = await viewService.getNewLicenseData();
+
+  res.status(200).render('applications/apply', {
     title: 'تقديم طلب جديد',
     user: req.user,
+    pricesJson: data.pricesJson,
   });
 });
 
 exports.getAdminDashboard = catchAsync(async (req, res, next) => {
-  // Get dashboard stats
-  const stats = await adminService.getDashboardStats();
+  const data = await viewService.getAdminDashboardData();
 
-  // Get recent applications (last 5)
-  const result = await adminService.getAllApplications({ limit: 5 });
-
-  res.status(200).render('admin', {
+  res.status(200).render('admin/dashboard', {
     title: 'لوحة الإدارة',
     user: req.user,
     currentPage: 'dashboard',
-    stats,
-    recentApplications: result.applications,
-    pendingCount: stats.overview.new,
+    stats: data.stats,
+    recentApplications: data.recentApplications,
+    pendingCount: data.pendingCount,
   });
 });
 
 exports.getReviewApplication = catchAsync(async (req, res, next) => {
   const application = await adminService.getApplicationForReview(req.params.id);
 
-  res.status(200).render('admin-details', {
+  res.status(200).render('admin/application-details', {
     title: `مراجعة الطلب #${application.applicationNumber}`,
     user: req.user,
     currentPage: 'applications',
@@ -225,18 +129,16 @@ exports.getReviewApplication = catchAsync(async (req, res, next) => {
 });
 
 exports.getProfile = catchAsync(async (req, res, next) => {
-  res.status(200).render('profile', {
+  res.status(200).render('user/profile', {
     title: 'الملف الشخصي',
     user: req.user,
   });
 });
 
-// New view controller for pricing management
 exports.getAdminPricing = catchAsync(async (req, res, next) => {
-  const pricingService = require('../services/pricingService');
-  const prices = await pricingService.getAllPrices({});
+  const prices = await viewService.getAdminPricingData();
 
-  res.status(200).render('admin-pricing', {
+  res.status(200).render('admin/pricing', {
     title: 'إعدادات التسعير',
     user: req.user,
     currentPage: 'pricing',
@@ -244,196 +146,113 @@ exports.getAdminPricing = catchAsync(async (req, res, next) => {
   });
 });
 
-// New view controller for audit logs (super_admin only)
 exports.getAuditLogs = catchAsync(async (req, res, next) => {
-  res.status(200).render('admin-audit', {
+  res.status(200).render('admin/audit', {
     title: 'سجل النشاطات',
     user: req.user,
     currentPage: 'audit',
   });
 });
 
-// Admin applications list view
 exports.getAdminApplications = catchAsync(async (req, res, next) => {
   const result = await adminService.getAllApplications(req.query);
+  const pendingCount = await Application.count({ where: { status: 'received' } });
 
-  res.status(200).render('admin-applications', {
+  res.status(200).render('admin/applications', {
     title: 'إدارة الطلبات',
     user: req.user,
     currentPage: 'applications',
     applications: result.applications,
     pagination: result.pagination,
     query: req.query || {},
-    pendingCount: await Application.count({ where: { status: 'received' } }),
+    pendingCount,
   });
 });
 
-// User application details view
 exports.getApplicationDetails = catchAsync(async (req, res, next) => {
-  const AppError = require('../utils/appError');
+  const application = await viewService.getApplicationDetails(req.params.id, req.user.id);
 
-  const application = await Application.findOne({
-    where: {
-      id: req.params.id,
-      userId: req.user.id, // Ensure user can only view their own applications
-    },
-    include: [
-      { model: Document, as: 'documents' },
-      {
-        model: ApplicationStatusHistory,
-        as: 'statusHistory',
-        order: [['createdAt', 'DESC']],
-      },
-    ],
-  });
-
-  if (!application) {
-    return next(new AppError('لم يتم العثور على الطلب', 404));
-  }
-
-  res.status(200).render('application-details', {
+  res.status(200).render('applications/details', {
     title: `تفاصيل الطلب #${application.applicationNumber}`,
     user: req.user,
     application,
   });
 });
 
-// Payment page view
 exports.getPaymentPage = catchAsync(async (req, res, next) => {
-  const AppError = require('../utils/appError');
-
-  const application = await Application.findOne({
-    where: {
-      id: req.params.id,
-      userId: req.user.id,
-    },
-    include: [
-      {
-        model: User,
-        as: 'applicant',
-        attributes: ['id', 'firstNameAr', 'lastNameAr', 'phone', 'nationalId'],
-      },
-    ],
-  });
-
-  if (!application) {
-    return next(new AppError('لم يتم العثور على الطلب', 404));
-  }
+  const application = await viewService.getPaymentPageData(req.params.id, req.user.id);
 
   // Check if payment is required
   if (application.status !== 'approved_payment_pending') {
     return res.redirect(`/applications/${application.id}`);
   }
 
-  res.status(200).render('payment', {
+  res.status(200).render('payments/pay', {
     title: 'دفع الرسوم',
     user: req.user,
     application,
   });
 });
 
-// User notifications view
 exports.getNotifications = catchAsync(async (req, res, next) => {
-  const { Notification } = require('../models');
+  const notifications = await viewService.getNotificationsData(req.user.id);
 
-  // Fetch notifications for the current user
-  const notifications = await Notification.findAll({
-    where: { userId: req.user.id },
-    order: [['createdAt', 'DESC']],
-    limit: 50,
-  });
-
-  res.status(200).render('notifications', {
+  res.status(200).render('user/notifications', {
     title: 'الإشعارات',
     user: req.user,
     notifications,
   });
 });
 
-// Super Admin Dashboard with charts and statistics
 exports.getSuperAdminDashboard = catchAsync(async (req, res, next) => {
-  const { Application, User } = require('../models');
-  const { Op, fn, col, literal } = require('sequelize');
+  const data = await viewService.getSuperAdminDashboardData();
 
-  // Get dashboard stats
-  const stats = await adminService.getDashboardStats();
-
-  // Get recent applications
-  const result = await adminService.getAllApplications({ limit: 10 });
-
-  // Calculate total revenue from completed applications
-  const totalRevenueResult = await Application.findOne({
-    where: { status: 'completed' },
-    attributes: [[fn('SUM', col('payment_amount')), 'total']],
-    raw: true,
-  });
-  const totalRevenue = parseFloat(totalRevenueResult?.total) || 0;
-
-  // Get total users count
-  const totalUsers = await User.count();
-
-  // Get monthly revenue data (last 6 months)
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-  const monthlyRevenueRaw = await Application.findAll({
-    where: {
-      status: 'completed',
-      paymentVerifiedAt: { [Op.gte]: sixMonthsAgo },
-    },
-    attributes: [
-      [fn('DATE_TRUNC', 'month', col('payment_verified_at')), 'month'],
-      [fn('SUM', col('payment_amount')), 'amount'],
-    ],
-    group: [fn('DATE_TRUNC', 'month', col('payment_verified_at'))],
-    order: [[fn('DATE_TRUNC', 'month', col('payment_verified_at')), 'ASC']],
-    raw: true,
-  });
-
-  // Format monthly revenue for chart
-  const monthlyRevenue = monthlyRevenueRaw.map(item => ({
-    month: new Date(item.month).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short' }),
-    amount: parseFloat(item.amount) || 0,
-  }));
-
-  res.status(200).render('super-admin-dashboard', {
+  res.status(200).render('admin/super-dashboard', {
     title: 'لوحة الإحصائيات المتقدمة',
     user: req.user,
     currentPage: 'super-dashboard',
-    stats,
-    recentApplications: result.applications,
-    totalRevenue,
-    totalUsers,
-    monthlyRevenue,
+    stats: data.stats,
+    recentApplications: data.recentApplications,
+    totalRevenue: data.totalRevenue,
+    totalUsers: data.totalUsers,
+    monthlyRevenue: data.monthlyRevenue,
   });
 });
 
-// Admin users management page
 exports.getAdminUsers = catchAsync(async (req, res, next) => {
-  const { User } = require('../models');
+  const data = await viewService.getAdminUsersData(req.query);
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = 20;
-  const offset = (page - 1) * limit;
-
-  const { count, rows: users } = await User.findAndCountAll({
-    order: [['createdAt', 'DESC']],
-    limit,
-    offset,
-    attributes: ['id', 'firstNameAr', 'lastNameAr', 'nationalId', 'phone', 'email', 'role', 'isActive', 'createdAt'],
-  });
-
-  res.status(200).render('admin-users', {
+  res.status(200).render('admin/users', {
     title: 'إدارة المستخدمين',
     user: req.user,
     currentUser: req.user,
     currentPage: 'users',
-    users,
-    pagination: {
-      total: count,
-      page,
-      pages: Math.ceil(count / limit),
-      limit,
-    },
+    users: data.users,
+    pagination: data.pagination,
+  });
+});
+
+exports.getAdminNews = catchAsync(async (req, res, next) => {
+  const data = await viewService.getAdminNewsData(req.query);
+
+  res.status(200).render('admin/news', {
+    title: 'إدارة الأخبار',
+    user: req.user,
+    currentPage: 'news',
+    news: data.news,
+    stats: data.stats,
+    pagination: data.pagination,
+  });
+});
+
+exports.getPricing = catchAsync(async (req, res, next) => {
+  const data = await viewService.getPricingPageData();
+
+  res.status(200).render('public/pricing', {
+    title: 'الأسعار والرسوم',
+    user: req.user || null,
+    currentPage: 'pricing',
+    prices: data.prices,
+    pricesByType: data.pricesByType,
   });
 });

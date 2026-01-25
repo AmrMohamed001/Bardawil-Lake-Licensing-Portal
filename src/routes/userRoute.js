@@ -12,7 +12,7 @@ const {
   uploadSingle,
   handleUploadError,
 } = require('../middlewares/uploadMiddleware');
-const { param, body } = require('express-validator');
+const userValidator = require('../validators/userValidator');
 
 /**
  * User Routes - Profile and admin user management
@@ -27,18 +27,7 @@ router.get('/me', userController.getMe);
 // @route   PATCH /api/v1/users/me
 router.patch(
   '/me',
-  body('firstNameAr')
-    .optional()
-    .isLength({ min: 2, max: 100 })
-    .withMessage('الاسم الأول يجب أن يكون بين 2 و 100 حرف'),
-  body('lastNameAr')
-    .optional()
-    .isLength({ min: 2, max: 100 })
-    .withMessage('اسم العائلة يجب أن يكون بين 2 و 100 حرف'),
-  body('phone')
-    .optional()
-    .matches(/^(01|05)[0-9]{8,9}$/)
-    .withMessage('رقم الهاتف يجب أن يكون بالصيغة المصرية'),
+  userValidator.updateProfileValidator,
   validatorMiddleware,
   userController.updateMe
 );
@@ -65,7 +54,7 @@ router.get('/', isAdmin, userController.getAllUsers);
 router.get(
   '/:id',
   isAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
+  userValidator.userIdValidator,
   validatorMiddleware,
   userController.getUser
 );
@@ -74,15 +63,7 @@ router.get(
 router.patch(
   '/:id',
   isAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
-  body('role')
-    .optional()
-    .isIn(['citizen', 'admin', 'super_admin'])
-    .withMessage('الصلاحية غير صالحة'),
-  body('status')
-    .optional()
-    .isIn(['active', 'suspended'])
-    .withMessage('الحالة غير صالحة'),
+  userValidator.adminUpdateUserValidator,
   validatorMiddleware,
   userController.updateUser
 );
@@ -91,7 +72,7 @@ router.patch(
 router.put(
   '/:id/suspend',
   isAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
+  userValidator.userIdValidator,
   validatorMiddleware,
   userController.suspendUser
 );
@@ -100,7 +81,7 @@ router.put(
 router.put(
   '/:id/activate',
   isAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
+  userValidator.userIdValidator,
   validatorMiddleware,
   userController.activateUser
 );
@@ -109,7 +90,7 @@ router.put(
 router.delete(
   '/:id',
   isSuperAdmin,
-  param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
+  userValidator.userIdValidator,
   validatorMiddleware,
   userController.deleteUser
 );

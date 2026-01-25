@@ -14,6 +14,8 @@ const validatorMiddleware = (req, res, next) => {
       message: err.msg,
     }));
 
+    console.error('Validation Errors:', JSON.stringify(errorMessages, null, 2));
+
     return next(new AppError(400, 'بيانات غير صالحة', errorMessages));
   }
 

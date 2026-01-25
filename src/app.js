@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 const globalErrorHandlingMiddleware = require('./middlewares/globalErrorHandlingMiddleware');
@@ -13,6 +14,16 @@ const path = require('path');
 // ... (imports)
 
 const app = express();
+
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6 // Compression level (0-9)
+}));
 
 // Set View Engine
 app.set('view engine', 'ejs');
@@ -88,6 +99,8 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/payment', paymentRoutes);
+app.use('/financial', require('./routes/financialRoute'));
+app.use('/api/v1/financial', require('./routes/financialRoute'));
 
 /////////////////////////////////////////////////////////////////
 // 404 Handler - Express v5 compatible
