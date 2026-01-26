@@ -52,6 +52,7 @@
   "devDependencies": {
     "autocannon": "^8.0.0",
     "jest": "^30.2.0",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "pm2": "^6.0.14"
   }
 }

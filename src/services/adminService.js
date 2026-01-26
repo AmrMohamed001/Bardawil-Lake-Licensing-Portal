@@ -11,6 +11,9 @@ const {
 const AppError = require('../utils/appError');
 const auditLogService = require('./auditLogService');
 const pdfService = require('./pdfService'); // Add pdfService
+const { sequelize } = require('../config/db');
+
+const cacheService = require('./cacheService');
 
 /**
  * Admin Service - Handles admin panel business logic
@@ -21,80 +24,75 @@ const pdfService = require('./pdfService'); // Add pdfService
  * Get admin dashboard statistics (FR-ADMIN-001)
  */
 exports.getDashboardStats = async () => {
-  const today = new Date();
-  const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
+  return cacheService.getOrSet('admin_dashboard_stats', async () => {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
 
-  const [
-    totalApplications,
-    newApplications,
-    underReview,
-    approved,
-    completed,
-    rejected,
-    monthlyStats,
-  ] = await Promise.all([
-    Application.count(),
-    Application.count({ where: { status: 'received' } }),
-    Application.count({ where: { status: 'under_review' } }),
-    Application.count({
-      where: {
-        status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
-      }
-    }),
-    Application.count({ where: { status: 'completed' } }),
-    Application.count({ where: { status: 'rejected' } }),
-    Application.findAll({
-      where: {
-        createdAt: { [Op.gte]: thirtyDaysAgo },
-      },
-      attributes: [
-        [
-          require('sequelize').fn(
-            'DATE',
-            require('sequelize').col('created_at')
-          ),
-          'date',
-        ],
-        [require('sequelize').fn('COUNT', '*'), 'count'],
-      ],
-      group: [
-        require('sequelize').fn('DATE', require('sequelize').col('created_at')),
-      ],
-      raw: true,
-    }),
-  ]);
-
-  // Application by type
-  const byType = await Application.findAll({
-    attributes: [
-      'applicationType',
-      [require('sequelize').fn('COUNT', '*'), 'count'],
-    ],
-    group: ['applicationType'],
-    raw: true,
-  });
-
-  // Applications by status
-  const byStatus = await Application.findAll({
-    attributes: ['status', [require('sequelize').fn('COUNT', '*'), 'count']],
-    group: ['status'],
-    raw: true,
-  });
-
-  return {
-    overview: {
-      total: totalApplications,
-      new: newApplications,
+    const [
+      totalApplications,
+      newApplications,
       underReview,
       approved,
       completed,
       rejected,
-    },
-    byType,
-    byStatus,
-    monthlyTrend: monthlyStats,
-  };
+      monthlyStats,
+      byType,
+      byStatus
+    ] = await Promise.all([
+      Application.count(),
+      Application.count({ where: { status: 'received' } }),
+      Application.count({ where: { status: 'under_review' } }),
+      Application.count({
+        where: {
+          status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
+        }
+      }),
+      Application.count({ where: { status: 'completed' } }),
+      Application.count({ where: { status: 'rejected' } }),
+      Application.findAll({
+        where: {
+          createdAt: { [Op.gte]: thirtyDaysAgo },
+        },
+        attributes: [
+          [sequelize.fn('date_trunc', 'day', sequelize.col('created_at')), 'date'],
+          [sequelize.fn('count', '*'), 'count'],
+        ],
+        group: [sequelize.fn('date_trunc', 'day', sequelize.col('created_at'))],
+        order: [[sequelize.fn('date_trunc', 'day', sequelize.col('created_at')), 'ASC']],
+      }),
+      // Application by type
+      Application.findAll({
+        attributes: [
+          'applicationType',
+          [sequelize.fn('COUNT', '*'), 'count'],
+        ],
+        group: ['applicationType'],
+        raw: true,
+      }),
+      // Applications by status
+      Application.findAll({
+        attributes: ['status', [sequelize.fn('COUNT', '*'), 'count']],
+        group: ['status'],
+        raw: true,
+      })
+    ]);
+
+    return {
+      overview: {
+        total: totalApplications,
+        new: newApplications,
+        underReview,
+        approved,
+        completed,
+        rejected,
+      },
+      byType,
+      byStatus,
+      monthlyTrend: monthlyStats,
+    };
+  }, 300); // Cache for 5 minutes
 };
+
 
 /**
  * Get all applications for admin (FR-ADMIN-002)
