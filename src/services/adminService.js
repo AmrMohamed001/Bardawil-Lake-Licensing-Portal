@@ -221,7 +221,9 @@ exports.startReview = async (applicationId, adminId) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('under_review');
   application.status = 'under_review';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   application.reviewedBy = adminId;
   application.reviewedAt = new Date();
   await application.save();
@@ -293,8 +295,10 @@ exports.approveApplication = async (applicationId, adminId) => {
   const supplyOrderId = `SO-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('approved_payment_pending');
   // Use approved_payment_pending for Paymob online payment flow
   application.status = 'approved_payment_pending';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   application.paymentAmount = finalPrice;
   application.supplyOrderId = supplyOrderId;
   application.approvedAt = new Date();
@@ -362,7 +366,9 @@ exports.rejectApplication = async (applicationId, adminId, reason) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('rejected');
   application.status = 'rejected';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   application.rejectionReason = reason;
   application.reviewedBy = adminId;
   await application.save();
@@ -419,7 +425,9 @@ exports.verifyPayment = async (applicationId, adminId) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('payment_verified');
   application.status = 'payment_verified';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   application.paymentVerifiedAt = new Date();
   await application.save();
 
@@ -461,7 +469,9 @@ exports.markLicenseReady = async (applicationId, adminId) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('ready');
   application.status = 'ready';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   await application.save();
 
   // Create status history
@@ -502,7 +512,9 @@ exports.completeApplication = async (applicationId, adminId) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('completed');
   application.status = 'completed';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   await application.save();
 
   // Create status history

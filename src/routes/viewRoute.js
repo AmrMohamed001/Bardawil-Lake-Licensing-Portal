@@ -11,16 +11,16 @@ const router = express.Router();
 
 // Public Routes
 // Public Routes
-router.get('/', optionalAuth, viewController.getHome);
-router.get('/login', optionalAuth, viewController.getLogin);
-router.get('/register', optionalAuth, viewController.getRegister);
-router.get('/news', optionalAuth, viewController.getNews);
-router.get('/news/:id', optionalAuth, viewController.getNewsDetail);
-router.get('/contact', optionalAuth, viewController.getContact);
-router.get('/terms', optionalAuth, viewController.getTerms);
-router.get('/about', optionalAuth, viewController.getAbout);
-router.get('/services', optionalAuth, viewController.getServices);
-router.get('/pricing', protect, attachUnreadCount, viewController.getPricing);
+router.get('/', optionalAuth, attachUnreadCount, viewController.getHome);
+router.get('/login', optionalAuth, attachUnreadCount, viewController.getLogin);
+router.get('/register', optionalAuth, attachUnreadCount, viewController.getRegister);
+router.get('/news', optionalAuth, attachUnreadCount, viewController.getNews);
+router.get('/news/:id', optionalAuth, attachUnreadCount, viewController.getNewsDetail);
+router.get('/contact', optionalAuth, attachUnreadCount, viewController.getContact);
+router.get('/terms', optionalAuth, attachUnreadCount, viewController.getTerms);
+router.get('/about', optionalAuth, attachUnreadCount, viewController.getAbout);
+router.get('/services', optionalAuth, attachUnreadCount, viewController.getServices);
+router.get('/pricing', optionalAuth, attachUnreadCount, viewController.getPricing);
 
 // Protected Routes (User) - Apply protect and attachUnreadCount middleware
 router.get('/dashboard', protect, attachUnreadCount, viewController.getDashboard);

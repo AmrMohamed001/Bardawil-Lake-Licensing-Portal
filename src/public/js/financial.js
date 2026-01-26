@@ -25,9 +25,18 @@ async function viewPaymentDetails(applicationId) {
 
     // Find receipt document
     const receiptDoc = app.documents && app.documents.find(d => d.fileName === app.paymentReceiptPath || d.documentType === 'payment_receipt');
-    const getFileName = (path) => path ? path.split(/[/\\]/).pop() : null;
-    const receiptFileName = getFileName(app.paymentReceiptPath) || (receiptDoc ? getFileName(receiptDoc.fileName) : null);
-    const receiptPath = receiptFileName ? `/uploads/${receiptFileName}` : null;
+
+    // Helper to clean path
+    const getCleanPath = (path) => {
+      if (!path) return null;
+      let clean = path.replace(/\\/g, '/');
+      if (clean.startsWith('src/public/')) clean = clean.replace('src/public/', '/');
+      else if (clean.startsWith('public/')) clean = clean.replace('public/', '/');
+      if (!clean.startsWith('/')) clean = '/' + clean;
+      return clean;
+    };
+
+    const receiptPath = getCleanPath(app.paymentReceiptPath) || (receiptDoc ? getCleanPath(receiptDoc.filePath) : null) || (receiptDoc ? `/uploads/${receiptDoc.fileName}` : null);
 
 
     modalBody.innerHTML = `

@@ -339,8 +339,10 @@ exports.uploadPaymentReceipt = async (applicationId, userId, receiptPath) => {
 
   // Update application
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('payment_submitted');
   application.paymentReceiptPath = receiptPath;
   application.status = 'payment_submitted';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   await application.save();
 
   // Create status history
@@ -447,7 +449,9 @@ exports.cancelApplication = async (applicationId, userId) => {
   }
 
   const oldStatus = application.status;
+  const newStatusObj = await ApplicationStatus.getByCode('rejected');
   application.status = 'rejected';
+  if (newStatusObj) application.statusId = newStatusObj.id;
   application.rejectionReason = 'تم إلغاء الطلب بواسطة المستخدم';
   await application.save();
 

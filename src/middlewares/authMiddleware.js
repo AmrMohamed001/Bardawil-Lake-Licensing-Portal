@@ -229,6 +229,12 @@ exports.optionalAuth = catchAsync(async (req, res, next) => {
       }
       // Otherwise continue without user
     }
+  } else if (req.cookies.refreshToken) {
+    // If no access token but refresh token exists, try to refresh
+    const user = await tryRefreshToken(req.cookies.refreshToken, res);
+    if (user) {
+      req.user = user;
+    }
   }
 
   next();

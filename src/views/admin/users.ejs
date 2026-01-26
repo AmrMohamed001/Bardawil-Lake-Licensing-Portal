@@ -51,6 +51,7 @@
                                         <option value="citizen">مستخدم عادي</option>
                                         <option value="admin">مسؤول</option>
                                         <option value="super_admin">مسؤول عام</option>
+                                        <option value="financial_officer">مسؤول مالي</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
@@ -110,7 +111,9 @@
                                                         <% if (user.role==='citizen' ) { %>مستخدم
                                                             <% } else if (user.role==='admin' ) { %>مسؤول
                                                                 <% } else if (user.role==='super_admin' ) { %>مسؤول عام
-                                                                    <% } %>
+                                                                    <% } else if (user.role==='financial_officer' ) { %>
+                                                                        مسؤول مالي
+                                                                        <% } %>
                                                     </span>
                                                 </td>
                                                 <td>
@@ -190,6 +193,7 @@
                                     <option value="citizen">مستخدم عادي</option>
                                     <option value="admin">مسؤول</option>
                                     <option value="super_admin">مسؤول عام</option>
+                                    <option value="financial_officer">مسؤول مالي</option>
                                 </select>
                             </div>
                         </div>
@@ -362,7 +366,13 @@
 
                         .role-badge.super_admin {
                             background: #fce4ec;
+                            background: #fce4ec;
                             color: #c2185b;
+                        }
+
+                        .role-badge.financial_officer {
+                            background: #e8eaf6;
+                            color: #3f51b5;
                         }
 
                         .status-badge {
@@ -524,7 +534,7 @@
 
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
                     <script>
-                        const currentUser = <%- JSON.stringify({ id: currentUser.id, role: currentUser.role }) %>;
+                        const currentUser = <% - JSON.stringify({ id: currentUser.id, role: currentUser.role }) %>;
 
                         function filterUsers() {
                             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -558,7 +568,7 @@
                             const status = row.dataset.status;
                             const createdAt = row.querySelector('td:nth-child(6)')?.textContent?.trim() || 'غير متوفر';
 
-                            const roleText = role === 'citizen' ? 'مستخدم عادي' : (role === 'admin' ? 'مسؤول' : 'مسؤول عام');
+                            const roleText = role === 'citizen' ? 'مستخدم عادي' : (role === 'admin' ? 'مسؤول' : (role === 'super_admin' ? 'مسؤول عام' : 'مسؤول مالي'));
                             const statusText = status === 'active' ? 'نشط' : 'معلق';
                             const statusClass = status === 'active' ? 'active' : 'suspended';
 

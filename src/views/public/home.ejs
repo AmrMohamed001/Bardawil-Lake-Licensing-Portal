@@ -298,66 +298,51 @@
             <p class="section-subtitle">Latest News & Updates</p>
           </div>
 
-          <div class="grid grid-cols-3">
-
-            <!-- News Item 1 -->
-            <article class="news-card card">
-              <div class="news-image">
-                <img src="/imgs/news1.png" alt="افتتاح موسم الصيد" width="400" height="250" loading="lazy">
-                <div class="news-badge">جديد</div>
-              </div>
-              <div class="news-content">
-                <div class="news-meta">
-                  <span><i class="fas fa-calendar"></i> ٢٥ أكتوبر ٢٠٢٥</span>
-                </div>
-                <h3 class="news-title">افتتاح موسم الصيد الجديد في بحيرة البردويل</h3>
-                <p class="news-excerpt">
-                  يسر جهاز مستقبل مصر الإعلان عن افتتاح موسم الصيد الجديد...
-                </p>
-                <a href="#" class="news-link">
-                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
-                </a>
-              </div>
-            </article>
-
-            <!-- News Item 2 -->
-            <article class="news-card card">
-              <div class="news-image">
-                <img src="/imgs/news2.png" alt="تحديث النظام" width="400" height="250" loading="lazy">
-              </div>
-              <div class="news-content">
-                <div class="news-meta">
-                  <span><i class="fas fa-calendar"></i> ٢٣ أكتوبر ٢٠٢٥</span>
-                </div>
-                <h3 class="news-title">تحديث نظام التراخيص الإلكترونية</h3>
-                <p class="news-excerpt">
-                  تم تحديث نظام التراخيص ليصبح أسرع وأسهل...
-                </p>
-                <a href="#" class="news-link">
-                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
-                </a>
-              </div>
-            </article>
-
-            <!-- News Item 3 -->
-            <article class="news-card card">
-              <div class="news-image">
-                <img src="/imgs/news3.png" alt="ورشة عمل" width="400" height="250" loading="lazy">
-              </div>
-              <div class="news-content">
-                <div class="news-meta">
-                  <span><i class="fas fa-calendar"></i> ٢٠ أكتوبر ٢٠٢٥</span>
-                </div>
-                <h3 class="news-title">ورشة عمل حول الصيد المستدام</h3>
-                <p class="news-excerpt">
-                  ينظم الجهاز ورشة عمل حول ممارسات الصيد المستدام...
-                </p>
-                <a href="#" class="news-link">
-                  اقرأ المزيد <i class="fas fa-arrow-left"></i>
-                </a>
-              </div>
-            </article>
-
+          <div class="grid <%= news && news.length === 4 ? 'grid-cols-4' : 'grid-cols-3' %>">
+            <% if (locals.news && news.length> 0) { %>
+              <% news.forEach(item=> { %>
+                <article class="news-card card">
+                  <div class="news-image">
+                    <% let imgPath=item.imagePath; if (imgPath) { imgPath=imgPath.replace(/\\/g, '/' ); if
+                      (imgPath.startsWith('src/public/')) imgPath=imgPath.replace('src/public/', '/' ); else if
+                      (imgPath.startsWith('public/')) imgPath=imgPath.replace('public/', '/' ); if
+                      (!imgPath.startsWith('http') && !imgPath.startsWith('/')) { imgPath='/uploads/' + imgPath; } if
+                      (imgPath.startsWith('//')) imgPath=imgPath.substring(1); } else { imgPath='/imgs/news1.png' ; } %>
+                      <img src="<%= imgPath %>" alt="<%= item.titleAr %>" width="400" height="250" loading="lazy"
+                        style="object-fit: cover; height: 200px; width: 100%;">
+                      <% if (new Date(item.createdAt)> new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
+                        <div class="news-badge">جديد</div>
+                        <% } %>
+                  </div>
+                  <div class="news-content">
+                    <div class="news-meta">
+                      <span><i class="fas fa-calendar"></i>
+                        <%= new Date(item.publishedAt || item.createdAt).toLocaleDateString('ar-EG') %>
+                      </span>
+                      <% if (item.viewCount> 0) { %>
+                        <span style="margin-right: 10px;"><i class="fas fa-eye"></i>
+                          <%= item.viewCount %>
+                        </span>
+                        <% } %>
+                    </div>
+                    <h3 class="news-title">
+                      <%= item.titleAr %>
+                    </h3>
+                    <p class="news-excerpt">
+                      <%= item.contentAr.replace(/<[^>]*>/g, '').substring(0, 100) %>...
+                    </p>
+                    <a href="/news/<%= item.id %>" class="news-link">
+                      اقرأ المزيد <i class="fas fa-arrow-left"></i>
+                    </a>
+                  </div>
+                </article>
+                <% }); %>
+                  <% } else { %>
+                    <div class="col-span-full text-center py-5">
+                      <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                      <p class="text-muted">لا توجد أخبار حالياً</p>
+                    </div>
+                    <% } %>
           </div>
         </div>
       </section>

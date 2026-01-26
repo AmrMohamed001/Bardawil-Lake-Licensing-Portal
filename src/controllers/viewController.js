@@ -1,7 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const viewService = require('../services/viewService');
 const adminService = require('../services/adminService'); // Kept for some direct calls if needed, or move all to viewService
-const { Application } = require('../models'); // Some counts are still used inline in legacy code? Let's check.
+const { Application, News } = require('../models'); // Some counts are still used inline in legacy code? Let's check.
 const { Op } = require('sequelize');
 
 /**
@@ -9,9 +9,16 @@ const { Op } = require('sequelize');
  */
 
 exports.getHome = catchAsync(async (req, res, next) => {
+  const topNews = await News.findAll({
+    where: { isPublished: true },
+    order: [['viewCount', 'DESC']],
+    limit: 4,
+  });
+
   res.status(200).render('public/home', {
     title: 'الرئيسية | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
+    news: topNews,
   });
 });
 

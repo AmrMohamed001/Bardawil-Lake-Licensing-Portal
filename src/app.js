@@ -51,6 +51,8 @@ app.use(
           "'self'",
           "'unsafe-inline'", // Allow inline scripts (EJS templates)
           "https://cdnjs.cloudflare.com", // Axios, Font Awesome
+          "https://cdn.jsdelivr.net",
+          "https://unpkg.com",
         ],
         "script-src-attr": [
           "'unsafe-inline'", // Allow inline event handlers (onclick, etc.)
@@ -60,13 +62,14 @@ app.use(
           "'unsafe-inline'", // For inline styles
           "https://fonts.googleapis.com",
           "https://cdnjs.cloudflare.com",
+          "https://unpkg.com",
         ],
         "font-src": [
           "'self'",
           "https://fonts.gstatic.com",
           "https://cdnjs.cloudflare.com",
         ],
-        "img-src": ["'self'", "data:", "blob:"],
+        "img-src": ["'self'", "data:", "blob:", "https://ui-avatars.com"],
         "connect-src": [
           "'self'",
           "http://localhost:*",
@@ -74,7 +77,7 @@ app.use(
           "https://cdnjs.cloudflare.com", // Allow fetching source maps
           process.env.NODE_ENV === 'production' ? '' : 'http://127.0.0.1:*'
         ].filter(Boolean),
-        "frame-src": ["'none'"],
+        "frame-src": ["'self'", "https://www.google.com"],
         "object-src": ["'none'"],
         upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
       },
