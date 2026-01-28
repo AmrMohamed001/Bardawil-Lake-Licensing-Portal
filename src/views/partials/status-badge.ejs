@@ -1,4 +1,6 @@
-<% var hasStatusInfo=(typeof statusInfo !='undefined' ) && statusInfo && statusInfo.nameAr; if (hasStatusInfo) { %>
+<% var hasStatusInfo=(typeof statusInfo !=='undefined' ) && statusInfo && statusInfo.nameAr; if (hasStatusInfo && typeof
+  status !=='undefined' && statusInfo.code && statusInfo.code !==status) { hasStatusInfo=false; } if (hasStatusInfo) {
+  %>
   <span class="status-badge" style="background-color: <%= statusInfo.color %>20; color: <%= statusInfo.color %>;">
     <i class="fas <%= statusInfo.icon %>"></i>
     <%= statusInfo.nameAr %>

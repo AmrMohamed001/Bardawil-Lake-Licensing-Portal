@@ -133,6 +133,7 @@
                                         <th>مقدم الطلب</th>
                                         <th>نوع الترخيص</th>
                                         <th>تاريخ التقديم</th>
+                                        <th>المحقق / المراجع</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
                                     </tr>
@@ -185,6 +186,14 @@
                                                         </span></td>
                                                     <td>
                                                         <%= new Date(app.updatedAt).toLocaleDateString('ar-EG') %>
+                                                    </td>
+                                                    <td>
+                                                        <span style="font-size: 0.85rem; color: #666;">
+                                                            <%= app.paymentVerifier ? (app.paymentVerifier.firstNameAr
+                                                                + ' ' + app.paymentVerifier.lastNameAr) : (app.reviewer
+                                                                ? (app.reviewer.firstNameAr + ' ' +
+                                                                app.reviewer.lastNameAr) : '-' ) %>
+                                                        </span>
                                                     </td>
                                                     <td><span class="status-badge <%= getStatusClass(app.status) %>">
                                                             <%= getStatusName(app.status) %>

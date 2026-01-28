@@ -441,7 +441,8 @@
 
                                 <div class="form-group">
                                     <label class="form-label">نوع الترخيص</label>
-                                    <select class="form-control" id="licenseType" required>
+                                    <select class="form-control" id="licenseType" required
+                                        onchange="updateCategories()">
                                         <option value="fisherman">صيد</option>
                                         <option value="boat">مراكب</option>
                                         <option value="trade">تجارة</option>
@@ -452,8 +453,9 @@
 
                                 <div class="form-group">
                                     <label class="form-label">الفئة</label>
-                                    <input type="text" class="form-control" id="category"
-                                        placeholder="مثال: صياد مؤمن عليه" required onchange="updateBaseDuration()">
+                                    <select class="form-control" id="category" required onchange="updateBaseDuration()">
+                                        <option value="">اختر الفئة...</option>
+                                    </select>
                                     <small style="color: #757575; margin-top: 0.25rem; display: block;">اختر الفئة
                                         لتحديد المدة الأساسية تلقائياً</small>
                                 </div>
@@ -503,31 +505,37 @@
                     <script>
                         let isEditing = false;
 
-                        // Category to base duration mapping (matching backend model)
-                        const CATEGORY_BASE_DURATIONS = {
-                            // 1 month base
-                            'تاجر': '1_month',
-                            'مندوب': '1_month',
-                            'تاجر خارج المحافظة': '1_month',
-                            'سيارة': '1_month',
-                            'نجار': '1_month',
-                            'ميكانيكي': '1_month',
-                            // 3 months base
-                            'صياد مؤمن عليه': '3_months',
-                            'صياد غير مؤمن عليه': '3_months',
-                            'صياد تحت السن': '3_months',
-                            'صيد رجلي': '3_months',
-                            'عامل تاجر': '3_months',
-                            'بياع': '3_months',
-                            'شيال': '3_months',
-                            'تروسيكل': '3_months',
-                            'أفراد شركات': '3_months',
-                            // Season only
-                            'تجديد مركب': 'season',
-                            'مركب جديد': 'season',
-                            'مركب جهاز': 'season',
-                            'تغيير مرسي': 'season',
-                            'تغيير موتور': 'season'
+                        // Configuration for Categories and Base Durations
+                        const TYPE_CONFIG = {
+                            fisherman: [
+                                { name: 'صياد مؤمن عليه', base: '3_months' },
+                                { name: 'صياد غير مؤمن عليه', base: '3_months' },
+                                { name: 'صياد تحت السن', base: '3_months' },
+                                { name: 'صيد رجلي', base: '3_months' }
+                            ],
+                            boat: [
+                                { name: 'مركب خاص', base: 'season' },
+                                { name: 'مركب الجهاز', base: 'season' },
+                                { name: 'تغيير مرسي', base: 'season' },
+                                { name: 'تغيير موتور', base: 'season' }
+                            ],
+                            trade: [
+                                { name: 'تاجر', base: '1_month' },
+                                { name: 'مندوب', base: '1_month' },
+                                { name: 'عامل تاجر', base: '3_months' },
+                                { name: 'تاجر خارج المحافظة', base: '1_month' },
+                                { name: 'بياع', base: '3_months' }
+                            ],
+                            entry: [
+                                { name: 'شيال', base: '3_months' },
+                                { name: 'نجار', base: '1_month' },
+                                { name: 'ميكانيكي', base: '1_month' },
+                                { name: 'أفراد شركات', base: '3_months' }
+                            ],
+                            vehicle: [
+                                { name: 'سيارة', base: '1_month' },
+                                { name: 'تروسيكل', base: '3_months' }
+                            ]
                         };
 
                         const DURATION_LABELS = {
@@ -544,10 +552,33 @@
                             'season': 9
                         };
 
+                        // Update categories dropdown when license type changes
+                        function updateCategories() {
+                            const type = document.getElementById('licenseType').value;
+                            const categorySelect = document.getElementById('category');
+                            const categories = TYPE_CONFIG[type] || [];
+
+                            // Clear current options
+                            categorySelect.innerHTML = '<option value="">اختر الفئة...</option>';
+
+                            // Add new options
+                            categories.forEach(cat => {
+                                const option = document.createElement('option');
+                                option.value = cat.name;
+                                option.textContent = cat.name;
+                                option.dataset.baseDuration = cat.base;
+                                categorySelect.appendChild(option);
+                            });
+
+                            // Reset dependent fields
+                            updateBaseDuration();
+                        }
+
                         // Update base duration when category changes
                         function updateBaseDuration() {
-                            const category = document.getElementById('category').value.trim();
-                            const baseDuration = CATEGORY_BASE_DURATIONS[category];
+                            const categorySelect = document.getElementById('category');
+                            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+                            const baseDuration = selectedOption?.dataset?.baseDuration || '';
 
                             if (baseDuration) {
                                 document.getElementById('baseDuration').value = baseDuration;
@@ -555,7 +586,7 @@
                                 calculatePrices(); // Trigger price recalculation
                             } else {
                                 document.getElementById('baseDuration').value = '';
-                                document.getElementById('baseDurationDisplay').value = 'غير معروف - تحقق من اسم الفئة';
+                                document.getElementById('baseDurationDisplay').value = '';
                                 document.getElementById('pricePreview').style.display = 'none';
                             }
                         }
@@ -609,6 +640,10 @@
                             isEditing = false;
                             document.getElementById('priceId').value = '';
                             document.getElementById('priceForm').reset();
+
+                            // Load initial categories for default type (fisherman)
+                            updateCategories();
+
                             document.getElementById('baseDuration').value = '';
                             document.getElementById('baseDurationDisplay').value = '';
                             document.getElementById('pricePreview').style.display = 'none';
@@ -619,12 +654,18 @@
                         function openEditModal(data) {
                             isEditing = true;
                             document.getElementById('priceId').value = data.id;
-                            document.getElementById('category').value = data.category;
-                            document.getElementById('price').value = data.price;
                             document.getElementById('licenseType').value = data.licenseType;
 
+                            // Load categories first
+                            updateCategories();
+
+                            // Select the category
+                            document.getElementById('category').value = data.category;
+
+                            document.getElementById('price').value = data.price;
+
                             // Set base duration
-                            const baseDuration = data.baseDuration || data.duration; // Fallback to duration if baseDuration not set yet
+                            const baseDuration = data.baseDuration || data.duration;
                             document.getElementById('baseDuration').value = baseDuration;
                             document.getElementById('baseDurationDisplay').value = DURATION_LABELS[baseDuration] || baseDuration;
 

@@ -143,6 +143,10 @@ exports.getPaymentHistory = async (req, res, next) => {
             payments: result.payments,
             totalAmount: result.totalAmount,
             pagination: result.pagination,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            search: req.query.search,
+            reviewerFilter: req.query.reviewerFilter,
         });
     } catch (error) {
         next(error);

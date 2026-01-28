@@ -58,6 +58,14 @@ async function viewPaymentDetails(applicationId) {
             <label>المبلغ المطلوب:</label>
             <span class="text-success fw-bold fs-5">${app.paymentAmount || 0} جنيه مصري</span>
           </div>
+          <div class="detail-item">
+            <label>المراجع (الموافقة المبدئية):</label>
+            <span>${app.reviewer ? (app.reviewer.firstNameAr + ' ' + app.reviewer.lastNameAr) : '-'}</span>
+          </div>
+          <div class="detail-item">
+            <label>المحقق (المالي):</label>
+            <span>${app.paymentVerifier ? (app.paymentVerifier.firstNameAr + ' ' + app.paymentVerifier.lastNameAr) : '-'}</span>
+          </div>
         </div>
 
         <div class="document-preview">

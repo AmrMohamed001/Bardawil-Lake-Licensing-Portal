@@ -32,6 +32,12 @@ Application.belongsTo(User, {
   as: 'reviewer',
 });
 
+// User (admin/financial) verifies payment
+Application.belongsTo(User, {
+  foreignKey: 'paymentVerifiedBy',
+  as: 'paymentVerifier',
+});
+
 // Application belongs to ApplicationStatus (lookup table)
 Application.belongsTo(ApplicationStatus, {
   foreignKey: 'statusId',

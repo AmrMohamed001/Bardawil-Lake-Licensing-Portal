@@ -99,6 +99,7 @@
                     <th>النوع</th>
                     <th>الفئة</th>
                     <th>التاريخ</th>
+                    <th>المراجع</th>
                     <th>الحالة</th>
                     <th>الإجراء</th>
                   </tr>
@@ -135,6 +136,11 @@
                         </td>
                         <td>
                           <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>
+                        </td>
+                        <td>
+                          <span style="font-size: 0.85rem; color: #666;">
+                            <%= app.reviewer ? (app.reviewer.firstNameAr + ' ' + app.reviewer.lastNameAr) : '-' %>
+                          </span>
                         </td>
                         <td>
                           <%- include('../partials/status-badge', { status: app.status, statusInfo: app.statusInfo }) %>

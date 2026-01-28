@@ -86,45 +86,80 @@ exports.getDashboardStats = async () => {
  * Get Recent Applications for Dashboard
  */
 exports.getRecentApplications = async (query) => {
-    const page = parseInt(query.page) || 1;
-    const limit = 10;
+    const { page = 1, limit = 10, search } = query;
     const offset = (page - 1) * limit;
-    const search = query.search;
 
-    const whereClause = {
+    const where = {
         status: {
-            [Op.in]: ['payment_submitted', 'payment_verified']
+            [Op.in]: ['payment_submitted', 'approved_payment_pending', 'payment_verified']
         }
     };
 
+    // Build include with optional search filtering
+    const applicantInclude = {
+        model: User,
+        as: 'applicant',
+        attributes: ['firstNameAr', 'lastNameAr', 'nationalId']
+    };
+
+    // If search is provided, filter by applicant name OR application number
     if (search) {
-        whereClause[Op.and] = {
-            [Op.or]: [
-                { applicationNumber: { [Op.iLike]: `%${search}%` } }
-            ]
-        };
+        const trimmedSearch = search.trim();
+        // Check if search looks like an application number
+        const isAppNumber = trimmedSearch.match(/^BRD-/i) || trimmedSearch.match(/^\d+$/);
+
+        if (isAppNumber) {
+            where.applicationNumber = { [Op.iLike]: `%${trimmedSearch}%` };
+        } else {
+            // Search by applicant name
+            applicantInclude.where = {
+                [Op.or]: [
+                    { firstNameAr: { [Op.iLike]: `%${trimmedSearch}%` } },
+                    { lastNameAr: { [Op.iLike]: `%${trimmedSearch}%` } },
+                    { nationalId: { [Op.iLike]: `%${trimmedSearch}%` } }
+                ]
+            };
+            applicantInclude.required = true;
+        }
     }
 
-    const { count, rows: applications } = await Application.findAndCountAll({
-        where: whereClause,
-        order: [['updatedAt', 'DESC']],
-        limit,
-        offset,
-        include: [{
+    const include = [
+        applicantInclude,
+        {
             model: User,
-            as: 'applicant',
-            attributes: ['firstNameAr', 'lastNameAr', 'nationalId']
-        }]
+            as: 'reviewer',
+            attributes: ['firstNameAr', 'lastNameAr']
+        },
+        {
+            model: User,
+            as: 'paymentVerifier',
+            attributes: ['firstNameAr', 'lastNameAr']
+        }
+    ];
+
+    const count = await Application.count({
+        where,
+        include,
+        distinct: true
+    });
+
+    const applications = await Application.findAll({
+        where,
+        include,
+        subQuery: false,
+        order: [['updatedAt', 'DESC']],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
     });
 
     return {
         applications,
         pagination: {
-            page,
-            limit,
             total: count,
-            pages: Math.ceil(count / limit)
-        }
+            pages: Math.ceil(count / limit),
+            page: parseInt(page),
+            limit: parseInt(limit),
+        },
     };
 };
 
@@ -197,6 +232,16 @@ exports.getPaymentDetails = async (id) => {
                 include: [{ model: User, as: 'changedByUser', attributes: ['firstNameAr', 'lastNameAr'] }],
                 order: [['changedAt', 'DESC']],
             },
+            {
+                model: User,
+                as: 'reviewer',
+                attributes: ['firstNameAr', 'lastNameAr']
+            },
+            {
+                model: User,
+                as: 'paymentVerifier',
+                attributes: ['firstNameAr', 'lastNameAr']
+            }
         ],
     });
 
@@ -297,7 +342,7 @@ exports.rejectPayment = async (id, adminId, reason) => {
  * Get Payment History
  */
 exports.getPaymentHistory = async (query) => {
-    const { page = 1, limit = 50, startDate, endDate } = query;
+    const { page = 1, limit = 50, startDate, endDate, search, reviewerFilter } = query;
     const offset = (page - 1) * limit;
 
     const where = {
@@ -306,24 +351,83 @@ exports.getPaymentHistory = async (query) => {
         },
     };
 
+    // Simple search on main table fields only (no association issues)
+    // Note: We don't add applicationNumber search to main where when searching by name
+    // because we want OR logic with applicant table
+
     if (startDate && endDate) {
         where.paymentVerifiedAt = {
             [Op.between]: [new Date(startDate), new Date(endDate)],
         };
     }
 
-    const { count, rows: payments } = await Application.findAndCountAll({
+    // Build include array with search on applicant
+    const applicantInclude = {
+        model: User,
+        as: 'applicant',
+        attributes: ['nationalId', 'firstNameAr', 'lastNameAr'],
+    };
+
+    // If search is provided, filter by applicant name OR application number
+    if (search) {
+        const trimmedSearch = search.trim();
+        // Check if search looks like an application number (starts with BRD or contains numbers)
+        const isAppNumber = trimmedSearch.match(/^BRD-/i) || trimmedSearch.match(/^\d+$/);
+
+        if (isAppNumber) {
+            // Search by application number only
+            where.applicationNumber = { [Op.iLike]: `%${trimmedSearch}%` };
+        } else {
+            // Search by applicant name - make applicant required for INNER JOIN
+            applicantInclude.where = {
+                [Op.or]: [
+                    { firstNameAr: { [Op.iLike]: `%${trimmedSearch}%` } },
+                    { lastNameAr: { [Op.iLike]: `%${trimmedSearch}%` } },
+                    { nationalId: { [Op.iLike]: `%${trimmedSearch}%` } }
+                ]
+            };
+            applicantInclude.required = true; // INNER JOIN - filter by applicant name
+        }
+    }
+
+    const reviewerInclude = {
+        model: User,
+        as: 'reviewer',
+        attributes: ['firstNameAr', 'lastNameAr']
+    };
+
+    // If reviewer filter is set, require match
+    if (reviewerFilter) {
+        reviewerInclude.where = {
+            [Op.or]: [
+                { firstNameAr: { [Op.iLike]: `%${reviewerFilter}%` } },
+                { lastNameAr: { [Op.iLike]: `%${reviewerFilter}%` } }
+            ]
+        };
+        reviewerInclude.required = true; // INNER JOIN - must match
+    }
+
+    const verifierInclude = {
+        model: User,
+        as: 'paymentVerifier',
+        attributes: ['firstNameAr', 'lastNameAr']
+    };
+
+    const include = [applicantInclude, reviewerInclude, verifierInclude];
+
+    const count = await Application.count({
         where,
-        include: [
-            {
-                model: User,
-                as: 'applicant',
-                attributes: ['nationalId', 'firstNameAr', 'lastNameAr'],
-            },
-        ],
+        include,
+        distinct: true
+    });
+
+    const payments = await Application.findAll({
+        where,
+        include,
+        subQuery: false,
         order: [['paymentVerifiedAt', 'DESC']],
         limit: parseInt(limit),
-        offset,
+        offset: parseInt(offset),
     });
 
     const totalAmount = await Application.sum('paymentAmount', { where });

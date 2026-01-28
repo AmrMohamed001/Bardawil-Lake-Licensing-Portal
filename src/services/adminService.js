@@ -136,6 +136,11 @@ exports.getAllApplications = async (query = {}) => {
         as: 'statusInfo',
         attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon'],
       },
+      {
+        model: User,
+        as: 'reviewer',
+        attributes: ['firstNameAr', 'lastNameAr'],
+      },
     ],
     order: [['createdAt', 'DESC']],
     limit: parseInt(limit),
@@ -185,6 +190,11 @@ exports.getApplicationForReview = async applicationId => {
       {
         model: User,
         as: 'reviewer',
+        attributes: ['id', 'firstNameAr', 'lastNameAr'],
+      },
+      {
+        model: User,
+        as: 'paymentVerifier',
         attributes: ['id', 'firstNameAr', 'lastNameAr'],
       },
       {

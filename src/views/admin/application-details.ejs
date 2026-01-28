@@ -316,13 +316,27 @@
                         </p>
                       </div>
                       <% } %>
-                        <% if (application.rejectionReason) { %>
-                          <div class="info-item" style="grid-column: span 2;"><label>سبب الرفض</label>
-                            <p style="color: #c62828;">
-                              <%= application.rejectionReason %>
+                        <div class="info-item"><label>تمت المراجعة بواسطة</label>
+                          <p>
+                            <%= application.reviewer ? (application.reviewer.firstNameAr + ' ' +
+                              application.reviewer.lastNameAr) : '-' %>
+                          </p>
+                        </div>
+                        <% if (application.paymentVerifier) { %>
+                          <div class="info-item"><label>المحقق المالي</label>
+                            <p style="color: #2e7d32;">
+                              <%= application.paymentVerifier.firstNameAr + ' ' + application.paymentVerifier.lastNameAr
+                                %>
                             </p>
                           </div>
                           <% } %>
+                            <% if (application.rejectionReason) { %>
+                              <div class="info-item" style="grid-column: span 2;"><label>سبب الرفض</label>
+                                <p style="color: #c62828;">
+                                  <%= application.rejectionReason %>
+                                </p>
+                              </div>
+                              <% } %>
                   </div>
                 </div>
               </div>
