@@ -69,7 +69,7 @@ app.use(
           "https://fonts.gstatic.com",
           "https://cdnjs.cloudflare.com",
         ],
-        "img-src": ["'self'", "data:", "blob:", "https://ui-avatars.com"],
+        "img-src": ["'self'", "data:", "blob:", "https://ui-avatars.com", "https://img.youm7.com"],
         "connect-src": [
           "'self'",
           "http://localhost:*",

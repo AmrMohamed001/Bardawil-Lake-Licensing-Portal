@@ -250,6 +250,7 @@
                             padding: 2rem 0;
                             min-height: calc(100vh - 200px);
                             background: #f5f7fa;
+                            overflow-x: hidden;
                         }
 
                         .page-header {
@@ -715,10 +716,10 @@
                         const typeColors = ['#2196f3', '#00897b', '#ff9800', '#9c27b0'];
 
                         // Parse data from server
-                        const byStatusData = <%- JSON.stringify(stats.byStatus || []) %>;
-                        const byTypeData = <%- JSON.stringify(stats.byType || []) %>;
-                        const monthlyTrendData = <%- JSON.stringify(stats.monthlyTrend || []) %>;
-                        const revenueData = <%- JSON.stringify(monthlyRevenue || []) %>;
+                        const byStatusData = <% - JSON.stringify(stats.byStatus || []) %>;
+                        const byTypeData = <% - JSON.stringify(stats.byType || []) %>;
+                        const monthlyTrendData = <% - JSON.stringify(stats.monthlyTrend || []) %>;
+                        const revenueData = <% - JSON.stringify(monthlyRevenue || []) %>;
 
                         console.log('=== DEBUG DATA ===');
                         console.log('byStatusData:', byStatusData);
