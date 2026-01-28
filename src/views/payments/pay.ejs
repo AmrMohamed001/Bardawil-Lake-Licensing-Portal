@@ -240,10 +240,12 @@
                                 <% if (application.applicationType==='fisherman' ) { %>صياد
                                     <% } else if (application.applicationType==='boat' ) { %>مركب
                                         <% } else if (application.applicationType==='vehicle' ) { %>سيارة
-                                            <% } else if (application.applicationType==='other' ) { %>أخرى
-                                                <% } else { %>
-                                                    <%= application.applicationType %>
-                                                        <% } %>
+                                            <% } else if (application.applicationType==='trade' ) { %>تجارة
+                                                <% } else if (application.applicationType==='entry' ) { %>دخول
+                                                    <% } else if (application.applicationType==='other' ) { %>أخرى
+                                                        <% } else { %>
+                                                            <%= application.applicationType %>
+                                                                <% } %>
                             </span>
                         </div>
                         <div class="order-info-row">

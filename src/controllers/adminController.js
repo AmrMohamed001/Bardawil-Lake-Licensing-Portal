@@ -314,3 +314,35 @@ exports.updateUserStatus = catchAsync(async (req, res, next) => {
   });
 });
 
+// =============================================
+// License Review (FR-ADMIN-005)
+// =============================================
+
+// @desc    Get license review data (grouped by license type)
+// @route   GET /api/v1/admin/license-review
+// @access  Private/Admin
+exports.getLicenseReview = catchAsync(async (req, res, next) => {
+  const result = await adminService.getLicenseReview(req.query);
+
+  res.status(200).json({
+    status: 'success',
+    results: result.applications.length,
+    pagination: result.pagination,
+    statistics: result.statistics,
+    data: {
+      applications: result.applications,
+    },
+  });
+});
+
+// @desc    Get license review statistics
+// @route   GET /api/v1/admin/license-review/stats
+// @access  Private/Admin
+exports.getLicenseReviewStats = catchAsync(async (req, res, next) => {
+  const stats = await adminService.getLicenseReviewStats();
+
+  res.status(200).json({
+    status: 'success',
+    data: stats,
+  });
+});

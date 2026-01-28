@@ -214,6 +214,51 @@
             <div class="form-step" id="step2">
               <h2>البيانات الشخصية</h2>
 
+              <!-- License Holder Section -->
+              <div class="license-holder-section"
+                style="margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 0.75rem; border: 1px solid #e0e0e0;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="isSelfLicenseHolder" checked onchange="toggleLicenseHolderFields(this)">
+                    <span style="font-weight: 600; color: #1e3c72;">أنا صاحب الرخصة</span>
+                  </label>
+                </div>
+
+                <div id="licenseHolderFields" style="display: none;">
+                  <div class="info-box" style="background: #fff3e0; border-color: #ff9800; margin-bottom: 1rem;">
+                    <i class="fas fa-info-circle" style="color: #e65100;"></i>
+                    <div>
+                      <strong style="color: #e65100;">بيانات صاحب الرخصة</strong>
+                      <p style="margin: 0; color: #bf360c;">أدخل بيانات الشخص الذي ستصدر الرخصة باسمه</p>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">اسم صاحب الرخصة <span class="required-star"
+                          style="color: #e53935;">*</span></label>
+                      <input type="text" name="licenseHolderName" id="licenseHolderNameInput" class="form-control"
+                        placeholder="الاسم الكامل لصاحب الرخصة" onblur="validateLicenseHolderName()">
+                      <div id="licenseHolderNameError" class="field-error"
+                        style="display: none; color: #e53935; font-size: 0.8rem; margin-top: 0.25rem;">
+                        <i class="fas fa-exclamation-circle"></i> <span></span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">الرقم القومي لصاحب الرخصة <span class="required-star"
+                          style="color: #e53935;">*</span></label>
+                      <input type="text" name="licenseHolderNationalId" id="licenseHolderNationalIdInput"
+                        class="form-control" maxlength="14" inputmode="numeric" placeholder="الرقم القومي (14 رقم)"
+                        onblur="validateLicenseHolderNationalId()"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                      <div id="licenseHolderNationalIdError" class="field-error"
+                        style="display: none; color: #e53935; font-size: 0.8rem; margin-top: 0.25rem;">
+                        <i class="fas fa-exclamation-circle"></i> <span></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Fisherman Fields -->
               <div class="type-fields fisherman-fields">
                 <div class="form-row">
@@ -837,12 +882,181 @@
             opacity: 0.6;
             cursor: not-allowed;
           }
+
+          .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+          }
+
+          .form-control.is-invalid {
+            border-color: #e53935 !important;
+            background-color: #fff8f8;
+          }
+
+          .form-control.is-valid {
+            border-color: #4caf50 !important;
+          }
+
+          .field-error {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+          }
         </style>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
         <script src="/js/main.js"></script>
         <script>
           let currentStep = 1;
+
+          // License holder validation state
+          let licenseHolderNameValid = true;  // Default valid when self is checked
+          let licenseHolderNationalIdValid = true;
+
+          // Validate license holder name
+          function validateLicenseHolderName() {
+            const checkbox = document.getElementById('isSelfLicenseHolder');
+            if (checkbox.checked) {
+              licenseHolderNameValid = true;
+              return true;
+            }
+
+            const field = document.getElementById('licenseHolderNameInput');
+            const errorDiv = document.getElementById('licenseHolderNameError');
+            const errorSpan = errorDiv.querySelector('span');
+            const value = field.value.trim();
+
+            if (!value) {
+              field.classList.add('is-invalid');
+              errorSpan.textContent = 'يجب إدخال اسم صاحب الرخصة';
+              errorDiv.style.display = 'block';
+              licenseHolderNameValid = false;
+              return false;
+            }
+
+            if (value.length < 4) {
+              field.classList.add('is-invalid');
+              errorSpan.textContent = 'الاسم يجب أن يكون 4 أحرف على الأقل';
+              errorDiv.style.display = 'block';
+              licenseHolderNameValid = false;
+              return false;
+            }
+
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            errorDiv.style.display = 'none';
+            licenseHolderNameValid = true;
+            return true;
+          }
+
+          // Validate license holder national ID
+          function validateLicenseHolderNationalId() {
+            const checkbox = document.getElementById('isSelfLicenseHolder');
+            if (checkbox.checked) {
+              licenseHolderNationalIdValid = true;
+              return true;
+            }
+
+            const field = document.getElementById('licenseHolderNationalIdInput');
+            const errorDiv = document.getElementById('licenseHolderNationalIdError');
+            const errorSpan = errorDiv.querySelector('span');
+            const value = field.value.trim();
+
+            if (!value) {
+              field.classList.add('is-invalid');
+              errorSpan.textContent = 'يجب إدخال الرقم القومي';
+              errorDiv.style.display = 'block';
+              licenseHolderNationalIdValid = false;
+              return false;
+            }
+
+            if (!/^[0-9]{14}$/.test(value)) {
+              field.classList.add('is-invalid');
+              errorSpan.textContent = 'الرقم القومي يجب أن يكون 14 رقم';
+              errorDiv.style.display = 'block';
+              licenseHolderNationalIdValid = false;
+              return false;
+            }
+
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            errorDiv.style.display = 'none';
+            licenseHolderNationalIdValid = true;
+            return true;
+          }
+
+          // Toggle license holder fields visibility
+          function toggleLicenseHolderFields(checkbox) {
+            const fieldsDiv = document.getElementById('licenseHolderFields');
+            const nameField = document.getElementById('licenseHolderNameInput');
+            const idField = document.getElementById('licenseHolderNationalIdInput');
+            const nameError = document.getElementById('licenseHolderNameError');
+            const idError = document.getElementById('licenseHolderNationalIdError');
+
+            if (checkbox.checked) {
+              // Self - hide fields and clear values/errors
+              fieldsDiv.style.display = 'none';
+              nameField.value = '';
+              idField.value = '';
+              nameField.classList.remove('is-invalid', 'is-valid');
+              idField.classList.remove('is-invalid', 'is-valid');
+              nameError.style.display = 'none';
+              idError.style.display = 'none';
+              // Mark as valid since we're using user's own data
+              licenseHolderNameValid = true;
+              licenseHolderNationalIdValid = true;
+            } else {
+              // Other person - show fields, mark as not yet validated
+              fieldsDiv.style.display = 'block';
+              licenseHolderNameValid = false;
+              licenseHolderNationalIdValid = false;
+            }
+            updateStep2NextButton();
+          }
+
+          // Update Step 2 next button state
+          function updateStep2NextButton() {
+            const btn = document.getElementById('step2NextBtn');
+            const checkbox = document.getElementById('isSelfLicenseHolder');
+
+            if (checkbox.checked) {
+              btn.disabled = false;
+              btn.classList.remove('btn-disabled');
+            } else {
+              const isValid = licenseHolderNameValid && licenseHolderNationalIdValid;
+              btn.disabled = !isValid;
+              if (isValid) {
+                btn.classList.remove('btn-disabled');
+              } else {
+                btn.classList.add('btn-disabled');
+              }
+            }
+          }
+
+          // Add input listeners to update button state
+          document.addEventListener('DOMContentLoaded', function () {
+            const nameField = document.getElementById('licenseHolderNameInput');
+            const idField = document.getElementById('licenseHolderNationalIdInput');
+
+            if (nameField) {
+              nameField.addEventListener('input', function () {
+                if (this.value.trim().length >= 4) {
+                  validateLicenseHolderName();
+                  updateStep2NextButton();
+                }
+              });
+            }
+
+            if (idField) {
+              idField.addEventListener('input', function () {
+                if (this.value.length === 14) {
+                  validateLicenseHolderNationalId();
+                  updateStep2NextButton();
+                }
+              });
+            }
+          });
 
           // License Categories for 2026 Season
           // Categories grouped by application type
@@ -1360,6 +1574,20 @@
                 input.style.borderColor = '';
               }
             });
+
+            // Special validation for Step 2 license holder fields
+            if (currentStep === 2) {
+              const isSelf = document.getElementById('isSelfLicenseHolder').checked;
+              if (!isSelf) {
+                const nameValid = validateLicenseHolderName();
+                const idValid = validateLicenseHolderNationalId();
+                if (!nameValid || !idValid) {
+                  valid = false;
+                  showFormAlert('الرجاء ملء بيانات صاحب الرخصة بشكل صحيح');
+                  return;
+                }
+              }
+            }
 
             if (!valid) {
               showFormAlert('الرجاء ملء جميع الحقول المطلوبة');

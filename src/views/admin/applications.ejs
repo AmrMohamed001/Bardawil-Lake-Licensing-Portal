@@ -123,10 +123,12 @@
                           <% if (app.applicationType==='fisherman' ) { %>صياد
                             <% } else if (app.applicationType==='boat' ) { %>مركب
                               <% } else if (app.applicationType==='vehicle' ) { %>سيارة
-                                <% } else if (app.applicationType==='other' ) { %>تراخيص أخرى
-                                  <% } else { %>
-                                    <%= app.applicationType %>
-                                      <% } %>
+                                <% } else if (app.applicationType==='trade' ) { %>تجارة
+                                  <% } else if (app.applicationType==='entry' ) { %>دخول
+                                    <% } else if (app.applicationType==='other' ) { %>تراخيص أخرى
+                                      <% } else { %>
+                                        <%= app.applicationType %>
+                                          <% } %>
                         </td>
                         <td>
                           <%= app.licenseCategory %>

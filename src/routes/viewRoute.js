@@ -108,5 +108,14 @@ router.get(
   viewController.getSuperAdminDashboard
 );
 
+// License Review (Admin)
+router.get(
+  '/admin/license-review',
+  protect,
+  attachUnreadCount,
+  restrictTo('admin', 'super_admin'),
+  viewController.getLicenseReview
+);
+
 module.exports = router;
 

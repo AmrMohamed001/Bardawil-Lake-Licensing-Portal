@@ -54,6 +54,17 @@
           </div>
     </a>
 
+    <!-- License Review -->
+    <a href="/admin/license-review" class="sidebar-link <%= currentPage === 'license-review' ? 'active' : '' %>">
+      <div class="link-icon">
+        <i class="fas fa-id-card-clip"></i>
+      </div>
+      <span class="link-text">مراجعة التراخيص</span>
+      <div class="link-arrow">
+        <i class="fas fa-chevron-left"></i>
+      </div>
+    </a>
+
     <!-- Financial Department -->
     <% if (locals.user && (user.role==='FINANCIAL_DEPT' || user.role==='financial_dept' || user.role==='SUPER_ADMIN' ||
       user.role==='super_admin' )) { %>

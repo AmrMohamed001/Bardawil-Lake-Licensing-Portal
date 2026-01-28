@@ -117,9 +117,13 @@
                                 <i class="fas fa-ship" style="color: #00897B;"></i> مركب
                                 <% } else if (app.applicationType==='vehicle' ) { %>
                                   <i class="fas fa-truck" style="color: #FF9800;"></i> سيارة
-                                  <% } else { %>
-                                    <%= app.applicationType %>
-                                      <% } %>
+                                  <% } else if (app.applicationType==='trade' ) { %>
+                                    <i class="fas fa-store" style="color: #9C27B0;"></i> تجارة
+                                    <% } else if (app.applicationType==='entry' ) { %>
+                                      <i class="fas fa-door-open" style="color: #607D8B;"></i> دخول
+                                      <% } else { %>
+                                        <%= app.applicationType %>
+                                          <% } %>
                           </td>
                           <td>
                             <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>

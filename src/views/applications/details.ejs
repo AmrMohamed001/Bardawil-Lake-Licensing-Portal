@@ -52,7 +52,13 @@
                         <i class="fas fa-ship text-accent"></i> ترخيص مركب
                         <% } else if (application.applicationType==='vehicle' ) { %>
                           <i class="fas fa-truck text-warning"></i> ترخيص سيارة
-                          <% } %>
+                          <% } else if (application.applicationType==='trade' ) { %>
+                            <i class="fas fa-store text-purple"></i> ترخيص تجارة
+                            <% } else if (application.applicationType==='entry' ) { %>
+                              <i class="fas fa-door-open text-muted"></i> ترخيص دخول
+                              <% } else { %>
+                                <%= application.applicationType %>
+                                  <% } %>
                   </span>
                 </div>
                 <div class="info-item">

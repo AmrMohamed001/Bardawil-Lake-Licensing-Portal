@@ -287,3 +287,24 @@ exports.getPricing = catchAsync(async (req, res, next) => {
     pricesByType: data.pricesByType,
   });
 });
+
+exports.getLicenseReview = catchAsync(async (req, res, next) => {
+  const result = await adminService.getLicenseReview(req.query);
+  const stats = await adminService.getLicenseReviewStats();
+  const pendingCount = await Application.count({
+    where: { status: { [Op.in]: ['received', 'under_review'] } }
+  });
+
+  res.status(200).render('admin/license-review', {
+    title: 'مراجعة التراخيص',
+    user: req.user,
+    currentPage: 'license-review',
+    applications: result.applications,
+    pagination: result.pagination,
+    statistics: result.statistics,
+    overviewStats: stats.overview,
+    byType: stats.byType,
+    query: req.query || {},
+    pendingCount,
+  });
+});

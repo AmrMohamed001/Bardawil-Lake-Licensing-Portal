@@ -75,6 +75,16 @@ exports.createApplication = async (applicationData, userId, files) => {
   const initialStatus = await ApplicationStatus.getByCode('received');
   const statusId = initialStatus ? initialStatus.id : null;
 
+  // Determine license holder information
+  // If not provided, default to the submitting user's info
+  const user = await User.findByPk(userId);
+  const licenseHolderName = applicationData.licenseHolderName && applicationData.licenseHolderName.trim()
+    ? applicationData.licenseHolderName.trim()
+    : `${user.firstNameAr} ${user.lastNameAr}`;
+  const licenseHolderNationalId = applicationData.licenseHolderNationalId && applicationData.licenseHolderNationalId.trim()
+    ? applicationData.licenseHolderNationalId.trim()
+    : user.nationalId;
+
   // Create application
   const application = await Application.create({
     applicationNumber,
@@ -87,6 +97,8 @@ exports.createApplication = async (applicationData, userId, files) => {
     status: 'received',
     statusId,
     paymentAmount,
+    licenseHolderName,
+    licenseHolderNationalId,
     data: data,
     submittedAt: new Date(),
   });

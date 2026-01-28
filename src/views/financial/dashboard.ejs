@@ -177,6 +177,10 @@
                                                     </td>
                                                     <td><span class="license-badge">
                                                             <%= app.applicationType==='fisherman' ? 'صياد' :
+                                                                app.applicationType==='boat' ? 'مركب' :
+                                                                app.applicationType==='vehicle' ? 'سيارة' :
+                                                                app.applicationType==='trade' ? 'تجارة' :
+                                                                app.applicationType==='entry' ? 'دخول' :
                                                                 app.applicationType %>
                                                         </span></td>
                                                     <td>

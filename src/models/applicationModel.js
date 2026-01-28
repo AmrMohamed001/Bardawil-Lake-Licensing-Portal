@@ -175,6 +175,17 @@ const Application = sequelize.define(
       allowNull: true,
       field: 'rejection_reason',
     },
+    // License Holder Information (may differ from submitting user)
+    licenseHolderName: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+      field: 'license_holder_name',
+    },
+    licenseHolderNationalId: {
+      type: DataTypes.STRING(14),
+      allowNull: true,
+      field: 'license_holder_national_id',
+    },
     // Application data (JSON for flexible form data)
     data: {
       type: DataTypes.JSONB,
@@ -195,6 +206,9 @@ const Application = sequelize.define(
       { fields: ['user_id', 'status'] },
       { fields: ['status', 'created_at'] },
       { fields: ['application_type', 'status'] },
+      // License holder indexes for admin review
+      { fields: ['license_holder_national_id'] },
+      { fields: ['application_type', 'license_holder_national_id'] },
     ],
     validate: {
       // Custom model-level validation

@@ -115,9 +115,13 @@
                                 <i class="fas fa-ship text-accent"></i> مركب
                                 <% } else if (app.applicationType==='vehicle' ) { %>
                                   <i class="fas fa-truck text-warning"></i> سيارة
-                                  <% } else { %>
-                                    <%= app.applicationType %>
-                                      <% } %>
+                                  <% } else if (app.applicationType==='trade' ) { %>
+                                    <i class="fas fa-store text-purple"></i> تجارة
+                                    <% } else if (app.applicationType==='entry' ) { %>
+                                      <i class="fas fa-door-open text-muted"></i> دخول
+                                      <% } else { %>
+                                        <%= app.applicationType %>
+                                          <% } %>
                           </td>
                           <td>
                             <%= app.licenseCategory %>
@@ -126,7 +130,8 @@
                             <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>
                           </td>
                           <td>
-                            <%- include('../partials/status-badge', { status: app.status, statusInfo: app.statusInfo }) %>
+                            <%- include('../partials/status-badge', { status: app.status, statusInfo: app.statusInfo })
+                              %>
                           </td>
                           <td>
                             <a href="/applications/<%= app.id %>" class="btn-icon" title="عرض التفاصيل">

@@ -566,3 +566,185 @@ exports.getLicenseData = async (applicationId) => {
 
   return await pdfService.generateLicenseCertificate(application, application.applicant);
 };
+
+/**
+ * Get License Review - Applications grouped by license type
+ * Supports search by license holder name, national ID, or date range
+ * @param {Object} query - Query parameters
+ */
+exports.getLicenseReview = async (query = {}) => {
+  const { search, startDate, endDate, applicationType, page = 1, limit = 20 } = query;
+
+  // Build where clause
+  const where = {};
+
+  // Filter by application type if specified
+  if (applicationType) {
+    where.applicationType = applicationType;
+  }
+
+  // Search by license holder name or national ID
+  if (search) {
+    where[Op.or] = [
+      { licenseHolderName: { [Op.iLike]: `%${search}%` } },
+      { licenseHolderNationalId: { [Op.iLike]: `%${search}%` } },
+      { applicationNumber: { [Op.iLike]: `%${search}%` } },
+    ];
+  }
+
+  // Filter by date range
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) where.createdAt[Op.gte] = new Date(startDate);
+    if (endDate) where.createdAt[Op.lte] = new Date(endDate + 'T23:59:59');
+  }
+
+  const offset = (page - 1) * limit;
+
+  // Get applications
+  const { count, rows: applications } = await Application.findAndCountAll({
+    where,
+    include: [
+      {
+        model: User,
+        as: 'applicant',
+        attributes: ['id', 'nationalId', 'firstNameAr', 'lastNameAr', 'phone'],
+      },
+      {
+        model: ApplicationStatus,
+        as: 'statusInfo',
+        attributes: ['code', 'nameAr', 'nameEn', 'color', 'icon'],
+      },
+    ],
+    order: [['createdAt', 'DESC']],
+    limit: parseInt(limit),
+    offset,
+  });
+
+  // Get summary statistics grouped by license type
+  const typeStats = await Application.findAll({
+    where: where.applicationType ? { applicationType: where.applicationType } : {},
+    attributes: [
+      'applicationType',
+      [sequelize.fn('COUNT', '*'), 'total'],
+      [sequelize.fn('COUNT', sequelize.literal("CASE WHEN status = 'completed' THEN 1 END")), 'completed'],
+      [sequelize.fn('SUM', sequelize.col('payment_amount')), 'totalRevenue'],
+    ],
+    group: ['applicationType'],
+    raw: true,
+  });
+
+  // Get category breakdown within each type
+  const categoryStats = await Application.findAll({
+    where,
+    attributes: [
+      'applicationType',
+      'licenseCategory',
+      [sequelize.fn('COUNT', '*'), 'count'],
+    ],
+    group: ['applicationType', 'licenseCategory'],
+    raw: true,
+  });
+
+  return {
+    applications,
+    pagination: {
+      total: count,
+      page: parseInt(page),
+      pages: Math.ceil(count / limit),
+      limit: parseInt(limit),
+    },
+    statistics: {
+      byType: typeStats,
+      byCategory: categoryStats,
+    },
+  };
+};
+
+/**
+ * Get License Review Statistics Summary
+ * Overview stats for the license review dashboard
+ */
+exports.getLicenseReviewStats = async () => {
+  const [
+    totalLicenses,
+    completedLicenses,
+    pendingLicenses,
+    totalRevenue,
+    byType,
+    recentApplications
+  ] = await Promise.all([
+    Application.count(),
+    Application.count({ where: { status: 'completed' } }),
+    Application.count({ where: { status: { [Op.notIn]: ['completed', 'rejected'] } } }),
+    Application.sum('paymentAmount', { where: { status: 'completed' } }),
+    Application.findAll({
+      attributes: [
+        'applicationType',
+        [sequelize.fn('COUNT', '*'), 'total'],
+        [sequelize.fn('COUNT', sequelize.literal("CASE WHEN status = 'completed' THEN 1 END")), 'completed'],
+      ],
+      group: ['applicationType'],
+      raw: true,
+    }),
+    Application.findAll({
+      where: { status: 'completed' },
+      order: [['createdAt', 'DESC']],
+      limit: 10,
+      include: [
+        { model: User, as: 'applicant', attributes: ['firstNameAr', 'lastNameAr'] },
+        { model: ApplicationStatus, as: 'statusInfo', attributes: ['nameAr', 'color'] },
+      ],
+    }),
+  ]);
+
+  return {
+    overview: {
+      total: totalLicenses,
+      completed: completedLicenses,
+      pending: pendingLicenses,
+      revenue: totalRevenue || 0,
+    },
+    byType,
+    recentApplications,
+  };
+};
+
+/**
+ * Export License Review Data
+ * Returns applications for Excel export with license holder info
+ */
+exports.getLicenseReviewForExport = async (query = {}) => {
+  const { search, startDate, endDate, applicationType } = query;
+
+  const where = {};
+
+  if (applicationType) {
+    where.applicationType = applicationType;
+  }
+
+  if (search) {
+    where[Op.or] = [
+      { licenseHolderName: { [Op.iLike]: `%${search}%` } },
+      { licenseHolderNationalId: { [Op.iLike]: `%${search}%` } },
+    ];
+  }
+
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) where.createdAt[Op.gte] = new Date(startDate);
+    if (endDate) where.createdAt[Op.lte] = new Date(endDate + 'T23:59:59');
+  }
+
+  return Application.findAll({
+    where,
+    include: [
+      {
+        model: User,
+        as: 'applicant',
+        attributes: ['firstNameAr', 'lastNameAr', 'nationalId', 'phone'],
+      },
+    ],
+    order: [['applicationType', 'ASC'], ['createdAt', 'DESC']],
+  });
+};

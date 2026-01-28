@@ -251,4 +251,17 @@ router.get(
 router.get('/audit/export/excel', isSuperAdmin, exportController.exportAuditLogsExcel);
 router.get('/audit/export/csv', isSuperAdmin, exportController.exportAuditLogsCSV);
 
+// =============================================
+// License Review
+// =============================================
+
+// @route   GET /api/v1/admin/license-review
+router.get('/license-review', adminController.getLicenseReview);
+
+// @route   GET /api/v1/admin/license-review/stats
+router.get('/license-review/stats', adminController.getLicenseReviewStats);
+
+// @route   GET /api/v1/admin/license-review/export/excel
+router.get('/license-review/export/excel', exportController.exportLicenseReviewExcel);
+
 module.exports = router;

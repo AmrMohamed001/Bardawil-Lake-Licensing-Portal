@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= title || 'مراجعة التراخيص' %> - منصة تراخيص بحيرة البردويل
+    </title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="icon" type="image/png" href="/imgs/logo.png" />
+</head>
+
+<body>
+    <%- include('../partials/spinner') %>
+        <%- include('../partials/navbar') %>
+            <%- include('../partials/admin-sidebar', { currentPage: 'license-review' , pendingCount: pendingCount || 0
+                }) %>
+
+                <div class="license-review-page">
+                    <div class="container">
+                        <!-- Page Header -->
+                        <div class="page-header">
+                            <div class="header-content">
+                                <h1><i class="fas fa-file-certificate"></i> مراجعة التراخيص</h1>
+                                <p>عرض وتحليل جميع التراخيص الصادرة حسب النوع</p>
+                            </div>
+                            <div class="header-actions">
+                                <a href="/admin-dashboard" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-right"></i> لوحة التحكم
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card stat-total">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.total || 0 %>
+                                    </h3>
+                                    <p>إجمالي التراخيص</p>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-completed">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.completed || 0 %>
+                                    </h3>
+                                    <p>تراخيص مكتملة</p>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-pending">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.pending || 0 %>
+                                    </h3>
+                                    <p>قيد المعالجة</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- License Types Summary -->
+                        <div class="license-types-section">
+                            <h2><i class="fas fa-chart-pie"></i> توزيع التراخيص حسب النوع</h2>
+                            <div class="license-types-grid">
+                                <% if (byType && byType.length> 0) { %>
+                                    <% byType.forEach(type=> { %>
+                                        <div class="type-card" onclick="filterByType('<%= type.applicationType %>')">
+                                            <div class="type-icon <%= type.applicationType %>">
+                                                <% if (type.applicationType==='fisherman' ) { %>
+                                                    <i class="fas fa-fish"></i>
+                                                    <% } else if (type.applicationType==='boat' ) { %>
+                                                        <i class="fas fa-ship"></i>
+                                                        <% } else if (type.applicationType==='vehicle' ) { %>
+                                                            <i class="fas fa-truck"></i>
+                                                            <% } else if (type.applicationType==='trade' ) { %>
+                                                                <i class="fas fa-store"></i>
+                                                                <% } else if (type.applicationType==='entry' ) { %>
+                                                                    <i class="fas fa-door-open"></i>
+                                                                    <% } else { %>
+                                                                        <i class="fas fa-file"></i>
+                                                                        <% } %>
+                                            </div>
+                                            <div class="type-content">
+                                                <h4>
+                                                    <% if (type.applicationType==='fisherman' ) { %>صياد
+                                                        <% } else if (type.applicationType==='boat' ) { %>مركب
+                                                            <% } else if (type.applicationType==='vehicle' ) { %>سيارة
+                                                                <% } else if (type.applicationType==='trade' ) { %>تجارة
+                                                                    <% } else if (type.applicationType==='entry' ) { %>
+                                                                        دخول
+                                                                        <% } else { %>
+                                                                            <%= type.applicationType %>
+                                                                                <% } %>
+                                                </h4>
+                                                <p class="total">
+                                                    <%= type.total || 0 %> ترخيص
+                                                </p>
+                                                <p class="completed">
+                                                    <%= type.completed || 0 %> مكتمل
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p class="no-data">لا توجد بيانات</p>
+                                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="filters-section">
+                            <form id="filterForm" action="/admin/license-review" method="GET" class="filters-row">
+                                <div class="filter-group">
+                                    <label><i class="fas fa-tag"></i> نوع الترخيص</label>
+                                    <select name="applicationType" class="form-control filter-auto">
+                                        <option value="">جميع الأنواع</option>
+                                        <option value="fisherman" <%=query?.applicationType==='fisherman' ? 'selected'
+                                            : '' %>>صياد</option>
+                                        <option value="boat" <%=query?.applicationType==='boat' ? 'selected' : '' %>
+                                            >مركب</option>
+                                        <option value="vehicle" <%=query?.applicationType==='vehicle' ? 'selected' : ''
+                                            %>>سيارة</option>
+                                        <option value="trade" <%=query?.applicationType==='trade' ? 'selected' : '' %>
+                                            >تجارة</option>
+                                        <option value="entry" <%=query?.applicationType==='entry' ? 'selected' : '' %>
+                                            >دخول</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label><i class="fas fa-calendar"></i> من تاريخ</label>
+                                    <input type="date" name="startDate" class="form-control filter-auto"
+                                        value="<%= query?.startDate || '' %>">
+                                </div>
+                                <div class="filter-group">
+                                    <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
+                                    <input type="date" name="endDate" class="form-control filter-auto"
+                                        value="<%= query?.endDate || '' %>">
+                                </div>
+                                <div class="filter-group" style="flex: 2;">
+                                    <label><i class="fas fa-search"></i> بحث (اسم، رقم قومي، رقم طلب)</label>
+                                    <input type="text" id="searchInput" name="search" class="form-control"
+                                        placeholder="ابحث بالاسم أو الرقم القومي أو رقم الطلب..."
+                                        value="<%= query?.search || '' %>">
+                                </div>
+                                <div class="filter-group filter-button">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i>
+                                        بحث</button>
+                                </div>
+                            </form>
+                            <div class="export-buttons" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <a href="/api/v1/admin/license-review/export/excel?applicationType=<%= query?.applicationType || '' %>&startDate=<%= query?.startDate || '' %>&endDate=<%= query?.endDate || '' %>&search=<%= query?.search || '' %>"
+                                    class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-excel"></i> تصدير Excel
+                                </a>
+                                <% if (query?.applicationType || query?.startDate || query?.endDate || query?.search) {
+                                    %>
+                                    <a href="/admin/license-review" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-times"></i> مسح الفلاتر
+                                    </a>
+                                    <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Applications Table -->
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم الطلب</th>
+                                        <th>صاحب الرخصة</th>
+                                        <th>الرقم القومي</th>
+                                        <th>النوع</th>
+                                        <th>الفئة</th>
+                                        <th>التاريخ</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (applications && applications.length> 0) { %>
+                                        <% applications.forEach(app=> { %>
+                                            <tr>
+                                                <td class="application-number">#<%= app.applicationNumber %>
+                                                </td>
+                                                <td>
+                                                    <div class="license-holder-info">
+                                                        <strong>
+                                                            <%= app.licenseHolderName || '-' %>
+                                                        </strong>
+                                                        <% if (app.applicant && (app.applicant.firstNameAr + ' ' +
+                                                            app.applicant.lastNameAr) !==app.licenseHolderName) { %>
+                                                            <small class="submitted-by">
+                                                                <i class="fas fa-user"></i> مقدم الطلب: <%=
+                                                                    app.applicant.firstNameAr %>
+                                                                    <%= app.applicant.lastNameAr %>
+                                                            </small>
+                                                            <% } %>
+                                                    </div>
+                                                </td>
+                                                <td class="national-id">
+                                                    <%= app.licenseHolderNationalId || '-' %>
+                                                </td>
+                                                <td>
+                                                    <span class="type-badge <%= app.applicationType %>">
+                                                        <% if (app.applicationType==='fisherman' ) { %>صياد
+                                                            <% } else if (app.applicationType==='boat' ) { %>مركب
+                                                                <% } else if (app.applicationType==='vehicle' ) { %>
+                                                                    سيارة
+                                                                    <% } else if (app.applicationType==='trade' ) { %>
+                                                                        تجارة
+                                                                        <% } else if (app.applicationType==='entry' ) {
+                                                                            %>دخول
+                                                                            <% } else { %>
+                                                                                <%= app.applicationType %>
+                                                                                    <% } %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <%= app.licenseCategory %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %>
+                                                </td>
+                                                <td>
+                                                    <%- include('../partials/status-badge', { status: app.status,
+                                                        statusInfo: app.statusInfo }) %>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/application/<%= app.id %>"
+                                                        class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i> عرض
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="8" class="empty-state">
+                                                            <i class="fas fa-folder-open"></i>
+                                                            <p>لا توجد تراخيص مطابقة للبحث</p>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <% if (pagination && pagination.pages> 1) { %>
+                            <% const buildUrl=(page)=> {
+                                const params = new URLSearchParams();
+                                if (query?.applicationType) params.set('applicationType', query.applicationType);
+                                if (query?.startDate) params.set('startDate', query.startDate);
+                                if (query?.endDate) params.set('endDate', query.endDate);
+                                if (query?.search) params.set('search', query.search);
+                                params.set('page', page);
+                                return '?' + params.toString();
+                                }; %>
+                                <div class="pagination">
+                                    <% if (pagination.page> 1) { %>
+                                        <a href="<%= buildUrl(pagination.page - 1) %>" class="page-link">السابق</a>
+                                        <% } %>
+                                            <% for (let i=1; i <=Math.min(pagination.pages, 5); i++) { %>
+                                                <a href="<%= buildUrl(i) %>"
+                                                    class="page-link <%= i === pagination.page ? 'active' : '' %>">
+                                                    <%= i %>
+                                                </a>
+                                                <% } %>
+                                                    <% if (pagination.page < pagination.pages) { %>
+                                                        <a href="<%= buildUrl(pagination.page + 1) %>"
+                                                            class="page-link">التالي</a>
+                                                        <% } %>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+
+                <%- include('../partials/footer') %>
+
+                    <style>
+                        .license-review-page {
+                            padding: 2rem 0;
+                            min-height: calc(100vh - 200px);
+                            background: #f5f7fa;
+                        }
+
+                        .page-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 2rem;
+                            flex-wrap: wrap;
+                            gap: 1rem;
+                        }
+
+                        .page-header h1 {
+                            font-size: 2rem;
+                            font-weight: 700;
+                            color: #212121;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                        }
+
+                        .page-header h1 i {
+                            color: #1e3c72;
+                        }
+
+                        .page-header p {
+                            color: #757575;
+                            margin-top: 0.5rem;
+                        }
+
+                        /* Stats Grid */
+                        .stats-grid {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 1.5rem;
+                            margin-bottom: 2rem;
+                        }
+
+                        .stat-card {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                            transition: transform 0.3s, box-shadow 0.3s;
+                        }
+
+                        .stat-card:hover {
+                            transform: translateY(-5px);
+                            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+                        }
+
+                        .stat-icon {
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.5rem;
+                            color: white;
+                        }
+
+                        .stat-total .stat-icon {
+                            background: linear-gradient(135deg, #1e3c72, #2a5298);
+                        }
+
+                        .stat-completed .stat-icon {
+                            background: linear-gradient(135deg, #2e7d32, #4caf50);
+                        }
+
+                        .stat-pending .stat-icon {
+                            background: linear-gradient(135deg, #f57c00, #ff9800);
+                        }
+
+                        /* Removed Revenue Card Styles */
+
+                        .stat-content h3 {
+                            font-size: 1.75rem;
+                            font-weight: 700;
+                            color: #212121;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .stat-content p {
+                            font-size: 0.875rem;
+                            color: #757575;
+                        }
+
+                        /* License Types Section */
+                        .license-types-section {
+                            background: white;
+                            border-radius: 16px;
+                            padding: 1.5rem;
+                            margin-bottom: 2rem;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        }
+
+                        .license-types-section h2 {
+                            font-size: 1.25rem;
+                            font-weight: 600;
+                            color: #212121;
+                            margin-bottom: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+
+                        .license-types-section h2 i {
+                            color: #1e3c72;
+                        }
+
+                        .license-types-grid {
+                            display: grid;
+                            grid-template-columns: repeat(5, 1fr);
+                            gap: 1rem;
+                        }
+
+                        .type-card {
+                            background: #f8f9fa;
+                            border-radius: 12px;
+                            padding: 1.25rem;
+                            text-align: center;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            border: 2px solid transparent;
+                        }
+
+                        .type-card:hover {
+                            border-color: #1e3c72;
+                            background: linear-gradient(135deg, rgba(30, 60, 114, 0.05), rgba(42, 82, 152, 0.05));
+                        }
+
+                        .type-icon {
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto 0.75rem;
+                            font-size: 1.25rem;
+                            color: white;
+                        }
+
+                        .type-icon.fisherman {
+                            background: linear-gradient(135deg, #2196f3, #1976d2);
+                        }
+
+                        .type-icon.boat {
+                            background: linear-gradient(135deg, #00897b, #00695c);
+                        }
+
+                        .type-icon.vehicle {
+                            background: linear-gradient(135deg, #ff9800, #f57c00);
+                        }
+
+                        .type-icon.trade {
+                            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+                        }
+
+                        .type-icon.entry {
+                            background: linear-gradient(135deg, #607d8b, #455a64);
+                        }
+
+                        .type-icon.other {
+                            background: linear-gradient(135deg, #616161, #424242);
+                        }
+
+                        .type-content h4 {
+                            font-size: 1rem;
+                            font-weight: 600;
+                            color: #212121;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .type-content .total {
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            color: #1e3c72;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .type-content .completed {
+                            font-size: 0.75rem;
+                            color: #4caf50;
+                        }
+
+                        /* Filters */
+                        .filters-section {
+                            background: white;
+                            border-radius: 12px;
+                            padding: 1.5rem;
+                            margin-bottom: 1.5rem;
+                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .filters-row {
+                            display: flex;
+                            gap: 1rem;
+                            flex-wrap: wrap;
+                            align-items: flex-end;
+                        }
+
+                        .filter-group {
+                            flex: 1;
+                            min-width: 150px;
+                        }
+
+                        .filter-group label {
+                            display: block;
+                            font-size: 0.875rem;
+                            font-weight: 600;
+                            color: #424242;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .filter-group label i {
+                            margin-left: 0.25rem;
+                            color: #1e3c72;
+                        }
+
+                        .filter-button {
+                            flex: 0 0 auto;
+                        }
+
+                        /* Table */
+                        .table-container {
+                            background: white;
+                            border-radius: 12px;
+                            overflow: hidden;
+                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                        }
+
+                        .data-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+
+                        .data-table th,
+                        .data-table td {
+                            padding: 1rem;
+                            text-align: right;
+                            border-bottom: 1px solid #eee;
+                        }
+
+                        .data-table th {
+                            background: #f8f9fa;
+                            font-weight: 600;
+                            color: #424242;
+                        }
+
+                        .data-table tbody tr:hover {
+                            background: #f8f9fa;
+                        }
+
+                        .application-number {
+                            font-weight: 600;
+                            color: #1e3c72;
+                        }
+
+                        .license-holder-info strong {
+                            display: block;
+                            color: #212121;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .license-holder-info .submitted-by {
+                            font-size: 0.75rem;
+                            color: #9e9e9e;
+                        }
+
+                        .license-holder-info .submitted-by i {
+                            margin-left: 0.25rem;
+                        }
+
+                        .national-id {
+                            font-family: monospace;
+                            font-size: 0.875rem;
+                            color: #616161;
+                        }
+
+                        .type-badge {
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.75rem;
+                            font-weight: 600;
+                        }
+
+                        .type-badge.fisherman {
+                            background: #e3f2fd;
+                            color: #1976d2;
+                        }
+
+                        .type-badge.boat {
+                            background: #e0f2f1;
+                            color: #00796b;
+                        }
+
+                        .type-badge.vehicle {
+                            background: #fff3e0;
+                            color: #f57c00;
+                        }
+
+                        .type-badge.trade {
+                            background: #f3e5f5;
+                            color: #7b1fa2;
+                        }
+
+                        .type-badge.entry {
+                            background: #eceff1;
+                            color: #455a64;
+                        }
+
+                        .btn-sm {
+                            padding: 0.375rem 0.75rem;
+                            font-size: 0.875rem;
+                        }
+
+                        .empty-state {
+                            text-align: center;
+                            padding: 3rem;
+                            color: #9e9e9e;
+                        }
+
+                        .empty-state i {
+                            font-size: 3rem;
+                            margin-bottom: 1rem;
+                            display: block;
+                        }
+
+                        /* Pagination */
+                        .pagination {
+                            display: flex;
+                            justify-content: center;
+                            gap: 0.5rem;
+                            margin-top: 1.5rem;
+                        }
+
+                        .page-link {
+                            padding: 0.5rem 1rem;
+                            border-radius: 8px;
+                            background: white;
+                            color: #424242;
+                            text-decoration: none;
+                            border: 1px solid #e0e0e0;
+                            transition: all 0.3s ease;
+                        }
+
+                        .page-link:hover,
+                        .page-link.active {
+                            background: #1e3c72;
+                            color: white;
+                            border-color: #1e3c72;
+                        }
+
+                        @media (max-width: 1024px) {
+                            .stats-grid {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+
+                            .license-types-grid {
+                                grid-template-columns: repeat(3, 1fr);
+                            }
+                        }
+
+                        @media (max-width: 768px) {
+                            .stats-grid {
+                                grid-template-columns: 1fr;
+                            }
+
+                            .license-types-grid {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+
+                            .data-table th:nth-child(3),
+                            .data-table td:nth-child(3),
+                            .data-table th:nth-child(5),
+                            .data-table td:nth-child(5) {
+                                display: none;
+                            }
+                        }
+                    </style>
+
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+                    <script>
+                        // Filter by type when clicking on type cards
+                        function filterByType(type) {
+                            window.location.href = '/admin/license-review?applicationType=' + type;
+                        }
+
+                        // Auto-submit on filter change
+                        document.querySelectorAll('.filter-auto').forEach(function (el) {
+                            el.addEventListener('change', function () {
+                                document.getElementById('filterForm').submit();
+                            });
+                        });
+
+                        // Debounced search on typing
+                        var searchTimeout;
+                        document.getElementById('searchInput').addEventListener('input', function () {
+                            clearTimeout(searchTimeout);
+                            searchTimeout = setTimeout(function () {
+                                document.getElementById('filterForm').submit();
+                            }, 500);
+                        });
+                    </script>
+</body>
+
+</html>

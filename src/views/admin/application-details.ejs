@@ -289,7 +289,9 @@
                       <p>
                         <%= application.applicationType==='fisherman' ? 'صياد' : application.applicationType==='boat'
                           ? 'مركب' : application.applicationType==='vehicle' ? 'سيارة' :
-                          application.applicationType==='other' ? 'تراخيص أخرى' : application.applicationType %>
+                          application.applicationType==='trade' ? 'تجارة' : application.applicationType==='entry'
+                          ? 'دخول' : application.applicationType==='other' ? 'تراخيص أخرى' : application.applicationType
+                          %>
                       </p>
                     </div>
                     <div class="info-item"><label>الفئة</label>
@@ -469,6 +471,38 @@
                             </strong>
                           </div>
                           <% } %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- License Holder Information -->
+              <div class="detail-card" style="margin-top: 1rem;">
+                <div class="detail-card-header" style="background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);">
+                  <h2><i class="fas fa-id-badge"></i> صاحب الرخصة</h2>
+                </div>
+                <div class="detail-card-body">
+                  <div style="display: grid; gap: 0.75rem;">
+                    <div
+                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #f3e5f5; border-radius: 8px;">
+                      <i class="fas fa-user" style="color: #7b1fa2; font-size: 1.25rem;"></i>
+                      <div>
+                        <span style="color: #757575; font-size: 0.75rem; display: block;">اسم صاحب الرخصة</span>
+                        <strong style="font-size: 1.125rem;">
+                          <%= application.licenseHolderName || 'غير محدد' %>
+                        </strong>
+                      </div>
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #f3e5f5; border-radius: 8px;">
+                      <i class="fas fa-id-card" style="color: #7b1fa2; font-size: 1.25rem;"></i>
+                      <div>
+                        <span style="color: #757575; font-size: 0.75rem; display: block;">الرقم القومي لصاحب
+                          الرخصة</span>
+                        <strong style="font-family: monospace;">
+                          <%= application.licenseHolderNationalId || 'غير محدد' %>
+                        </strong>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
