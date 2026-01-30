@@ -26,6 +26,36 @@ router.use(protect, isAdmin);
 router.get('/dashboard', adminController.getDashboard);
 
 // =============================================
+// User Management (Super Admin Only) - must be before parametric routes
+// =============================================
+
+// @route   PUT /api/v1/admin/users/:id/role
+router.put(
+  '/users/:id/role',
+  isSuperAdmin,
+  adminValidator.updateUserRoleValidator,
+  validatorMiddleware,
+  adminController.updateUserRole
+);
+// @route   PATCH /api/v1/admin/users/:id/role (same handler, for client compatibility)
+router.patch(
+  '/users/:id/role',
+  isSuperAdmin,
+  adminValidator.updateUserRoleValidator,
+  validatorMiddleware,
+  adminController.updateUserRole
+);
+
+// @route   PUT /api/v1/admin/users/:id/status
+router.put(
+  '/users/:id/status',
+  isSuperAdmin,
+  adminValidator.updateUserStatusValidator,
+  validatorMiddleware,
+  adminController.updateUserStatus
+);
+
+// =============================================
 // Applications Management
 // =============================================
 
@@ -145,28 +175,6 @@ router.get(
   adminValidator.applicationIdValidator,
   validatorMiddleware,
   adminController.getLicensePdf
-);
-
-// =============================================
-// User Management (Super Admin Only)
-// =============================================
-
-// @route   PUT /api/v1/admin/users/:id/role
-router.put(
-  '/users/:id/role',
-  isSuperAdmin,
-  adminValidator.updateUserRoleValidator,
-  validatorMiddleware,
-  adminController.updateUserRole
-);
-
-// @route   PUT /api/v1/admin/users/:id/status
-router.put(
-  '/users/:id/status',
-  isSuperAdmin,
-  adminValidator.updateUserStatusValidator,
-  validatorMiddleware,
-  adminController.updateUserStatus
 );
 
 // =============================================

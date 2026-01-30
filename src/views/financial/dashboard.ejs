@@ -73,7 +73,7 @@
                         </div>
                         <div class="stat-content">
                             <h3 class="stat-value">
-                                <%= stats.todayTotal.toLocaleString('ar-EG') %>
+                                <%= (stats.todayTotal ?? 0).toLocaleString('ar-EG') %>
                             </h3>
                             <p class="stat-label">اجمالي النقدية اليوم (جنيه)</p>
                         </div>
@@ -85,7 +85,7 @@
                         </div>
                         <div class="stat-content">
                             <h3 class="stat-value">
-                                <%= stats.monthlyTotal.toLocaleString('ar-EG') %>
+                                <%= (stats.monthlyTotal ?? 0).toLocaleString('ar-EG') %>
                             </h3>
                             <p class="stat-label">إجمالي الشهر (جنيه)</p>
                         </div>

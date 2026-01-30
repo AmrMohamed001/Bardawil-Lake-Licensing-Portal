@@ -73,8 +73,10 @@ const Notification = sequelize.define(
     timestamps: true,
     indexes: [
       { fields: ['user_id'] },
-      { fields: ['is_read'] },
-      { fields: ['created_at'] },
+      // Optimization: Composite index for unread count queries (frequent)
+      { fields: ['user_id', 'is_read'] },
+      // Optimization: Composite index for user feed sorting
+      { fields: ['user_id', 'created_at'] },
     ],
   }
 );

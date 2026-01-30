@@ -30,6 +30,7 @@
     "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.8.1",
+    "connect-redis": "^9.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -46,6 +47,7 @@
     "pdfkit": "^0.17.2",
     "pg": "^8.17.1",
     "pg-hstore": "^2.3.4",
+    "redis": "^5.10.0",
     "sequelize": "^6.37.7",
     "uuid": "^13.0.0"
   },

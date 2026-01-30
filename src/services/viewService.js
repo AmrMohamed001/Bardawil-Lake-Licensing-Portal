@@ -91,27 +91,39 @@ exports.getUserDashboardData = async (userId, query) => {
     const limit = 10;
     const offset = (page - 1) * limit;
 
-    const { count, rows: applications } = await Application.findAndCountAll({
-        where: { userId },
-        order: [['createdAt', 'DESC']],
-        limit,
-        offset,
-    });
-
-    const stats = {
-        total: await Application.count({ where: { userId } }),
-        pending: await Application.count({
+    const [
+        { count, rows: applications },
+        total,
+        pending,
+        approved,
+        completed
+    ] = await Promise.all([
+        Application.findAndCountAll({
+            where: { userId },
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset,
+        }),
+        Application.count({ where: { userId } }),
+        Application.count({
             where: { userId, status: { [Op.in]: ['received', 'under_review'] } },
         }),
-        approved: await Application.count({
+        Application.count({
             where: {
                 userId,
                 status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
             },
         }),
-        completed: await Application.count({
+        Application.count({
             where: { userId, status: 'completed' },
         }),
+    ]);
+
+    const stats = {
+        total,
+        pending,
+        approved,
+        completed,
     };
 
     return {

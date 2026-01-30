@@ -64,13 +64,22 @@ exports.register = async userData => {
     status: 'active',
   });
 
+  // Generate tokens so user is logged in after signup (same as login)
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+  user.refreshTokens = [refreshToken];
+  await user.save();
+
   return {
-    message: 'تم التسجيل بنجاح. يمكنك الآن تسجيل الدخول',
+    message: 'تم التسجيل بنجاح',
+    accessToken,
+    refreshToken,
     user: {
       id: user.id,
       nationalId: user.nationalId,
       fullName: user.getFullNameAr(),
       phone: user.phone,
+      role: user.role,
     },
   };
 };

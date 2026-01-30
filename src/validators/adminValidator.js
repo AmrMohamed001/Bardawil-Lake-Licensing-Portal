@@ -54,7 +54,7 @@ exports.updatePriceValidator = [
 
 exports.updateUserRoleValidator = [
     param('id').isUUID().withMessage('معرف المستخدم غير صالح'),
-    body('role').isIn(['citizen', 'admin', 'super_admin']).withMessage('الصلاحية غير صالحة'),
+    body('role').isIn(['citizen', 'admin', 'super_admin', 'financial_officer']).withMessage('الصلاحية غير صالحة'),
 ];
 
 exports.updateUserStatusValidator = [

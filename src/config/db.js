@@ -70,17 +70,16 @@ const connectDB = async (retries = 5, delay = 3000) => {
       console.log(`   Pool: max=${sequelize.options.pool.max}, min=${sequelize.options.pool.min}`);
 
       // Sync models based on environment
-      if (process.env.NODE_ENV === 'development') {
+      // Sync models based on environment and configuration
+      const shouldSyncAlter = process.env.DB_SYNC === 'true';
+
+      if (shouldSyncAlter) {
         await sequelize.sync({ alter: true });
         console.log('✅ Database models synchronized (alter mode)');
-      } else if (process.env.NODE_ENV === 'test') {
-        // For tests, just sync without altering
-        await sequelize.sync();
-        console.log('✅ Database models synchronized (test mode)');
       } else {
-        // Production - only sync without changes
+        // Fast startup: Only create tables if they don't exist, don't check/alter columns
         await sequelize.sync();
-        console.log('✅ Database models synchronized');
+        console.log('✅ Database models synchronized (basic mode)');
       }
 
       return true;

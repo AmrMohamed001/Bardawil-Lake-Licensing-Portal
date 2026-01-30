@@ -1,17 +1,25 @@
-/**
- * Cache Service - L1 Memory Cache
- * Uses node-cache for in-memory caching of frequently accessed data
- */
+const redis = require('redis');
 
-const NodeCache = require('node-cache');
-
-// Cache configuration
-const cache = new NodeCache({
-    stdTTL: 300, // Default TTL: 5 minutes
-    checkperiod: 60, // Check for expired keys every 60 seconds
-    useClones: true, // Return cloned objects to prevent mutation
-    deleteOnExpire: true,
+// Create Redis client
+const client = redis.createClient({
+    socket: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379,
+    },
+    password: process.env.REDIS_PASSWORD || undefined,
 });
+
+client.on('error', (err) => console.log('Redis Client Error', err));
+client.on('connect', () => console.log('✅ Redis Client Connected'));
+
+// Connect to Redis
+(async () => {
+    try {
+        await client.connect();
+    } catch (err) {
+        console.error('❌ Redis Connection Failed:', err);
+    }
+})();
 
 // Cache key constants
 const CACHE_KEYS = {
@@ -34,10 +42,16 @@ const TTL = {
 /**
  * Get value from cache
  * @param {string} key - Cache key
- * @returns {*} Cached value or undefined
+ * @returns {*} Cached value or null
  */
-const get = (key) => {
-    return cache.get(key);
+const get = async (key) => {
+    try {
+        const value = await client.get(key);
+        return value ? JSON.parse(value) : null;
+    } catch (error) {
+        console.error(`[Cache] Error getting key ${key}:`, error);
+        return null; // Fail safe
+    }
 };
 
 /**
@@ -47,8 +61,19 @@ const get = (key) => {
  * @param {number} ttl - Time to live in seconds (optional)
  * @returns {boolean} Success
  */
-const set = (key, value, ttl) => {
-    return cache.set(key, value, ttl);
+const set = async (key, value, ttl) => {
+    try {
+        const stringValue = JSON.stringify(value);
+        if (ttl) {
+            await client.set(key, stringValue, { EX: ttl });
+        } else {
+            await client.set(key, stringValue);
+        }
+        return true;
+    } catch (error) {
+        console.error(`[Cache] Error setting key ${key}:`, error);
+        return false;
+    }
 };
 
 /**
@@ -56,40 +81,54 @@ const set = (key, value, ttl) => {
  * @param {string} key - Cache key
  * @returns {number} Number of deleted entries
  */
-const del = (key) => {
-    return cache.del(key);
+const del = async (key) => {
+    try {
+        return await client.del(key);
+    } catch (error) {
+        console.error(`[Cache] Error deleting key ${key}:`, error);
+        return 0;
+    }
 };
 
 /**
  * Delete multiple keys matching a pattern
  * @param {string} pattern - Key pattern prefix
  */
-const delByPattern = (pattern) => {
-    const keys = cache.keys().filter(key => key.startsWith(pattern));
-    return cache.del(keys);
+const delByPattern = async (pattern) => {
+    try {
+        const keys = await client.keys(pattern + '*');
+        if (keys.length > 0) {
+            return await client.del(keys);
+        }
+        return 0;
+    } catch (error) {
+        console.error(`[Cache] Error deleting pattern ${pattern}:`, error);
+        return 0;
+    }
 };
 
 /**
  * Flush entire cache
  */
-const flush = () => {
-    cache.flushAll();
-    console.log('[Cache] Flushed all cached data');
+const flush = async () => {
+    try {
+        await client.flushAll();
+        console.log('[Cache] Flushed all cached data');
+    } catch (error) {
+        console.error('[Cache] Error flushing cache:', error);
+    }
 };
 
 /**
- * Get cache statistics
+ * Get cache statistics (Simplified for Redis)
  * @returns {Object} Cache stats
  */
-const stats = () => {
-    const s = cache.getStats();
+const stats = async () => {
+    // Redis doesn't expose hit/miss stats simply like node-cache without config
+    // We can return basic info
     return {
-        hits: s.hits,
-        misses: s.misses,
-        keys: cache.keys().length,
-        hitRate: s.hits + s.misses > 0
-            ? ((s.hits / (s.hits + s.misses)) * 100).toFixed(2) + '%'
-            : 'N/A',
+        info: 'Redis Cache',
+        isConnected: client.isOpen
     };
 };
 
@@ -101,41 +140,43 @@ const stats = () => {
  * @returns {*} Cached or fresh value
  */
 const getOrSet = async (key, fn, ttl) => {
-    const cached = cache.get(key);
-    if (cached !== undefined) {
-        console.log(`[Cache] HIT: ${key}`);
+    const cached = await get(key);
+    if (cached !== null) {
+        // console.log(`[Cache] HIT: ${key}`);
         return cached;
     }
 
-    console.log(`[Cache] MISS: ${key}`);
+    // console.log(`[Cache] MISS: ${key}`);
     const value = await fn();
-    cache.set(key, value, ttl);
+    if (value !== undefined && value !== null) {
+        await set(key, value, ttl);
+    }
     return value;
 };
 
 /**
  * Invalidate application statuses cache
  */
-const invalidateStatuses = () => {
-    del(CACHE_KEYS.APPLICATION_STATUSES);
-    delByPattern(CACHE_KEYS.APPLICATION_STATUSES_BY_CATEGORY);
+const invalidateStatuses = async () => {
+    await del(CACHE_KEYS.APPLICATION_STATUSES);
+    await delByPattern(CACHE_KEYS.APPLICATION_STATUSES_BY_CATEGORY);
     console.log('[Cache] Invalidated application statuses');
 };
 
 /**
  * Invalidate prices cache
  */
-const invalidatePrices = () => {
-    del(CACHE_KEYS.ACTIVE_PRICES);
+const invalidatePrices = async () => {
+    await del(CACHE_KEYS.ACTIVE_PRICES);
     console.log('[Cache] Invalidated prices');
 };
 
 /**
  * Invalidate news cache
  */
-const invalidateNews = () => {
-    del(CACHE_KEYS.PUBLISHED_NEWS);
-    delByPattern(CACHE_KEYS.PUBLISHED_NEWS_PAGE);
+const invalidateNews = async () => {
+    await del(CACHE_KEYS.PUBLISHED_NEWS);
+    await delByPattern(CACHE_KEYS.PUBLISHED_NEWS_PAGE);
     console.log('[Cache] Invalidated news');
 };
 
@@ -152,4 +193,5 @@ module.exports = {
     invalidateNews,
     CACHE_KEYS,
     TTL,
+    client // Export client if needed
 };
