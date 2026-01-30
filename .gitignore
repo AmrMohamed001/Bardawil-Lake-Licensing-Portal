@@ -6,3 +6,5 @@
 /src/scripts/
 tests/debug-auth.js
 tests/load-test.js
+.vercel
+.env*.local
