@@ -1,5 +1,6 @@
 const app = require('../src/app');
 const { connectDB } = require('../src/config/db');
+require('pg'); // Force inclusion of pg module for Vercel
 
 // Cache the database connection promise
 let dbConnection = null;
