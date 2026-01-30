@@ -1,12 +1,20 @@
 {
     "version": 2,
-    "rewrites": [
+    "builds": [
         {
-            "source": "/(.*)",
-            "destination": "/api/index.js"
+            "src": "src/server.js",
+            "use": "@vercel/node"
         }
     ],
-    "env": {
-        "NODE_ENV": "production"
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "src/server.js"
+        }
+    ],
+    "functions": {
+        "src/server.js": {
+            "includeFiles": "node_modules/pg/**"
+        }
     }
 }
