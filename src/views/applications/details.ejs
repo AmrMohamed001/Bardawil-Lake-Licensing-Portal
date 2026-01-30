@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/pages/application-details.css">
   <link rel="icon" type="image/png" href="/imgs/logo.png">
 </head>
 
@@ -21,375 +22,369 @@
       <div class="details-page">
         <div class="container">
           <!-- Breadcrumb -->
-          <div class="breadcrumb">
-            <a href="/dashboard"><i class="fas fa-home"></i> لوحة التحكم</a>
-            <span>/</span>
-            <span>تفاصيل الطلب</span>
-          </div>
+          <nav class="breadcrumb">
+            <a href="/dashboard" class="breadcrumb-link">
+              <i class="fas fa-home"></i>
+              <span>لوحة التحكم</span>
+            </a>
+            <i class="fas fa-chevron-left breadcrumb-separator"></i>
+            <span class="breadcrumb-current">تفاصيل الطلب</span>
+          </nav>
 
+          <!-- Page Header -->
           <div class="page-header">
             <div class="header-info">
-              <h1><i class="fas fa-file-alt"></i> طلب رقم <%= application.applicationNumber %>
+              <h1>
+                <span class="header-icon"><i class="fas fa-file-alt"></i></span>
+                طلب رقم <%= application.applicationNumber %>
               </h1>
-              <p>تاريخ التقديم: <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %>
+              <p class="header-meta">
+                <i class="far fa-calendar-alt"></i>
+                <span>تاريخ التقديم: <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %></span>
               </p>
             </div>
-            <%- include('../partials/status-badge', { status: application.status, statusInfo: application.statusInfo })
-              %>
+            <div class="header-badge">
+              <%- include('../partials/status-badge', { status: application.status, statusInfo: application.statusInfo
+                }) %>
+            </div>
           </div>
 
           <div class="content-grid">
-            <!-- Application Info -->
-            <div class="card info-card">
-              <h3><i class="fas fa-info-circle"></i> معلومات الطلب</h3>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">نوع الترخيص</span>
-                  <span class="value">
-                    <% if (application.applicationType==='fisherman' ) { %>
-                      <i class="fas fa-fish text-primary"></i> ترخيص صياد
-                      <% } else if (application.applicationType==='boat' ) { %>
-                        <i class="fas fa-ship text-accent"></i> ترخيص مركب
-                        <% } else if (application.applicationType==='vehicle' ) { %>
-                          <i class="fas fa-truck text-warning"></i> ترخيص سيارة
-                          <% } else if (application.applicationType==='trade' ) { %>
-                            <i class="fas fa-store text-purple"></i> ترخيص تجارة
-                            <% } else if (application.applicationType==='entry' ) { %>
-                              <i class="fas fa-door-open text-muted"></i> ترخيص دخول
-                              <% } else { %>
-                                <%= application.applicationType %>
-                                  <% } %>
-                  </span>
-                </div>
-                <div class="info-item">
-                  <span class="label">الفئة</span>
-                  <span class="value">
-                    <%= application.licenseCategory %>
-                  </span>
-                </div>
-                <div class="info-item">
-                  <span class="label">نوع الطلب</span>
-                  <span class="value">
-                    <%= application.isRenewal ? 'تجديد' : 'جديد' %>
-                  </span>
-                </div>
-                <% if (application.paymentAmount) { %>
-                  <div class="info-item">
-                    <span class="label">مبلغ الرسوم</span>
-                    <span class="value">
-                      <%= application.paymentAmount %> جنيه
-                    </span>
-                  </div>
-                  <% } %>
-              </div>
-            </div>
 
-            <!-- Status Timeline -->
-            <div class="card timeline-card">
-              <h3><i class="fas fa-history"></i> مراحل الطلب</h3>
-              <div class="timeline">
-                <!-- Step 1: تم استلام الطلب -->
-                <div class="timeline-item active">
-                  <div class="timeline-dot" style="background: #4CAF50;"><i class="fas fa-check"
-                      style="font-size: 10px; color: white;"></i></div>
-                  <div class="timeline-content">
-                    <span class="timeline-date">
-                      <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %>
-                    </span>
-                    <p><strong>تم استلام الطلب</strong></p>
-                  </div>
-                </div>
+            <!-- Status Messages (Moved Up) -->
+            <% if (['payment_verified', 'ready' , 'completed' , 'rejected' ].includes(application.status)) { %>
+              <div class="status-messages-wrapper" style="grid-column: 1 / -1; margin-bottom: 0;">
 
-                <!-- Step 2: قيد المراجعة -->
-                <% if (['under_review', 'approved_payment_pending' , 'payment_verified' , 'ready' , 'completed'
-                  ].includes(application.status) || application.reviewedAt) { %>
-                  <div class="timeline-item">
-                    <div class="timeline-dot" style="background: #4CAF50;"><i class="fas fa-check"
-                        style="font-size: 10px; color: white;"></i></div>
-                    <div class="timeline-content">
-                      <span class="timeline-date">
-                        <%= application.reviewedAt ? new Date(application.reviewedAt).toLocaleDateString('ar-EG') : ''
-                          %>
-                      </span>
-                      <p><strong>تمت مراجعة الطلب</strong></p>
+                <% if (application.status==='payment_verified' ) { %>
+                  <div class="status-message success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                      <p>تم تأكيد الدفع بنجاح!</p>
+                      <span style="font-size: 0.9em; opacity: 0.8;">جاري إعداد رخصتك، سيتم إشعارك عند جاهزيتها
+                        للاستلام</span>
                     </div>
                   </div>
-                  <% } else if (application.status==='received' ) { %>
-                    <div class="timeline-item">
-                      <div class="timeline-dot" style="background: #e0e0e0;"></div>
-                      <div class="timeline-content">
-                        <p style="color: #9e9e9e;">في انتظار المراجعة</p>
+                  <% } else if (application.status==='ready' ) { %>
+                    <div class="status-message ready">
+                      <i class="fas fa-gift"></i>
+                      <div>
+                        <p>الرخصة جاهزة للاستلام!</p>
+                        <span style="font-size: 0.9em; opacity: 0.8;">يرجى التوجه إلى مقر الجهاز لاستلام رخصتك خلال
+                          أوقات العمل الرسمية</span>
                       </div>
                     </div>
-                    <% } %>
-
-                      <!-- Step 3: تمت الموافقة -->
-                      <% if (['approved_payment_pending', 'payment_verified' , 'ready' , 'completed'
-                        ].includes(application.status) || application.approvedAt) { %>
-                        <div class="timeline-item">
-                          <div class="timeline-dot" style="background: #4CAF50;"><i class="fas fa-check"
-                              style="font-size: 10px; color: white;"></i></div>
-                          <div class="timeline-content">
-                            <span class="timeline-date">
-                              <%= application.approvedAt ? new Date(application.approvedAt).toLocaleDateString('ar-EG')
-                                : '' %>
-                            </span>
-                            <p><strong>تمت الموافقة على الطلب</strong></p>
-                          </div>
+                    <% } else if (application.status==='completed' ) { %>
+                      <div class="status-message completed">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                          <p>تم استلام الرخصة بنجاح!</p>
+                          <span style="font-size: 0.9em; opacity: 0.8;">شكراً لاستخدامك منصة تراخيص بحيرة البردويل.
+                            نتمنى لك موسم صيد موفق!</span>
                         </div>
-                        <% } else if (application.status !=='rejected' && (application.status==='received' ||
-                          application.status==='under_review' )) { %>
-                          <div class="timeline-item">
-                            <div class="timeline-dot" style="background: #e0e0e0;"></div>
-                            <div class="timeline-content">
-                              <p style="color: #9e9e9e;">في انتظار الموافقة</p>
+                      </div>
+                      <% } %>
+
+                        <!-- Rejection Message -->
+                        <% if (application.status==='rejected' && application.rejectionReason) { %>
+                          <div class="status-message error"
+                            style="background: #ffebee; color: #c62828; border: 1px solid #ef5350;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                              <p>تم رفض الطلب</p>
+                              <span style="font-size: 0.9em; opacity: 0.8;">
+                                <%= application.rejectionReason %>
+                              </span>
                             </div>
                           </div>
                           <% } %>
 
-                            <!-- Step 4: الدفع -->
-                            <% if (['payment_verified', 'ready' , 'completed' ].includes(application.status) ||
-                              application.paymentVerifiedAt) { %>
-                              <div class="timeline-item">
-                                <div class="timeline-dot" style="background: #4CAF50;"><i class="fas fa-check"
-                                    style="font-size: 10px; color: white;"></i></div>
-                                <div class="timeline-content">
-                                  <span class="timeline-date">
-                                    <%= application.paymentVerifiedAt ? new
-                                      Date(application.paymentVerifiedAt).toLocaleDateString('ar-EG') : '' %>
-                                  </span>
-                                  <p><strong>تم الدفع بنجاح 💰</strong></p>
-                                </div>
-                              </div>
-                              <% } else if (application.status==='approved_payment_pending' ) { %>
-                                <div class="timeline-item">
-                                  <div class="timeline-dot" style="background: #ff9800; animation: pulse 2s infinite;">
-                                    <i class="fas fa-clock" style="font-size: 10px; color: white;"></i>
-                                  </div>
-                                  <div class="timeline-content">
-                                    <p style="color: #ff9800;"><strong>في انتظار الدفع...</strong></p>
-                                  </div>
-                                </div>
-                                <% } else if (!['rejected', 'received' , 'under_review' ].includes(application.status))
-                                  { %>
-                                  <div class="timeline-item">
-                                    <div class="timeline-dot" style="background: #e0e0e0;"></div>
-                                    <div class="timeline-content">
-                                      <p style="color: #9e9e9e;">في انتظار الدفع</p>
-                                    </div>
-                                  </div>
-                                  <% } %>
-
-                                    <!-- Step 5: جاهز للاستلام / مكتمل -->
-                                    <% if (application.status==='ready' || application.status==='completed' ) { %>
-                                      <div class="timeline-item">
-                                        <div class="timeline-dot" style="background: #2196F3;"><i class="fas fa-gift"
-                                            style="font-size: 10px; color: white;"></i></div>
-                                        <div class="timeline-content">
-                                          <p><strong>
-                                              <%= application.status==='completed' ? 'تم استلام الرخصة ✅'
-                                                : 'جاهز للاستلام 📦' %>
-                                            </strong></p>
-                                        </div>
-                                      </div>
-                                      <% } else if (['payment_verified'].includes(application.status)) { %>
-                                        <div class="timeline-item">
-                                          <div class="timeline-dot" style="background: #e0e0e0;"></div>
-                                          <div class="timeline-content">
-                                            <p style="color: #9e9e9e;">في انتظار التجهيز (7-12 يوم)</p>
-                                          </div>
-                                        </div>
-                                        <% } %>
-
-                                          <!-- Rejected Status -->
-                                          <% if (application.status==='rejected' ) { %>
-                                            <div class="timeline-item">
-                                              <div class="timeline-dot" style="background: #f44336;"><i
-                                                  class="fas fa-times" style="font-size: 10px; color: white;"></i></div>
-                                              <div class="timeline-content">
-                                                <p style="color: #f44336;"><strong>تم رفض الطلب ❌</strong></p>
-                                                <% if (application.rejectionReason) { %>
-                                                  <p style="font-size: 0.85rem; color: #757575;">
-                                                    <%= application.rejectionReason %>
-                                                  </p>
-                                                  <% } %>
-                                              </div>
-                                            </div>
-                                            <% } %>
               </div>
-            </div>
+              <% } %>
 
-            <!-- Personal/Submitted Data -->
-            <div class="card data-card">
-              <h3><i class="fas fa-user"></i> البيانات المقدمة</h3>
-              <div class="info-grid">
-                <!-- User Info (Always visible) -->
-                <div class="info-item">
-                  <span class="label">اسم مقدم الطلب</span>
-                  <span class="value">
-                    <%= user.firstNameAr %>
-                      <%= user.lastNameAr %>
-                  </span>
-                </div>
-                <div class="info-item">
-                  <span class="label">الرقم القومي</span>
-                  <span class="value">
-                    <%= user.nationalId %>
-                  </span>
-                </div>
-                <div class="info-item">
-                  <span class="label">رقم الهاتف</span>
-                  <span class="value">
-                    <%= user.phone %>
-                  </span>
-                </div>
+                <!-- Application Info Card -->
+                <div class="card info-card">
+                  <h3><i class="fas fa-info-circle"></i> معلومات الطلب</h3>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="label">
+                        <i class="fas fa-tag"></i> نوع الترخيص
+                      </span>
+                      <span class="value">
+                        <% if (application.applicationType==='fisherman' ) { %>
+                          <span class="license-badge fisherman"><i class="fas fa-fish"></i> ترخيص صياد</span>
+                          <% } else if (application.applicationType==='boat' ) { %>
+                            <span class="license-badge boat"><i class="fas fa-ship"></i> ترخيص مركب</span>
+                            <% } else if (application.applicationType==='vehicle' ) { %>
+                              <span class="license-badge vehicle"><i class="fas fa-truck"></i> ترخيص سيارة</span>
+                              <% } else if (application.applicationType==='trade' ) { %>
+                                <span class="license-badge trade"><i class="fas fa-store"></i> ترخيص تجارة</span>
+                                <% } else if (application.applicationType==='entry' ) { %>
+                                  <span class="license-badge entry"><i class="fas fa-door-open"></i> ترخيص دخول</span>
+                                  <% } else { %>
+                                    <%= application.applicationType %>
+                                      <% } %>
+                      </span>
+                    </div>
 
-                <% if (application.data) { %>
-                  <% const data=typeof application.data==='string' ? JSON.parse(application.data) : application.data; %>
+                    <div class="info-item">
+                      <span class="label">
+                        <i class="fas fa-layer-group"></i> الفئة
+                      </span>
+                      <span class="value">
+                        <%= application.licenseCategory %>
+                      </span>
+                    </div>
 
-                    <!-- Fisherman Fields -->
-                    <% if (data.unionCardNumber) { %>
-                      <div class="info-item">
-                        <span class="label">رقم البطاقة النقابية</span>
-                        <span class="value">
-                          <%= data.unionCardNumber %>
+                    <div class="info-item">
+                      <span class="label">
+                        <i class="fas fa-sync-alt"></i> نوع الطلب
+                      </span>
+                      <span class="value">
+                        <span class="request-type <%= application.isRenewal ? 'renewal' : 'new' %>">
+                          <%= application.isRenewal ? 'تجديد' : 'جديد' %>
+                        </span>
+                      </span>
+                    </div>
+
+                    <% if (application.paymentAmount) { %>
+                      <div class="info-item highlight">
+                        <span class="label">
+                          <i class="fas fa-coins"></i> مبلغ الرسوم
+                        </span>
+                        <span class="value amount">
+                          <%= application.paymentAmount %> <small>جنيه</small>
                         </span>
                       </div>
                       <% } %>
+                  </div>
+                </div>
 
-                        <% if (data.marina) { %>
-                          <div class="info-item">
-                            <span class="label">المرسى</span>
-                            <span class="value">
-                              <%= data.marina %>
+                <!-- Timeline Card -->
+                <div class="card timeline-card">
+                  <h3><i class="fas fa-history"></i> مراحل الطلب</h3>
+                  <div class="timeline">
+                    <% timelineSteps.forEach(step=> { %>
+                      <div class="timeline-item <%= step.status %>">
+                        <div class="timeline-dot">
+                          <% if (step.status==='completed' ) { %>
+                            <i class="fas fa-check" style="font-size: 10px; color: white;"></i>
+                            <% } else if (step.status==='active' ) { %>
+                              <div style="width: 8px; height: 8px; background: white; border-radius: 50%;"></div>
+                              <% } %>
+                        </div>
+                        <div class="timeline-content">
+                          <% if (step.date) { %>
+                            <span class="timeline-date">
+                              <%= new Date(step.date).toLocaleDateString('ar-EG') %>
                             </span>
+                            <% } %>
+                              <p><strong>
+                                  <%= step.title %>
+                                </strong></p>
+                              <% if (step.description && (step.status==='completed' || step.status==='active' )) { %>
+                                <p class="timeline-desc">
+                                  <%= step.description %>
+                                </p>
+                                <% } %>
+                        </div>
+                      </div>
+                      <% }); %>
+
+                        <!-- Rejected Status -->
+                        <% if (application.status==='rejected' ) { %>
+                          <div class="timeline-item rejected">
+                            <div class="timeline-dot" style="background: #f44336;">
+                              <i class="fas fa-times" style="font-size: 10px; color: white;"></i>
+                            </div>
+                            <div class="timeline-content">
+                              <p style="color: #f44336;"><strong>تم رفض الطلب ❌</strong></p>
+                              <% if (application.rejectionReason) { %>
+                                <p class="timeline-desc">
+                                  <%= application.rejectionReason %>
+                                </p>
+                                <% } %>
+                            </div>
                           </div>
                           <% } %>
-
-                            <% if (data.previousLicenseNumber) { %>
-                              <div class="info-item">
-                                <span class="label">رقم الرخصة السابقة</span>
-                                <span class="value">
-                                  <%= data.previousLicenseNumber %>
-                                </span>
-                              </div>
-                              <% } %>
-
-                                <!-- Boat Fields -->
-                                <% if (data.boatNumber) { %>
-                                  <div class="info-item">
-                                    <span class="label">رقم الصال</span>
-                                    <span class="value">
-                                      <%= data.boatNumber %>
-                                    </span>
-                                  </div>
-                                  <% } %>
-                                    <% if (data.boatRegistration) { %>
-                                      <div class="info-item">
-                                        <span class="label">رقم تسجيل المركب</span>
-                                        <span class="value">
-                                          <%= data.boatRegistration %>
-                                        </span>
-                                      </div>
-                                      <% } %>
-                                        <% if (data.boatLength) { %>
-                                          <div class="info-item">
-                                            <span class="label">طول المركب</span>
-                                            <span class="value">
-                                              <%= data.boatLength %> متر
-                                            </span>
-                                          </div>
-                                          <% } %>
-                                            <% if (data.enginePower) { %>
-                                              <div class="info-item">
-                                                <span class="label">قوة المحرك</span>
-                                                <span class="value">
-                                                  <%= data.enginePower %> حصان
-                                                </span>
-                                              </div>
-                                              <% } %>
-                                                <% if (data.plateNumber) { %>
-                                                  <div class="info-item">
-                                                    <span class="label">رقم لوحة السيارة</span>
-                                                    <span class="value">
-                                                      <%= data.plateNumber %>
-                                                    </span>
-                                                  </div>
-                                                  <% } %>
-                                                    <% if (data.vehicleModel) { %>
-                                                      <div class="info-item">
-                                                        <span class="label">موديل السيارة</span>
-                                                        <span class="value">
-                                                          <%= data.vehicleModel %>
-                                                        </span>
-                                                      </div>
-                                                      <% } %>
-                                                        <% if (data.previousBoatNumber) { %>
-                                                          <div class="info-item">
-                                                            <span class="label">رقم المركب في الموسم السابق</span>
-                                                            <span class="value">
-                                                              <%= data.previousBoatNumber %>
-                                                            </span>
-                                                          </div>
-                                                          <% } %>
-                                                            <% } else { %>
-                                                              <p style="color: #757575;">لا توجد بيانات إضافية</p>
-                                                              <% } %>
-              </div>
-            </div>
-
-            <!-- Documents -->
-            <% if (application.documents && application.documents.length> 0) { %>
-              <div class="card documents-card">
-                <h3><i class="fas fa-file-alt"></i> المستندات المرفقة</h3>
-                <div class="documents-list">
-                  <% application.documents.forEach(doc=> {
-                    let docPath = doc.filePath || '';
-                    docPath = docPath.replace(/\\/g, '/');
-                    if (docPath.startsWith('src/public/')) docPath = docPath.replace('src/public/', '/');
-                    else if (docPath.startsWith('public/')) docPath = docPath.replace('public/', '/');
-                    if (!docPath.startsWith('/')) docPath = '/' + docPath;
-
-                    // Fallback using filename if path is empty/invalid
-                    if ((docPath === '/' || docPath === '') && doc.fileName) {
-                    docPath = '/uploads/' + doc.fileName;
-                    }
-                    %>
-                    <div class="document-item">
-                      <div class="doc-info">
-                        <i class="<%= doc.mimeType === 'application/pdf' ? 'fas fa-file-pdf' : 'fas fa-image' %>"></i>
-                        <span>
-                          <%= doc.originalName || doc.fileName %>
-                        </span>
-                      </div>
-                      <a href="<%= docPath %>" target="_blank" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-eye"></i> عرض
-                      </a>
-                    </div>
-                    <% }); %>
+                  </div>
                 </div>
-              </div>
-              <% } %>
-                <% if (application.rejectionReason) { %>
-                  <!-- Rejection Reason -->
-                  <div class="card rejection-card">
-                    <h3><i class="fas fa-exclamation-triangle"></i> سبب الرفض</h3>
-                    <p>
-                      <%= application.rejectionReason %>
-                    </p>
+
+                <!-- Personal Data Card -->
+                <div class="card data-card">
+                  <h3><i class="fas fa-user-circle"></i> البيانات الشخصية</h3>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="label"><i class="fas fa-user"></i> الاسم</span>
+                      <span class="value">
+                        <%= user.firstNameAr %>
+                          <%= user.lastNameAr %>
+                      </span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label"><i class="fas fa-id-card"></i> الرقم القومي</span>
+                      <span class="value">
+                        <%= user.nationalId %>
+                      </span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label"><i class="fas fa-phone"></i> رقم الهاتف</span>
+                      <span class="value">
+                        <%= user.phone %>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Additional Data Card -->
+                <% if (applicationData && Object.keys(applicationData).length> 0) { %>
+                  <div class="card data-card">
+                    <h3><i class="fas fa-clipboard-list"></i> البيانات الإضافية</h3>
+                    <div class="info-grid">
+
+                      <% if (applicationData.unionCardNumber) { %>
+                        <div class="info-item">
+                          <span class="label"><i class="fas fa-id-badge"></i> رقم البطاقة النقابية</span>
+                          <span class="value">
+                            <%= applicationData.unionCardNumber %>
+                          </span>
+                        </div>
+                        <% } %>
+
+                          <% if (applicationData.marina) { %>
+                            <div class="info-item">
+                              <span class="label"><i class="fas fa-anchor"></i> المرسى</span>
+                              <span class="value">
+                                <%= applicationData.marina %>
+                              </span>
+                            </div>
+                            <% } %>
+
+                              <% if (applicationData.previousLicenseNumber) { %>
+                                <div class="info-item">
+                                  <span class="label"><i class="fas fa-file-contract"></i> رقم الرخصة السابقة</span>
+                                  <span class="value">
+                                    <%= applicationData.previousLicenseNumber %>
+                                  </span>
+                                </div>
+                                <% } %>
+
+                                  <% if (applicationData.boatNumber) { %>
+                                    <div class="info-item">
+                                      <span class="label"><i class="fas fa-hashtag"></i> رقم الصال</span>
+                                      <span class="value">
+                                        <%= applicationData.boatNumber %>
+                                      </span>
+                                    </div>
+                                    <% } %>
+
+                                      <% if (applicationData.boatRegistration) { %>
+                                        <div class="info-item">
+                                          <span class="label"><i class="fas fa-certificate"></i> رقم تسجيل المركب</span>
+                                          <span class="value">
+                                            <%= applicationData.boatRegistration %>
+                                          </span>
+                                        </div>
+                                        <% } %>
+
+                                          <% if (applicationData.boatLength) { %>
+                                            <div class="info-item">
+                                              <span class="label"><i class="fas fa-ruler-horizontal"></i> طول
+                                                المركب</span>
+                                              <span class="value">
+                                                <%= applicationData.boatLength %> متر
+                                              </span>
+                                            </div>
+                                            <% } %>
+
+                                              <% if (applicationData.enginePower) { %>
+                                                <div class="info-item">
+                                                  <span class="label"><i class="fas fa-tachometer-alt"></i> قوة
+                                                    المحرك</span>
+                                                  <span class="value">
+                                                    <%= applicationData.enginePower %> حصان
+                                                  </span>
+                                                </div>
+                                                <% } %>
+
+                                                  <% if (applicationData.plateNumber) { %>
+                                                    <div class="info-item">
+                                                      <span class="label"><i class="fas fa-car"></i> رقم لوحة
+                                                        السيارة</span>
+                                                      <span class="value">
+                                                        <%= applicationData.plateNumber %>
+                                                      </span>
+                                                    </div>
+                                                    <% } %>
+
+                                                      <% if (applicationData.vehicleModel) { %>
+                                                        <div class="info-item">
+                                                          <span class="label"><i class="fas fa-cogs"></i> موديل
+                                                            السيارة</span>
+                                                          <span class="value">
+                                                            <%= applicationData.vehicleModel %>
+                                                          </span>
+                                                        </div>
+                                                        <% } %>
+
+                                                          <% if (applicationData.previousBoatNumber) { %>
+                                                            <div class="info-item">
+                                                              <span class="label"><i class="fas fa-history"></i> رقم
+                                                                المركب
+                                                                السابق</span>
+                                                              <span class="value">
+                                                                <%= applicationData.previousBoatNumber %>
+                                                              </span>
+                                                            </div>
+                                                            <% } %>
+
+                    </div>
                   </div>
                   <% } %>
+
+                    <!-- Documents Card -->
+                    <% if (application.documents && application.documents.length> 0) { %>
+                      <div class="card documents-card full-width">
+                        <h3><i class="fas fa-folder-open"></i> المستندات المرفقة</h3>
+                        <div class="documents-list">
+                          <% application.documents.forEach(doc=> {
+                            let docPath = doc.filePath || '';
+                            docPath = docPath.replace(/\\/g, '/');
+                            if (docPath.startsWith('src/public/')) docPath = docPath.replace('src/public/', '/');
+                            else if (docPath.startsWith('public/')) docPath = docPath.replace('public/', '/');
+                            if (!docPath.startsWith('/')) docPath = '/' + docPath;
+                            if ((docPath === '/' || docPath === '') && doc.fileName) {
+                            docPath = '/uploads/' + doc.fileName;
+                            }
+                            const isPdf = doc.mimeType === 'application/pdf';
+                            %>
+                            <div class="document-item">
+                              <div class="doc-info">
+                                <i class="<%= isPdf ? 'fas fa-file-pdf' : 'fas fa-image' %>"></i>
+                                <span>
+                                  <%= doc.originalName || doc.fileName %>
+                                </span>
+                              </div>
+                              <a href="<%= docPath %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> <span>عرض</span>
+                              </a>
+                            </div>
+                            <% }); %>
+                        </div>
+                      </div>
+                      <% } %>
+
           </div>
 
           <!-- Payment Required Section -->
           <% if (application.status==='approved_payment_pending' ) { %>
             <div class="payment-required-card">
               <div class="payment-icon">
-                <i class="fas fa-money-bill-wave"></i>
+                <i class="fas fa-wallet"></i>
               </div>
               <div class="payment-info">
                 <h3>مطلوب دفع الرسوم</h3>
-                <p>تمت الموافقة على طلبك. يرجى دفع الرسوم المطلوبة لإنهاء الإجراءات.</p>
+                <p>تمت الموافقة على طلبك بنجاح! يرجى دفع الرسوم لإتمام الإجراءات</p>
+
                 <% if (application.paymentAmount) { %>
                   <div class="payment-amount">
                     <span class="amount">
@@ -401,601 +396,75 @@
 
                     <div class="bank-info"
                       style="margin-top: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; border: 1px solid #90caf9;">
-                      <p style="margin-bottom: 0.5rem; font-weight: 600; color: #1565c0; font-size: 0.9rem;">حساب جهاز
-                        مستقبل مصر للتنمية المستدامه للتحويل:</p>
-                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-                        <p
+                      <p style="margin-bottom: 0.5rem; font-weight: 600; color: #1565c0; font-size: 0.9rem;">
+                        <i class="fas fa-university"></i> حساب جهاز مستقبل مصر للتنمية المستدامة:
+                      </p>
+                      <div
+                        style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                        <p class="account-number"
                           style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #0d47a1; margin: 0; direction: ltr;">
-                          5170199000001735</p>
-                        <button onclick="navigator.clipboard.writeText('5170199000001735')"
+                          <%= bankAccount %>
+                        </p>
+                        <button class="copy-btn" onclick="copyAccountNumber('<%= bankAccount %>')"
                           style="background: white; border: 1px solid #bbdefb; border-radius: 4px; padding: 4px 8px; cursor: pointer; color: #1565c0;">
                           <i class="fas fa-copy"></i>
                         </button>
                       </div>
                     </div>
               </div>
+
               <div class="payment-actions">
-                <a href="/payment/<%= application.id %>" class="btn btn-pay">
-                  <i class="fas fa-upload"></i> رفع إيصال السداد
+                <a href="/payment/<%= application.id %>" class="btn-pay">
+                  <i class="fas fa-upload"></i>
+                  <span>رفع إيصال السداد</span>
                 </a>
-                <p class="payment-note">يرجى الدفع ورفع صورة الإيصال</p>
+                <p class="payment-note">
+                  <i class="fas fa-info-circle"></i>
+                  قم بالتحويل البنكي ثم ارفع صورة الإيصال
+                </p>
               </div>
             </div>
             <% } %>
 
-              <!-- Status Messages -->
-              <% if (application.status==='payment_verified' ) { %>
-                <div class="status-message success">
-                  <i class="fas fa-check-circle"></i>
-                  <p>تم استلام الدفع بنجاح! جاري إعداد الرخصة...</p>
-                </div>
-                <% } else if (application.status==='ready' ) { %>
-                  <div class="status-message ready">
-                    <i class="fas fa-gift"></i>
-                    <p>الرخصة جاهزة للاستلام. يرجى التوجه للمقر لاستلام رخصتك.</p>
-                  </div>
-                  <% } else if (application.status==='completed' ) { %>
-                    <div class="status-message completed">
-                      <i class="fas fa-trophy"></i>
-                      <p>تم تسليم الرخصة بنجاح. شكراً لاستخدامك منصتنا!</p>
-                    </div>
-                    <% } %>
 
-                      <div class="actions-bar">
-                        <a href="/dashboard" class="btn btn-outline-primary">
-                          <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
-                        </a>
-                      </div>
+
+              <!-- Action Buttons -->
+              <div class="actions-bar" style="justify-content: center; margin-top: 2rem;">
+                <a href="/dashboard" class="btn-secondary"
+                  style="border: 1px solid #1e3c72; color: #1e3c72; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+                  <i class="fas fa-arrow-right"></i>
+                  <span>العودة للوحة التحكم</span>
+                </a>
+              </div>
+
         </div>
       </div>
 
       <%- include('../partials/footer') %>
 
-        <style>
-          .details-page {
-            padding: 2rem 0;
-            min-height: calc(100vh - 200px);
-            background: #FAFAFA;
-          }
-
-          .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9375rem;
-            color: #757575;
-          }
-
-          .breadcrumb a {
-            color: #1e3c72;
-            text-decoration: none;
-          }
-
-          .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-          }
-
-          .header-info h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #212121;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-          }
-
-          .header-info h1 i {
-            color: #1e3c72;
-          }
-
-          .header-info p {
-            color: #757575;
-          }
-
-          .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-          }
-
-          .card {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          }
-
-          .card h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #212121;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-          }
-
-          .card h3 i {
-            color: #1e3c72;
-          }
-
-          .info-grid {
-            display: grid;
-            gap: 1rem;
-          }
-
-          .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
-          }
-
-          .info-item:last-child {
-            border-bottom: none;
-          }
-
-          .info-item .label {
-            color: #757575;
-          }
-
-          .info-item .value {
-            font-weight: 600;
-            color: #212121;
-          }
-
-          .timeline {
-            position: relative;
-            padding-right: 2rem;
-          }
-
-          .timeline::before {
-            content: '';
-            position: absolute;
-            right: 7px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e0e0e0;
-          }
-
-          .timeline-item {
-            position: relative;
-            padding-bottom: 1.5rem;
-          }
-
-          .timeline-dot {
-            position: absolute;
-            right: -2rem;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px #e0e0e0;
-          }
-
-          .timeline-item.active .timeline-dot {
-            background: #4CAF50;
-            box-shadow: 0 0 0 2px #4CAF50;
-          }
-
-          .timeline-date {
-            font-size: 0.875rem;
-            color: #757575;
-          }
-
-          .timeline-content p {
-            font-weight: 600;
-            color: #212121;
-            margin: 0.25rem 0 0 0;
-          }
-
-          .rejection-card {
-            grid-column: 1 / -1;
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
-          }
-
-          .rejection-card h3 {
-            color: #c62828;
-          }
-
-          .rejection-card h3 i {
-            color: #c62828;
-          }
-
-          .documents-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-
-          .document-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: #f5f5f5;
-            border-radius: 0.5rem;
-          }
-
-          .doc-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-          }
-
-          .document-item i {
-            color: #e53935;
-            font-size: 1.25rem;
-          }
-
-          .actions-bar {
-            display: flex;
-            gap: 1rem;
-          }
-
-          @media (max-width: 768px) {
-            .content-grid {
-              grid-template-columns: 1fr;
-            }
-
-            .page-header {
-              flex-direction: column;
-              align-items: flex-start;
-            }
-
-            .payment-required-card {
-              flex-direction: column;
-              text-align: center;
-            }
-          }
-
-          /* Payment Required Card */
-          .payment-required-card {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-            border: 2px solid #ffc107;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-          }
-
-          .payment-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-          }
-
-          .payment-icon i {
-            font-size: 2rem;
-            color: white;
-          }
-
-          .payment-info {
-            flex: 1;
-          }
-
-          .payment-info h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #e65100;
-            margin-bottom: 0.5rem;
-          }
-
-          .payment-info p {
-            color: #795548;
-            margin-bottom: 1rem;
-          }
-
-          .payment-amount {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-          }
-
-          .payment-amount .amount {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #e65100;
-          }
-
-          .payment-amount .currency {
-            font-size: 1rem;
-            color: #795548;
-          }
-
-          .payment-actions {
-            text-align: center;
-          }
-
-          .btn-pay {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%);
-            color: white;
-            font-size: 1.25rem;
-            font-weight: 700;
-            border-radius: 12px;
-            text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
-          }
-
-          .btn-pay:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
-          }
-
-          .payment-note {
-            margin-top: 0.75rem;
-            font-size: 0.875rem;
-            color: #795548;
-          }
-
-          /* Status Messages */
-          .status-message {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-          }
-
-          .status-message i {
-            font-size: 2rem;
-          }
-
-          .status-message p {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin: 0;
-          }
-
-          .status-message.success {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            border: 1px solid #4CAF50;
-          }
-
-          .status-message.success i,
-          .status-message.success p {
-            color: #2e7d32;
-          }
-
-          .status-message.ready {
-            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
-            border: 1px solid #00897b;
-          }
-
-          .status-message.ready i,
-          .status-message.ready p {
-            color: #00695c;
-          }
-
-          .status-message.completed {
-            background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
-            border: 1px solid #7e57c2;
-          }
-
-          .status-message.completed i,
-          .status-message.completed p {
-            color: #5e35b1;
-          }
-
-          /* Receipt Upload Styles */
-          .receipt-upload-card {
-            margin-top: 1.5rem;
-          }
-
-          .receipt-upload-card h3 {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #1e3c72;
-          }
-
-          .receipt-info {
-            color: #757575;
-            margin-bottom: 1rem;
-          }
-
-          .receipt-upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            background: #fafafa;
-          }
-
-          .receipt-upload-area:hover {
-            border-color: #1e3c72;
-            background: #f0f4ff;
-          }
-
-          .receipt-upload-area input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-          }
-
-          .receipt-upload-area .upload-icon {
-            font-size: 2.5rem;
-            color: #1e3c72;
-            margin-bottom: 0.5rem;
-          }
-
-          .receipt-upload-area .file-types {
-            font-size: 0.85rem;
-            color: #9e9e9e;
-          }
-
-          .receipt-preview {
-            margin: 1rem 0;
-          }
-
-          .receipt-preview img {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-          }
-
-          .upload-progress {
-            margin: 1rem 0;
-          }
-
-          .upload-progress.hidden {
-            display: none;
-          }
-
-          .progress-bar {
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-          }
-
-          .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #1e3c72, #2a5298);
-            width: 0%;
-            transition: width 0.3s;
-            animation: progressAnim 1.5s ease-in-out infinite;
-          }
-
-          @keyframes progressAnim {
-
-            0%,
-            100% {
-              width: 30%;
-              margin-left: 0;
-            }
-
-            50% {
-              width: 50%;
-              margin-left: 50%;
-            }
-          }
-
-          .progress-text {
-            font-size: 0.85rem;
-            color: #757575;
-            display: block;
-            margin-top: 0.5rem;
-          }
-
-          .receipt-uploaded {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: #e8f5e9;
-            border-radius: 8px;
-            color: #2e7d32;
-          }
-
-          .receipt-uploaded i {
-            font-size: 1.5rem;
-          }
-
-          #receiptUploadForm button {
-            margin-top: 1rem;
-          }
-        </style>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
         <script src="/js/main.js"></script>
         <script>
-          // Receipt upload handling
-          const receiptForm = document.getElementById('receiptUploadForm');
-          const receiptInput = document.getElementById('paymentReceiptInput');
-          const receiptPreview = document.getElementById('receiptPreview');
-          const uploadProgress = document.getElementById('uploadProgress');
-          const alertContainer = document.getElementById('receiptAlertContainer');
-          const uploadBtn = document.getElementById('uploadReceiptBtn');
+          // Copy account number function
+          function copyAccountNumber(accountNumber) {
+            if (!accountNumber) accountNumber = '5170199000001735';
+            navigator.clipboard.writeText(accountNumber).then(() => {
+              const btn = event.target.closest('.copy-btn');
+              const originalHTML = btn.innerHTML;
+              btn.innerHTML = '<i class="fas fa-check"></i>';
+              btn.style.background = '#4CAF50';
+              btn.style.color = 'white';
+              btn.style.borderColor = '#4CAF50';
 
-          if (receiptInput) {
-            receiptInput.addEventListener('change', function () {
-              if (this.files && this.files[0]) {
-                const file = this.files[0];
-                if (file.type.startsWith('image/')) {
-                  const reader = new FileReader();
-                  reader.onload = function (e) {
-                    receiptPreview.innerHTML = `<img src="${e.target.result}" alt="Receipt Preview">`;
-                  };
-                  reader.readAsDataURL(file);
-                } else {
-                  receiptPreview.innerHTML = `<p><i class="fas fa-file-pdf"></i> ${file.name}</p>`;
-                }
-              }
+              setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = 'white';
+                btn.style.color = '#1565c0';
+                btn.style.borderColor = '#bbdefb';
+              }, 2000);
+            }).catch(err => {
+              console.error('Failed to copy:', err);
             });
-          }
-
-          if (receiptForm) {
-            receiptForm.addEventListener('submit', async function (e) {
-              e.preventDefault();
-
-              if (!receiptInput.files || !receiptInput.files[0]) {
-                showReceiptAlert('يرجى اختيار ملف الإيصال', 'danger');
-                return;
-              }
-
-              const formData = new FormData();
-              formData.append('payment_receipt', receiptInput.files[0]);
-
-              uploadProgress.classList.remove('hidden');
-              uploadBtn.disabled = true;
-
-              try {
-                const response = await axios.post('/api/v1/applications/<%= application.id %>/payment-receipt', formData, {
-                  headers: { 'Content-Type': 'multipart/form-data' }
-                });
-
-                if (response.data.status === 'success') {
-                  showReceiptAlert('تم رفع الإيصال بنجاح! سيتم التحقق منه قريباً.', 'success');
-                  setTimeout(() => window.location.reload(), 2000);
-                }
-              } catch (err) {
-                showReceiptAlert(err.response?.data?.message || 'حدث خطأ أثناء رفع الإيصال', 'danger');
-              } finally {
-                uploadProgress.classList.add('hidden');
-                uploadBtn.disabled = false;
-              }
-            });
-          }
-
-          function showReceiptAlert(message, type) {
-            if (!alertContainer) return;
-            const icons = { success: 'check-circle', danger: 'exclamation-circle' };
-            alertContainer.innerHTML = `
-              <div class="alert alert-${type}" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; background: ${type === 'success' ? '#e8f5e9' : '#ffebee'}; color: ${type === 'success' ? '#2e7d32' : '#c62828'};">
-                <i class="fas fa-${icons[type]}"></i> ${message}
-              </div>
-            `;
           }
         </script>
 </body>

@@ -170,7 +170,7 @@ exports.getApplicationForReview = async applicationId => {
       {
         model: User,
         as: 'applicant',
-        attributes: ['id', 'nationalId', 'firstNameAr', 'lastNameAr', 'phone'],
+        attributes: ['id', 'nationalId', 'firstNameAr', 'lastNameAr', 'phone', 'profilePicture'],
       },
       {
         model: Document,

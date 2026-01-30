@@ -11,200 +11,375 @@
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" type="image/png" href="/imgs/logo.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+
   <style>
+    /* ============================================
+       ADMIN DESIGN SYSTEM
+       ============================================ */
+
+    :root {
+      /* Admin Colors */
+      --admin-primary: #1e3c72;
+      --admin-primary-light: #2a5298;
+      --admin-primary-dark: #152d5a;
+
+      --admin-secondary: #00897b;
+      --admin-secondary-light: #00a991;
+      --admin-secondary-dark: #00695c;
+
+      --admin-purple: #7b1fa2;
+      --admin-purple-light: #9c27b0;
+
+      /* Status Colors */
+      --status-pending: #ff9800;
+      --status-review: #2196f3;
+      --status-success: #4caf50;
+      --status-error: #f44336;
+      --status-info: #00bcd4;
+      --status-warning: #ff9800;
+
+      /* Neutrals */
+      --gray-50: #fafafa;
+      --gray-100: #f5f5f5;
+      --gray-200: #eeeeee;
+      --gray-300: #e0e0e0;
+      --gray-400: #bdbdbd;
+      --gray-500: #9e9e9e;
+      --gray-600: #757575;
+      --gray-700: #616161;
+      --gray-800: #424242;
+      --gray-900: #212121;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.16);
+
+      /* Border Radius */
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 0.75rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+
+      /* Transitions */
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================
+       BASE LAYOUT
+       ============================================ */
+
     .admin-detail-page {
-      padding: 2rem 0;
       min-height: calc(100vh - 200px);
-      background: #f5f7fa;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8ebf0 100%);
+      padding: var(--spacing-2xl) 0;
     }
 
-    .detail-grid {
+    /* ============================================
+       HEADER & BREADCRUMB
+       ============================================ */
+
+    .page-header-section {
+      margin-bottom: var(--spacing-xl);
+      background: white;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .breadcrumb-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      font-size: 0.9375rem;
+    }
+
+    .breadcrumb-nav a {
+      color: var(--admin-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+    }
+
+    .breadcrumb-nav a:hover {
+      background: var(--gray-100);
+      color: var(--admin-primary-dark);
+    }
+
+    .breadcrumb-separator {
+      color: var(--gray-400);
+    }
+
+    .breadcrumb-current {
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: white;
+      color: var(--admin-primary);
+      border: 2px solid var(--admin-primary);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+
+    .back-button:hover {
+      background: var(--admin-primary);
+      color: white;
+      transform: translateX(4px);
+    }
+
+    /* ============================================
+       GRID LAYOUT
+       ============================================ */
+
+    .admin-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
+      grid-template-columns: 1fr 420px;
+      gap: var(--spacing-xl);
     }
 
-    @media (max-width: 768px) {
-      .detail-grid {
+    @media (max-width: 1200px) {
+      .admin-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    .detail-card {
+    /* ============================================
+       MODERN CARDS
+       ============================================ */
+
+    .admin-card {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-lg);
+      transition: all var(--transition);
+      border: 1px solid var(--gray-200);
     }
 
-    .detail-card-header {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    .admin-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .admin-card-header {
+      padding: var(--spacing-lg);
+      background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-light) 100%);
       color: white;
-      padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 3px solid rgba(255, 255, 255, 0.2);
     }
 
-    .detail-card-header h2 {
-      font-size: 1.125rem;
-      font-weight: 600;
+    .admin-card-header.secondary {
+      background: linear-gradient(135deg, var(--admin-secondary) 0%, var(--admin-secondary-light) 100%);
     }
 
-    .detail-card-body {
-      padding: 1.5rem;
+    .admin-card-header.purple {
+      background: linear-gradient(135deg, var(--admin-purple) 0%, var(--admin-purple-light) 100%);
     }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
+    .admin-card-header.dark {
+      background: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
     }
 
-    .info-item label {
-      display: block;
-      color: #757575;
-      font-size: 0.875rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .info-item p {
-      font-weight: 600;
-      color: #212121;
-    }
-
-    .status-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .status-badge.pending {
-      background: #fff3e0;
-      color: #f57c00;
-    }
-
-    .status-badge.review {
-      background: #e3f2fd;
-      color: #1976d2;
-    }
-
-    .status-badge.payment {
-      background: #fce4ec;
-      color: #c2185b;
-    }
-
-    .status-badge.verified {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .status-badge.ready {
-      background: #e0f2f1;
-      color: #00796b;
-    }
-
-    .status-badge.completed {
-      background: #c8e6c9;
-      color: #1b5e20;
-    }
-
-    .status-badge.rejected {
-      background: #ffebee;
-      color: #c62828;
-    }
-
-    .docs-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .doc-item {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 0.5rem;
-    }
-
-    .doc-item img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .doc-item p {
-      font-size: 0.75rem;
-      color: #757575;
-      margin-top: 0.5rem;
-      font-weight: 600;
-    }
-
-    .history-item {
+    .card-header-title {
       display: flex;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
     }
 
-    .history-dot {
-      width: 10px;
-      height: 10px;
-      background: #1e3c72;
-      border-radius: 50%;
-      margin-top: 5px;
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .action-btn.primary {
-      background: #1e3c72;
-      color: white;
-    }
-
-    .action-btn.success {
-      background: #4caf50;
-      color: white;
-    }
-
-    .action-btn.danger {
-      background: #f44336;
-      color: white;
-    }
-
-    .action-btn.outline {
-      background: white;
-      border: 1px solid #e0e0e0;
-      color: #424242;
-    }
-
-    .action-btn:hover {
+    .card-header-title i {
+      font-size: 1.25rem;
       opacity: 0.9;
     }
 
-    .applicant-card {
+    .admin-card-body {
+      padding: var(--spacing-xl);
+    }
+
+    /* ============================================
+       INFO GRID
+       ============================================ */
+
+    .modern-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+    }
+
+    .info-field {
+      padding: var(--spacing-md);
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--admin-primary);
+      transition: all var(--transition);
+    }
+
+    .info-field:hover {
+      background: var(--gray-100);
+      border-left-color: var(--admin-secondary);
+      transform: translateX(-2px);
+    }
+
+    .info-field.highlight {
+      background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+      border-left-color: var(--status-warning);
+    }
+
+    .info-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .info-field label {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray-600);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-field label i {
+      color: var(--admin-primary);
+      font-size: 0.875rem;
+    }
+
+    .info-field p {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0;
+    }
+
+    .info-field p.amount {
+      font-size: 1.5rem;
+      color: var(--admin-secondary);
+      font-weight: 900;
+    }
+
+    .info-field p.rejected {
+      color: var(--status-error);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ============================================
+       STATUS BADGES
+       ============================================ */
+
+    .modern-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: 2rem;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .modern-status-badge.pending {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      color: #e65100;
+      border: 2px solid #ffb74d;
+    }
+
+    .modern-status-badge.review {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      color: #0d47a1;
+      border: 2px solid #64b5f6;
+    }
+
+    .modern-status-badge.payment {
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      color: #880e4f;
+      border: 2px solid #f48fb1;
+    }
+
+    .modern-status-badge.verified {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #1b5e20;
+      border: 2px solid #81c784;
+    }
+
+    .modern-status-badge.ready {
+      background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+      color: #004d40;
+      border: 2px solid #4db6ac;
+    }
+
+    .modern-status-badge.completed {
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      color: #4a148c;
+      border: 2px solid #ba68c8;
+    }
+
+    .modern-status-badge.rejected {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      color: #b71c1c;
+      border: 2px solid #e57373;
+    }
+
+    /* ============================================
+       APPLICANT CARD
+       ============================================ */
+
+    .applicant-profile {
       text-align: center;
     }
 
-    .applicant-avatar {
-      width: 80px;
-      height: 80px;
+    .applicant-avatar-wrapper {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto var(--spacing-lg);
       border-radius: 50%;
-      background: #e0e0e0;
-      margin: 0 auto 1rem;
+      padding: 4px;
+      background: linear-gradient(135deg, var(--admin-secondary) 0%, var(--admin-secondary-light) 100%);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .applicant-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--gray-200);
       overflow: hidden;
+      border: 4px solid white;
     }
 
     .applicant-avatar img {
@@ -213,47 +388,594 @@
       object-fit: cover;
     }
 
+    .applicant-name {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .contact-info-grid {
+      display: grid;
+      gap: var(--spacing-sm);
+      text-align: right;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md);
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      transition: all var(--transition);
+    }
+
+    .contact-info-item:hover {
+      background: var(--gray-100);
+      transform: translateX(-2px);
+    }
+
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .contact-icon.primary {
+      background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-light) 100%);
+      color: white;
+    }
+
+    .contact-icon.secondary {
+      background: linear-gradient(135deg, var(--admin-secondary) 0%, var(--admin-secondary-light) 100%);
+      color: white;
+    }
+
+    .contact-icon.danger {
+      background: linear-gradient(135deg, #e53935 0%, #d32f2f 100%);
+      color: white;
+    }
+
+    .contact-icon.warning {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      color: white;
+    }
+
+    .contact-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 2px;
+      font-weight: 500;
+    }
+
+    .contact-value {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      word-break: break-word;
+    }
+
+    /* ============================================
+       LICENSE HOLDER INFO
+       ============================================ */
+
+    .license-holder-grid {
+      display: grid;
+      gap: var(--spacing-sm);
+    }
+
+    .license-holder-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-lg);
+      background: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
+      border-radius: var(--radius-md);
+      border: 2px solid #ce93d8;
+      transition: all var(--transition);
+    }
+
+    .license-holder-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .license-holder-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--admin-purple) 0%, var(--admin-purple-light) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .license-holder-content {
+      flex: 1;
+    }
+
+    .license-holder-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .license-holder-value {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: var(--gray-900);
+    }
+
+    /* ============================================
+       DOCUMENTS GRID
+       ============================================ */
+
+    .documents-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+    }
+
+    .document-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+      cursor: pointer;
+      background: var(--gray-100);
+    }
+
+    .document-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .document-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .document-placeholder {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-300) 100%);
+    }
+
+    .document-placeholder i {
+      font-size: 3rem;
+      color: var(--gray-500);
+    }
+
+    .document-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--spacing-sm);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      color: white;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .no-documents {
+      text-align: center;
+      padding: var(--spacing-2xl);
+      color: var(--gray-500);
+    }
+
+    .no-documents i {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-md);
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       STATUS HISTORY
+       ============================================ */
+
+    .history-timeline {
+      position: relative;
+      padding-right: var(--spacing-xl);
+    }
+
+    .history-timeline::before {
+      content: '';
+      position: absolute;
+      right: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--gray-300);
+    }
+
+    .history-entry {
+      position: relative;
+      padding-bottom: var(--spacing-lg);
+      padding-right: var(--spacing-xl);
+    }
+
+    .history-entry:last-child {
+      padding-bottom: 0;
+    }
+
+    .history-dot {
+      position: absolute;
+      right: 0;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--admin-primary);
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px var(--admin-primary);
+    }
+
+    .history-content {
+      background: var(--gray-50);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      border-right: 3px solid var(--admin-primary);
+    }
+
+    .history-status-change {
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-xs);
+      font-size: 0.9375rem;
+    }
+
+    .history-notes {
+      color: var(--gray-700);
+      font-size: 0.875rem;
+      margin: var(--spacing-xs) 0;
+      line-height: 1.6;
+    }
+
+    .history-meta {
+      color: var(--gray-500);
+      font-size: 0.75rem;
+      margin-top: var(--spacing-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .history-meta i {
+      font-size: 0.625rem;
+    }
+
+    /* ============================================
+       ACTION BUTTONS
+       ============================================ */
+
+    .actions-section {
+      margin-top: var(--spacing-lg);
+    }
+
+    .actions-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      margin-bottom: var(--spacing-md);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .action-button {
+      width: 100%;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-bottom: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .action-button:active {
+      transform: translateY(0);
+    }
+
+    .action-button.primary {
+      background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-light) 100%);
+      color: white;
+    }
+
+    .action-button.success {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+      color: white;
+    }
+
+    .action-button.danger {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      color: white;
+    }
+
+    .action-button.outline {
+      background: white;
+      border: 2px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    .action-button.outline:hover {
+      border-color: var(--admin-primary);
+      color: var(--admin-primary);
+    }
+
+    /* ============================================
+       NOTICE BOXES
+       ============================================ */
+
+    .notice-box {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .notice-box i {
+      font-size: 1.125rem;
+    }
+
+    .notice-box.warning {
+      background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+      color: #e65100;
+      border: 2px solid #ffb74d;
+    }
+
+    .notice-box.success {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #1b5e20;
+      border: 2px solid #81c784;
+    }
+
+    .notice-box.error {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      color: #b71c1c;
+      border: 2px solid #e57373;
+    }
+
+    /* ============================================
+       PAYMENT DISPLAY
+       ============================================ */
+
+    .payment-display {
+      text-align: center;
+      padding: var(--spacing-xl);
+      background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+      border-radius: var(--radius-lg);
+      border: 3px solid var(--admin-secondary);
+    }
+
+    .payment-label {
+      font-size: 0.875rem;
+      color: var(--gray-700);
+      margin-bottom: var(--spacing-sm);
+      font-weight: 600;
+    }
+
+    .payment-amount {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--admin-secondary);
+      line-height: 1;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .payment-currency {
+      font-size: 1.125rem;
+      color: var(--gray-700);
+    }
+
+    /* ============================================
+       MODAL
+       ============================================ */
+
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
     }
 
-    .modal {
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
       background: white;
-      border-radius: 16px;
-      padding: 1.5rem;
-      max-width: 400px;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      max-width: 500px;
       width: 90%;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlideIn 0.3s ease;
     }
 
-    .notice-box {
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .notice-box.warning {
-      background: #fff8e1;
-      color: #f57c00;
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-lg);
     }
 
-    .notice-box.success {
-      background: #e8f5e9;
-      color: #2e7d32;
+    .modal-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--status-error) 0%, #d32f2f 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
     }
 
-    .notice-box.error {
-      background: #ffebee;
-      color: #c62828;
+    .modal-title {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin: 0;
+    }
+
+    .modal-body {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .modal-textarea {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 2px solid var(--gray-300);
+      border-radius: var(--radius-md);
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.9375rem;
+      resize: vertical;
+      transition: all var(--transition);
+    }
+
+    .modal-textarea:focus {
+      outline: none;
+      border-color: var(--admin-primary);
+      box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 1rem;
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, var(--status-error) 0%, #d32f2f 100%);
+      color: white;
+    }
+
+    .modal-btn.cancel {
+      background: white;
+      border: 2px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+       ============================================ */
+
+    @media (max-width: 768px) {
+      .admin-detail-page {
+        padding: var(--spacing-lg) 0;
+      }
+
+      .page-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--spacing-md);
+      }
+
+      .admin-grid {
+        gap: var(--spacing-md);
+      }
+
+      .modern-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .documents-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-card-body {
+        padding: var(--spacing-md);
+      }
+
+      .contact-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .payment-amount {
+        font-size: 2rem;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: var(--spacing-lg);
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -264,28 +986,44 @@
 
       <div class="admin-detail-page">
         <div class="container">
-          <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; gap: 0.5rem; color: #757575; font-size: 0.875rem;">
-              <a href="/admin-dashboard" style="color: #1e3c72;">لوحة الإدارة</a>
-              <span>/</span>
-              <span style="color: #212121; font-weight: 600;">تفاصيل الطلب #<%= application.applicationNumber %></span>
+
+          <!-- Header Section -->
+          <div class="page-header-section">
+            <div class="breadcrumb-nav">
+              <a href="/admin-dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>لوحة الإدارة</span>
+              </a>
+              <span class="breadcrumb-separator">/</span>
+              <span class="breadcrumb-current">تفاصيل الطلب #<%= application.applicationNumber %></span>
             </div>
-            <a href="/admin/applications" class="btn btn-outline-secondary">
-              <i class="fas fa-arrow-right"></i> عودة للقائمة
+            <a href="/admin/applications" class="back-button">
+              <i class="fas fa-arrow-right"></i>
+              <span>عودة للقائمة</span>
             </a>
           </div>
 
-          <div class="detail-grid">
-            <div>
-              <div class="detail-card">
-                <div class="detail-card-header">
-                  <h2><i class="fas fa-file-alt"></i> بيانات الطلب</h2>
+          <!-- Main Grid -->
+          <div class="admin-grid">
+
+            <!-- Left Column -->
+            <div class="left-column">
+
+              <!-- Application Data Card -->
+              <div class="admin-card">
+                <div class="admin-card-header">
+                  <h2 class="card-header-title">
+                    <i class="fas fa-file-invoice"></i>
+                    بيانات الطلب
+                  </h2>
                   <%- include('../partials/status-badge', { status: application.status, statusInfo:
                     application.statusInfo }) %>
                 </div>
-                <div class="detail-card-body">
-                  <div class="info-grid">
-                    <div class="info-item"><label>نوع الترخيص</label>
+                <div class="admin-card-body">
+                  <div class="modern-info-grid">
+
+                    <div class="info-field">
+                      <label><i class="fas fa-tag"></i> نوع الترخيص</label>
                       <p>
                         <%= application.applicationType==='fisherman' ? 'صياد' : application.applicationType==='boat'
                           ? 'مركب' : application.applicationType==='vehicle' ? 'سيارة' :
@@ -294,427 +1032,586 @@
                           %>
                       </p>
                     </div>
-                    <div class="info-item"><label>الفئة</label>
+
+                    <div class="info-field">
+                      <label><i class="fas fa-layer-group"></i> الفئة</label>
                       <p>
                         <%= application.licenseCategory %>
                       </p>
                     </div>
-                    <div class="info-item"><label>تاريخ التقديم</label>
+
+                    <div class="info-field">
+                      <label><i class="far fa-calendar-alt"></i> تاريخ التقديم</label>
                       <p>
                         <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %>
                       </p>
                     </div>
-                    <div class="info-item"><label>رقم أمر التوريد</label>
+
+                    <div class="info-field">
+                      <label><i class="fas fa-receipt"></i> رقم أمر التوريد</label>
                       <p>
                         <%= application.supplyOrderId || '-' %>
                       </p>
                     </div>
+
                     <% if (application.paymentAmount) { %>
-                      <div class="info-item"><label>المبلغ المطلوب</label>
-                        <p style="color: #00796b; font-size: 1.25rem;">
+                      <div class="info-field highlight">
+                        <label><i class="fas fa-coins"></i> المبلغ المطلوب</label>
+                        <p class="amount">
                           <%= application.paymentAmount %> ج.م
                         </p>
                       </div>
                       <% } %>
-                        <div class="info-item"><label>تمت المراجعة بواسطة</label>
+
+                        <div class="info-field">
+                          <label><i class="fas fa-user-check"></i> المراجع</label>
                           <p>
                             <%= application.reviewer ? (application.reviewer.firstNameAr + ' ' +
                               application.reviewer.lastNameAr) : '-' %>
                           </p>
                         </div>
+
                         <% if (application.paymentVerifier) { %>
-                          <div class="info-item"><label>المحقق المالي</label>
-                            <p style="color: #2e7d32;">
+                          <div class="info-field">
+                            <label><i class="fas fa-money-check-alt"></i> المحقق المالي</label>
+                            <p style="color: var(--admin-secondary);">
                               <%= application.paymentVerifier.firstNameAr + ' ' + application.paymentVerifier.lastNameAr
                                 %>
                             </p>
                           </div>
                           <% } %>
+
                             <% if (application.rejectionReason) { %>
-                              <div class="info-item" style="grid-column: span 2;"><label>سبب الرفض</label>
-                                <p style="color: #c62828;">
+                              <div class="info-field full-width">
+                                <label><i class="fas fa-exclamation-circle"></i> سبب الرفض</label>
+                                <p class="rejected">
                                   <%= application.rejectionReason %>
                                 </p>
                               </div>
                               <% } %>
+
                   </div>
                 </div>
               </div>
 
-              <div class="detail-card">
-                <div class="detail-card-header" style="background: #424242;">
-                  <h2><i class="fas fa-paperclip"></i> المرفقات</h2>
+              <!-- Documents Card -->
+              <div class="admin-card">
+                <div class="admin-card-header dark">
+                  <h2 class="card-header-title">
+                    <i class="fas fa-folder-open"></i>
+                    المرفقات
+                  </h2>
                 </div>
-                <div class="detail-card-body">
+                <div class="admin-card-body">
                   <% if (application.documents && application.documents.length> 0) { %>
-                    <div class="docs-grid">
+                    <div class="documents-grid">
                       <% application.documents.forEach(doc=> {
                         let docPath = doc.filePath || '';
-                        // Normalize path separators
                         docPath = docPath.replace(/\\/g, '/');
-
-                        // Handle path prefix
-                        if (docPath.startsWith('src/public/')) {
-                        docPath = docPath.replace('src/public/', '/');
-                        } else if (docPath.startsWith('public/')) {
-                        docPath = docPath.replace('public/', '/');
-                        }
-
-                        // Ensure it starts with /
-                        if (!docPath.startsWith('/')) {
-                        docPath = '/' + docPath;
-                        }
-
-                        // Fallback logic if path seems empty or invalid
-                        if (docPath === '/' && doc.fileName) {
-                        docPath = '/uploads/' + doc.fileName;
-                        }
-
+                        if (docPath.startsWith('src/public/')) docPath = docPath.replace('src/public/', '/');
+                        else if (docPath.startsWith('public/')) docPath = docPath.replace('public/', '/');
+                        if (!docPath.startsWith('/')) docPath = '/' + docPath;
+                        if (docPath === '/' && doc.fileName) docPath = '/uploads/' + doc.fileName;
                         const isImage = docPath.match(/\.(jpg|jpeg|png|gif)$/i);
                         %>
-                        <div class="doc-item">
+                        <div class="document-card" onclick="window.open('<%= docPath %>')">
                           <% if (isImage) { %>
-                            <img src="<%= docPath %>" onclick="window.open(this.src)" alt="<%= doc.documentType %>">
+                            <img src="<%= docPath %>" alt="<%= doc.documentType %>" class="document-image">
                             <% } else { %>
-                              <a href="<%= docPath %>" target="_blank"
-                                style="display: flex; align-items: center; justify-content: center; height: 150px; background: #f5f5f5; border-radius: 4px;">
-                                <i class="fas fa-file" style="font-size: 3rem; color: #9e9e9e;"></i>
-                              </a>
+                              <div class="document-placeholder">
+                                <i class="fas fa-file-pdf"></i>
+                              </div>
                               <% } %>
-                                <p>
+                                <div class="document-label">
                                   <%= doc.documentType %>
-                                </p>
+                                </div>
                         </div>
-                        <% }) %>
+                        <% }); %>
                     </div>
                     <% } else { %>
-                      <p style="text-align: center; color: #9e9e9e; padding: 2rem;">لا توجد مرفقات</p>
+                      <div class="no-documents">
+                        <i class="fas fa-folder-open"></i>
+                        <p>لا توجد مرفقات</p>
+                      </div>
                       <% } %>
                 </div>
               </div>
 
-              <div class="detail-card">
-                <div class="detail-card-header" style="background: #616161;">
-                  <h2><i class="fas fa-history"></i> سجل الحالة</h2>
+              <!-- Status History Card -->
+              <div class="admin-card">
+                <div class="admin-card-header dark">
+                  <h2 class="card-header-title">
+                    <i class="fas fa-history"></i>
+                    سجل الحالة
+                  </h2>
                 </div>
-                <div class="detail-card-body">
-                  <% if (application.statusHistory && application.statusHistory.length> 0) { %>
-                    <% application.statusHistory.forEach(history=> { %>
-                      <div class="history-item">
-                        <div class="history-dot"></div>
-                        <div>
-                          <p style="font-weight: 600;">
-                            <%= history.oldStatus || 'جديد' %> → <%= history.newStatus %>
-                          </p>
-                          <% if (history.notes) { %>
-                            <p style="color: #757575; font-size: 0.875rem;">
-                              <%= history.notes %>
-                            </p>
-                            <% } %>
-                              <p style="color: #9e9e9e; font-size: 0.75rem; margin-top: 0.25rem;">
-                                <%= new Date(history.changedAt).toLocaleString('ar-EG') %>
-                                  <% if (history.changedByUser) { %> - بواسطة <%= history.changedByUser.firstNameAr %>
-                                      <%= history.changedByUser.lastNameAr %>
-                                        <% } %>
-                              </p>
+                <div class="admin-card-body">
+                  <% if (application.statusHistory && application.statusHistory.length> 0) {
+                    const statusMap = {
+                    'received': 'تم الاستلام',
+                    'under_review': 'قيد المراجعة',
+                    'approved_payment_pending': 'موافقة (بانتظار الدفع)',
+                    'approved_payment_required': 'موافقة (مطلوب الدفع)',
+                    'payment_verified': 'تم التحقق من الدفع',
+                    'ready': 'جاهزة للاستلام',
+                    'completed': 'مكتملة',
+                    'rejected': 'مرفوضة',
+                    'payment_submitted': 'تم سداد الرسوم'
+                    };
+                    %>
+                    <div class="history-timeline">
+                      <% application.statusHistory.forEach(history=> {
+                        const oldStatusText = statusMap[history.oldStatus] || history.oldStatus || 'جديد';
+                        const newStatusText = statusMap[history.newStatus] || history.newStatus;
+                        %>
+                        <div class="history-entry">
+                          <div class="history-dot"></div>
+                          <div class="history-content">
+                            <div class="history-status-change">
+                              <%= oldStatusText %> <i class="fas fa-arrow-left"
+                                  style="font-size: 0.8em; margin: 0 5px;"></i>
+                                <%= newStatusText %>
+                            </div>
+                            <% if (history.notes) { %>
+                              <div class="history-notes">
+                                <%= history.notes %>
+                              </div>
+                              <% } %>
+                                <div class="history-meta">
+                                  <i class="fas fa-clock"></i>
+                                  <span>
+                                    <%= new Date(history.changedAt).toLocaleString('ar-EG') %>
+                                  </span>
+                                  <% if (history.changedByUser) { %>
+                                    <span>•</span>
+                                    <span>
+                                      <%= history.changedByUser.firstNameAr %>
+                                        <%= history.changedByUser.lastNameAr %>
+                                    </span>
+                                    <% } %>
+                                </div>
+                          </div>
                         </div>
+                        <% }); %>
+                    </div>
+                    <% } else { %>
+                      <div class="no-documents">
+                        <i class="fas fa-history"></i>
+                        <p>لا يوجد سجل حالة</p>
                       </div>
-                      <% }) %>
-                        <% } else { %>
-                          <p style="text-align: center; color: #9e9e9e;">لا يوجد سجل حالة</p>
-                          <% } %>
+                      <% } %>
                 </div>
               </div>
+
             </div>
 
-            <div>
-              <!-- Applicant Information -->
-              <div class="detail-card applicant-card">
-                <div class="detail-card-header" style="background: linear-gradient(135deg, #00897b 0%, #00695c 100%);">
-                  <h2><i class="fas fa-user"></i> بيانات مقدم الطلب</h2>
+            <!-- Right Column -->
+            <div class="right-column">
+
+              <!-- Applicant Card -->
+              <div class="admin-card applicant-profile">
+                <div class="admin-card-header secondary">
+                  <h2 class="card-header-title">
+                    <i class="fas fa-user-circle"></i>
+                    مقدم الطلب
+                  </h2>
                 </div>
-                <div class="detail-card-body">
-                  <div class="applicant-avatar">
-                    <% let avatarPath=application.applicant?.profilePicture; if (avatarPath) {
-                      avatarPath=avatarPath.replace(/\\/g, '/' ); if (avatarPath.startsWith('src/public/'))
-                      avatarPath=avatarPath.replace('src/public/', '/' ); else if (avatarPath.startsWith('public/'))
-                      avatarPath=avatarPath.replace('public/', '/' ); if (!avatarPath.startsWith('/') &&
-                      !avatarPath.startsWith('http')) avatarPath='/' + avatarPath; } const avatarSrc=avatarPath
-                      || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(application.applicant?.firstNameAr
-                      || 'User' ) + '&background=1e3c72&color=fff' ; %>
-                      <img src="<%= avatarSrc %>">
+                <div class="admin-card-body">
+                  <div class="applicant-avatar-wrapper">
+                    <div class="applicant-avatar">
+                      <% let avatarPath=application.applicant?.profilePicture; if (avatarPath) {
+                        avatarPath=avatarPath.replace(/\\/g, '/' ); if (avatarPath.startsWith('src/public/'))
+                        avatarPath=avatarPath.replace('src/public/', '/' ); else if (avatarPath.startsWith('public/'))
+                        avatarPath=avatarPath.replace('public/', '/' ); if (!avatarPath.startsWith('/') &&
+                        !avatarPath.startsWith('http')) avatarPath='/' + avatarPath; } const avatarSrc=avatarPath
+                        || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(application.applicant?.firstNameAr
+                        || 'User' ) + '&background=00897b&color=fff&size=200' ; %>
+                        <img src="<%= avatarSrc %>" alt="صورة المستخدم">
+                    </div>
                   </div>
-                  <h3 style="font-weight: 700; margin-bottom: 0.5rem; font-size: 1.25rem;">
+
+                  <h3 class="applicant-name">
                     <%= application.applicant?.firstNameAr %>
                       <%= application.applicant?.lastNameAr %>
                   </h3>
-                  <div style="display: grid; gap: 0.75rem; margin-top: 1rem; text-align: right;">
-                    <div
-                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 8px;">
-                      <i class="fas fa-id-card" style="color: #1e3c72;"></i>
-                      <span style="color: #757575; font-size: 0.875rem;">الرقم القومي:</span>
-                      <strong>
-                        <%= application.applicant?.nationalId %>
-                      </strong>
+
+                  <div class="contact-info-grid">
+                    <div class="contact-info-item">
+                      <div class="contact-icon primary">
+                        <i class="fas fa-id-card"></i>
+                      </div>
+                      <div class="contact-details">
+                        <span class="contact-label">الرقم القومي</span>
+                        <span class="contact-value">
+                          <%= application.applicant?.nationalId %>
+                        </span>
+                      </div>
                     </div>
-                    <div
-                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 8px;">
-                      <i class="fas fa-phone" style="color: #00897b;"></i>
-                      <span style="color: #757575; font-size: 0.875rem;">الهاتف:</span>
-                      <strong>
-                        <%= application.applicant?.phone %>
-                      </strong>
+
+                    <div class="contact-info-item">
+                      <div class="contact-icon secondary">
+                        <i class="fas fa-phone"></i>
+                      </div>
+                      <div class="contact-details">
+                        <span class="contact-label">الهاتف</span>
+                        <span class="contact-value">
+                          <%= application.applicant?.phone %>
+                        </span>
+                      </div>
                     </div>
+
                     <% if (application.applicant?.email) { %>
-                      <div
-                        style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 8px;">
-                        <i class="fas fa-envelope" style="color: #e53935;"></i>
-                        <span style="color: #757575; font-size: 0.875rem;">البريد:</span>
-                        <strong>
-                          <%= application.applicant?.email %>
-                        </strong>
+                      <div class="contact-info-item">
+                        <div class="contact-icon danger">
+                          <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                          <span class="contact-label">البريد الإلكتروني</span>
+                          <span class="contact-value">
+                            <%= application.applicant?.email %>
+                          </span>
+                        </div>
                       </div>
                       <% } %>
+
                         <% if (application.applicant?.address) { %>
-                          <div
-                            style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #f5f5f5; border-radius: 8px;">
-                            <i class="fas fa-map-marker-alt" style="color: #ff9800;"></i>
-                            <span style="color: #757575; font-size: 0.875rem;">العنوان:</span>
-                            <strong>
-                              <%= application.applicant?.address %>
-                            </strong>
+                          <div class="contact-info-item">
+                            <div class="contact-icon warning">
+                              <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                              <span class="contact-label">العنوان</span>
+                              <span class="contact-value">
+                                <%= application.applicant?.address %>
+                              </span>
+                            </div>
                           </div>
                           <% } %>
                   </div>
                 </div>
               </div>
 
-              <!-- License Holder Information -->
-              <div class="detail-card" style="margin-top: 1rem;">
-                <div class="detail-card-header" style="background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);">
-                  <h2><i class="fas fa-id-badge"></i> صاحب الرخصة</h2>
+              <!-- License Holder Card -->
+              <div class="admin-card">
+                <div class="admin-card-header purple">
+                  <h2 class="card-header-title">
+                    <i class="fas fa-id-badge"></i>
+                    صاحب الرخصة
+                  </h2>
                 </div>
-                <div class="detail-card-body">
-                  <div style="display: grid; gap: 0.75rem;">
-                    <div
-                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #f3e5f5; border-radius: 8px;">
-                      <i class="fas fa-user" style="color: #7b1fa2; font-size: 1.25rem;"></i>
-                      <div>
-                        <span style="color: #757575; font-size: 0.75rem; display: block;">اسم صاحب الرخصة</span>
-                        <strong style="font-size: 1.125rem;">
+                <div class="admin-card-body">
+                  <div class="license-holder-grid">
+                    <div class="license-holder-item">
+                      <div class="license-holder-icon">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <div class="license-holder-content">
+                        <span class="license-holder-label">اسم صاحب الرخصة</span>
+                        <span class="license-holder-value">
                           <%= application.licenseHolderName || 'غير محدد' %>
-                        </strong>
+                        </span>
                       </div>
                     </div>
-                    <div
-                      style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #f3e5f5; border-radius: 8px;">
-                      <i class="fas fa-id-card" style="color: #7b1fa2; font-size: 1.25rem;"></i>
-                      <div>
-                        <span style="color: #757575; font-size: 0.75rem; display: block;">الرقم القومي لصاحب
-                          الرخصة</span>
-                        <strong style="font-family: monospace;">
+
+                    <div class="license-holder-item">
+                      <div class="license-holder-icon">
+                        <i class="fas fa-id-card"></i>
+                      </div>
+                      <div class="license-holder-content">
+                        <span class="license-holder-label">الرقم القومي</span>
+                        <span class="license-holder-value">
                           <%= application.licenseHolderNationalId || 'غير محدد' %>
-                        </strong>
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Application Data Card -->
+              <!-- License Data Card -->
               <% const appData=application.data ? (typeof application.data==='string' ? JSON.parse(application.data) :
                 application.data) : {}; const hasData=Object.keys(appData).length> 0;
                 %>
                 <% if (hasData) { %>
-                  <div class="detail-card" style="margin-top: 1rem;">
-                    <div class="detail-card-header" style="background: #37474f;">
-                      <h2><i class="fas fa-clipboard-list"></i> بيانات الترخيص</h2>
+                  <div class="admin-card">
+                    <div class="admin-card-header dark">
+                      <h2 class="card-header-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        بيانات الترخيص
+                      </h2>
                     </div>
-                    <div class="detail-card-body">
-                      <div class="info-grid">
+                    <div class="admin-card-body">
+                      <div class="modern-info-grid">
+
                         <% if (appData.marina) { %>
-                          <div class="info-item"><label>المرسى</label>
+                          <div class="info-field">
+                            <label><i class="fas fa-anchor"></i> المرسى</label>
                             <p>
                               <%= appData.marina %>
                             </p>
                           </div>
                           <% } %>
+
                             <% if (appData.unionCardNumber) { %>
-                              <div class="info-item"><label>رقم البطاقة النقابية</label>
+                              <div class="info-field">
+                                <label><i class="fas fa-id-badge"></i> رقم البطاقة النقابية</label>
                                 <p>
                                   <%= appData.unionCardNumber %>
                                 </p>
                               </div>
                               <% } %>
+
                                 <% if (appData.previousLicenseNumber) { %>
-                                  <div class="info-item"><label>رقم الرخصة السابقة</label>
+                                  <div class="info-field">
+                                    <label><i class="fas fa-file-contract"></i> رقم الرخصة السابقة</label>
                                     <p>
                                       <%= appData.previousLicenseNumber %>
                                     </p>
                                   </div>
                                   <% } %>
+
                                     <% if (appData.boatNumber) { %>
-                                      <div class="info-item"><label>رقم الصال</label>
+                                      <div class="info-field">
+                                        <label><i class="fas fa-hashtag"></i> رقم الصال</label>
                                         <p>
                                           <%= appData.boatNumber %>
                                         </p>
                                       </div>
                                       <% } %>
+
                                         <% if (appData.boatRegistration) { %>
-                                          <div class="info-item"><label>رقم تسجيل المركب</label>
+                                          <div class="info-field">
+                                            <label><i class="fas fa-certificate"></i> رقم تسجيل المركب</label>
                                             <p>
                                               <%= appData.boatRegistration %>
                                             </p>
                                           </div>
                                           <% } %>
+
                                             <% if (appData.boatLength) { %>
-                                              <div class="info-item"><label>طول المركب</label>
+                                              <div class="info-field">
+                                                <label><i class="fas fa-ruler-horizontal"></i> طول المركب</label>
                                                 <p>
                                                   <%= appData.boatLength %> متر
                                                 </p>
                                               </div>
                                               <% } %>
+
                                                 <% if (appData.enginePower) { %>
-                                                  <div class="info-item"><label>قوة المحرك</label>
+                                                  <div class="info-field">
+                                                    <label><i class="fas fa-tachometer-alt"></i> قوة المحرك</label>
                                                     <p>
                                                       <%= appData.enginePower %> حصان
                                                     </p>
                                                   </div>
                                                   <% } %>
+
                                                     <% if (appData.plateNumber) { %>
-                                                      <div class="info-item"><label>رقم لوحة السيارة</label>
+                                                      <div class="info-field">
+                                                        <label><i class="fas fa-car"></i> رقم لوحة السيارة</label>
                                                         <p>
                                                           <%= appData.plateNumber %>
                                                         </p>
                                                       </div>
                                                       <% } %>
+
                                                         <% if (appData.vehicleType) { %>
-                                                          <div class="info-item"><label>نوع السيارة</label>
+                                                          <div class="info-field">
+                                                            <label><i class="fas fa-truck"></i> نوع السيارة</label>
                                                             <p>
                                                               <%= appData.vehicleType %>
                                                             </p>
                                                           </div>
                                                           <% } %>
+
                                                             <% if (appData.vehicleYear) { %>
-                                                              <div class="info-item"><label>سنة الصنع</label>
+                                                              <div class="info-field">
+                                                                <label><i class="far fa-calendar"></i> سنة الصنع</label>
                                                                 <p>
                                                                   <%= appData.vehicleYear %>
                                                                 </p>
                                                               </div>
                                                               <% } %>
+
                                                                 <% if (appData.capacity) { %>
-                                                                  <div class="info-item"><label>السعة</label>
+                                                                  <div class="info-field">
+                                                                    <label><i class="fas fa-weight"></i> السعة</label>
                                                                     <p>
                                                                       <%= appData.capacity %>
                                                                     </p>
                                                                   </div>
                                                                   <% } %>
+
                                                                     <% if (appData.motorNumber) { %>
-                                                                      <div class="info-item"><label>رقم الموتور</label>
+                                                                      <div class="info-field">
+                                                                        <label><i class="fas fa-cog"></i> رقم
+                                                                          الموتور</label>
                                                                         <p>
                                                                           <%= appData.motorNumber %>
                                                                         </p>
                                                                       </div>
                                                                       <% } %>
+
                                                                         <% if (appData.chassisNumber) { %>
-                                                                          <div class="info-item"><label>رقم
+                                                                          <div class="info-field">
+                                                                            <label><i class="fas fa-barcode"></i> رقم
                                                                               الشاسيه</label>
                                                                             <p>
                                                                               <%= appData.chassisNumber %>
                                                                             </p>
                                                                           </div>
                                                                           <% } %>
+
                                                                             <% if (appData.ownerName) { %>
-                                                                              <div class="info-item"><label>اسم
-                                                                                  المالك</label>
+                                                                              <div class="info-field">
+                                                                                <label><i class="fas fa-user-tie"></i>
+                                                                                  اسم المالك</label>
                                                                                 <p>
                                                                                   <%= appData.ownerName %>
                                                                                 </p>
                                                                               </div>
                                                                               <% } %>
+
                                                                                 <% if (appData.ownerNationalId) { %>
-                                                                                  <div class="info-item"><label>الرقم
-                                                                                      القومي للمالك</label>
+                                                                                  <div class="info-field">
+                                                                                    <label><i
+                                                                                        class="fas fa-id-card"></i>
+                                                                                      الرقم القومي للمالك</label>
                                                                                     <p>
                                                                                       <%= appData.ownerNationalId %>
                                                                                     </p>
                                                                                   </div>
                                                                                   <% } %>
+
                       </div>
                     </div>
                   </div>
                   <% } %>
 
-                    <div class="detail-card">
-                      <div class="detail-card-body">
-                        <h3 style="font-weight: 600; margin-bottom: 1rem; font-size: 0.875rem;">الإجراءات المتاحة</h3>
-                        <% if (application.status==='received' ) { %><button
-                            onclick="startReview('<%= application.id %>')" class="action-btn primary">📋 بدء
-                            المراجعة</button>
+                    <!-- Actions Card -->
+                    <div class="admin-card">
+                      <div class="admin-card-body">
+                        <h3 class="actions-title">الإجراءات المتاحة</h3>
+
+                        <% if (application.status==='received' ) { %>
+                          <button onclick="startReview('<%= application.id %>')" class="action-button primary">
+                            <i class="fas fa-play"></i>
+                            <span>بدء المراجعة</span>
+                          </button>
                           <% } %>
-                            <% if (application.status==='under_review' ) { %><button
-                                onclick="approveApplication('<%= application.id %>')" class="action-btn success">✅ قبول
-                                الطلب</button><button onclick="showRejectModal('<%= application.id %>')"
-                                class="action-btn danger">❌ رفض الطلب</button>
+
+                            <% if (application.status==='under_review' ) { %>
+                              <button onclick="approveApplication('<%= application.id %>')"
+                                class="action-button success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>قبول الطلب</span>
+                              </button>
+                              <button onclick="showRejectModal('<%= application.id %>')" class="action-button danger">
+                                <i class="fas fa-times-circle"></i>
+                                <span>رفض الطلب</span>
+                              </button>
                               <% } %>
+
                                 <% if (application.status==='approved_payment_pending' ) { %>
                                   <div class="notice-box warning">
-                                    تم إرسال الطلب للقسم المالي لتأكيد الدفع
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>تم إرسال الطلب للقسم المالي لتأكيد الدفع</span>
                                   </div>
                                   <button onclick="downloadSupplyOrder('<%= application.id %>')"
-                                    class="action-btn outline">
-                                    طباعة أمر التوريد
+                                    class="action-button outline">
+                                    <i class="fas fa-print"></i>
+                                    <span>طباعة أمر التوريد</span>
                                   </button>
                                   <% } %>
-                                    <% if (application.status==='payment_verified' ) { %><button
-                                        onclick="markReady('<%= application.id %>')" class="action-btn success">📦
-                                        الرخصة
-                                        جاهزة</button>
-                                      <div class="notice-box success">تم التحقق من الدفع</div>
+
+                                    <% if (application.status==='payment_verified' ) { %>
+                                      <div class="notice-box success">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>تم التحقق من الدفع</span>
+                                      </div>
+                                      <button onclick="markReady('<%= application.id %>')"
+                                        class="action-button success">
+                                        <i class="fas fa-box"></i>
+                                        <span>الرخصة جاهزة</span>
+                                      </button>
                                       <% } %>
-                                        <% if (application.status==='ready' ) { %><button
-                                            onclick="completeApplication('<%= application.id %>')"
-                                            class="action-btn success">🎉 تم التسليم</button>
-                                          <div class="notice-box success">الرخصة جاهزة للاستلام</div>
+
+                                        <% if (application.status==='ready' ) { %>
+                                          <div class="notice-box success">
+                                            <i class="fas fa-gift"></i>
+                                            <span>الرخصة جاهزة للاستلام</span>
+                                          </div>
+                                          <button onclick="completeApplication('<%= application.id %>')"
+                                            class="action-button success">
+                                            <i class="fas fa-trophy"></i>
+                                            <span>تم التسليم</span>
+                                          </button>
                                           <% } %>
+
                                             <% if (application.status==='completed' ) { %>
-                                              <div class="notice-box success"
-                                                style="text-align: center; font-weight: 600;">✨
-                                                تم تسليم الترخيص</div><button
-                                                onclick="printLicense('<%= application.id %>')"
-                                                class="action-btn outline">طباعة الشهادة</button>
+                                              <div class="notice-box success">
+                                                <i class="fas fa-check-double"></i>
+                                                <span>تم تسليم الترخيص</span>
+                                              </div>
+                                              <button onclick="printLicense('<%= application.id %>')"
+                                                class="action-button outline">
+                                                <i class="fas fa-file-pdf"></i>
+                                                <span>طباعة الشهادة</span>
+                                              </button>
                                               <% } %>
+
                                                 <% if (application.status==='rejected' ) { %>
-                                                  <div class="notice-box error"
-                                                    style="text-align: center; font-weight: 600;">
-                                                    ❌ تم رفض الطلب</div>
+                                                  <div class="notice-box error">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span>تم رفض الطلب</span>
+                                                  </div>
                                                   <% } %>
                       </div>
                     </div>
 
+                    <!-- Payment Display Card -->
                     <% if (application.paymentAmount) { %>
-                      <div class="detail-card">
-                        <div class="detail-card-body" style="text-align: center;">
-                          <p style="color: #757575; font-size: 0.875rem;">قيمة الرسوم</p>
-                          <p style="font-size: 1.75rem; font-weight: 700; color: #00796b;">
-                            <%= application.paymentAmount %> ج.م
-                          </p>
+                      <div class="admin-card">
+                        <div class="admin-card-body">
+                          <div class="payment-display">
+                            <div class="payment-label">قيمة الرسوم</div>
+                            <div class="payment-amount">
+                              <%= application.paymentAmount %>
+                            </div>
+                            <div class="payment-currency">جنيه مصري</div>
+                          </div>
                         </div>
                       </div>
                       <% } %>
+
             </div>
           </div>
+
         </div>
       </div>
 
+      <!-- Reject Modal -->
       <div id="rejectModal" class="modal-overlay">
-        <div class="modal">
-          <h3 style="font-weight: 700; margin-bottom: 1rem;">سبب الرفض</h3>
-          <textarea id="rejectReason" rows="4" class="form-control" placeholder="اكتب سبب الرفض..."
-            style="width: 100%; margin-bottom: 1rem;"></textarea>
-          <div style="display: flex; gap: 0.5rem;">
-            <button onclick="confirmReject()" class="action-btn danger" style="flex: 1;">تأكيد الرفض</button>
-            <button onclick="hideRejectModal()" class="action-btn outline" style="flex: 1;">إلغاء</button>
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="modal-title">سبب رفض الطلب</h3>
+          </div>
+          <div class="modal-body">
+            <textarea id="rejectReason" rows="5" class="modal-textarea"
+              placeholder="اكتب سبب رفض الطلب بشكل واضح ومفصل..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button onclick="confirmReject()" class="modal-btn confirm">
+              <i class="fas fa-times-circle"></i>
+              تأكيد الرفض
+            </button>
+            <button onclick="hideRejectModal()" class="modal-btn cancel">
+              <i class="fas fa-undo"></i>
+              إلغاء
+            </button>
           </div>
         </div>
       </div>
@@ -723,41 +1620,113 @@
 
         <script>
           var currentRejectId = null;
-          var api = axios.create({ baseURL: '/api/v1', withCredentials: true });
+          var api = axios.create({
+            baseURL: '/api/v1',
+            withCredentials: true
+          });
 
           function startReview(id) {
             if (!confirm('هل تريد بدء مراجعة هذا الطلب؟')) return;
-            api.put('/admin/applications/' + id + '/review').then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.put('/admin/applications/' + id + '/review')
+              .then(function (res) {
+                if (res.data.status === 'success') location.reload();
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
+
           function approveApplication(id) {
             if (!confirm('هل أنت متأكد من قبول الطلب؟')) return;
-            api.post('/admin/applications/' + id + '/approve').then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.post('/admin/applications/' + id + '/approve')
+              .then(function (res) {
+                if (res.data.status === 'success') location.reload();
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
-          function showRejectModal(id) { currentRejectId = id; document.getElementById('rejectModal').style.display = 'flex'; }
-          function hideRejectModal() { currentRejectId = null; document.getElementById('rejectModal').style.display = 'none'; document.getElementById('rejectReason').value = ''; }
+
+          function showRejectModal(id) {
+            currentRejectId = id;
+            document.getElementById('rejectModal').classList.add('active');
+          }
+
+          function hideRejectModal() {
+            currentRejectId = null;
+            document.getElementById('rejectModal').classList.remove('active');
+            document.getElementById('rejectReason').value = '';
+          }
+
           function confirmReject() {
             var reason = document.getElementById('rejectReason').value.trim();
-            if (!reason) { alert('يجب إدخال سبب الرفض'); return; }
-            api.post('/admin/applications/' + currentRejectId + '/reject', { reason: reason }).then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            if (!reason) {
+              alert('يجب إدخال سبب الرفض');
+              return;
+            }
+            api.post('/admin/applications/' + currentRejectId + '/reject', { reason: reason })
+              .then(function (res) {
+                if (res.data.status === 'success') location.reload();
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
-          function verifyPayment(id) {
-            if (!confirm('هل تم التحقق من الدفع؟')) return;
-            api.put('/admin/applications/' + id + '/verify-payment').then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
-          }
+
           function markReady(id) {
             if (!confirm('هل الرخصة جاهزة؟')) return;
-            api.put('/admin/applications/' + id + '/ready').then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.put('/admin/applications/' + id + '/ready')
+              .then(function (res) {
+                if (res.data.status === 'success') location.reload();
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
+
           function completeApplication(id) {
             if (!confirm('هل تم تسليم الرخصة؟')) return;
-            api.put('/admin/applications/' + id + '/complete').then(function (res) { if (res.data.status === 'success') location.reload(); }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.put('/admin/applications/' + id + '/complete')
+              .then(function (res) {
+                if (res.data.status === 'success') location.reload();
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
+
           function downloadSupplyOrder(id) {
-            api.get('/admin/applications/' + id + '/supply-order').then(function (res) { if (res.data.status === 'success') { console.log('Supply order:', res.data.data); alert('بيانات أمر التوريد جاهزة'); } }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.get('/admin/applications/' + id + '/supply-order')
+              .then(function (res) {
+                if (res.data.status === 'success') {
+                  console.log('Supply order:', res.data.data);
+                  alert('بيانات أمر التوريد جاهزة');
+                }
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
+
           function printLicense(id) {
-            api.get('/admin/applications/' + id + '/license-pdf').then(function (res) { if (res.data.status === 'success') { console.log('License:', res.data.data); alert('بيانات الشهادة جاهزة'); } }).catch(function (err) { alert(err.response?.data?.message || 'خطأ'); });
+            api.get('/admin/applications/' + id + '/license-pdf')
+              .then(function (res) {
+                if (res.data.status === 'success') {
+                  console.log('License:', res.data.data);
+                  alert('بيانات الشهادة جاهزة');
+                }
+              })
+              .catch(function (err) {
+                alert(err.response?.data?.message || 'حدث خطأ');
+              });
           }
+
+          // Close modal on outside click
+          document.getElementById('rejectModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+              hideRejectModal();
+            }
+          });
         </script>
 </body>
 

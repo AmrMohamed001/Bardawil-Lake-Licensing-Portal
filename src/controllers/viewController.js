@@ -191,10 +191,121 @@ exports.getAdminApplications = catchAsync(async (req, res, next) => {
 exports.getApplicationDetails = catchAsync(async (req, res, next) => {
   const application = await viewService.getApplicationDetails(req.params.id, req.user.id);
 
+  // Safe JSON Parse for application data
+  let applicationData = {};
+  if (application.data) {
+    try {
+      applicationData = typeof application.data === 'string'
+        ? JSON.parse(application.data)
+        : application.data;
+    } catch (e) {
+      console.error('Error parsing application data JSON:', e);
+      applicationData = {};
+    }
+  }
+
+  // Bank Account from Config
+  const bankAccount = process.env.BANK_ACCOUNT_NUMBER || '5170199000001735';
+
+  // Timeline Logic
+  const timelineSteps = [
+    {
+      id: 'received',
+      title: 'تم استلام الطلب',
+      description: 'تم استلام طلبك بنجاح وجاري المراجعة',
+      date: application.createdAt,
+      status: 'completed',
+      icon: 'check'
+    },
+    {
+      id: 'review',
+      title: 'مراجعة الطلب',
+      description: 'جاري مراجعة المستندات والبيانات',
+      date: application.reviewedAt,
+      status: 'upcoming',
+      icon: 'search'
+    },
+    {
+      id: 'approval',
+      title: 'الموافقات',
+      description: 'في انتظار الموافقة النهائية',
+      date: application.approvedAt,
+      status: 'upcoming',
+      icon: 'file-signature'
+    },
+    {
+      id: 'payment',
+      title: 'الدفع',
+      description: 'سداد الرسوم المقررة',
+      date: application.paymentVerifiedAt,
+      status: 'upcoming',
+      icon: 'credit-card'
+    },
+    {
+      id: 'delivery',
+      title: 'الاستلام',
+      description: 'استلام الترخيص النهائي',
+      date: application.completedAt || (application.status === 'completed' ? application.updatedAt : null),
+      status: 'upcoming',
+      icon: 'gift'
+    }
+  ];
+
+  // Calculate status for each step based on application state
+  const status = application.status;
+
+  // Step 2: Review
+  if (['under_review', 'approved_payment_pending', 'payment_verified', 'ready', 'completed'].includes(status) || application.reviewedAt) {
+    timelineSteps[1].status = 'completed';
+    timelineSteps[1].description = 'تمت مراجعة الطلب بنجاح';
+  } else if (status === 'received') {
+    timelineSteps[1].status = 'active'; // Or pending/processing style
+  }
+
+  // Step 3: Approval
+  if (['approved_payment_pending', 'payment_verified', 'ready', 'completed'].includes(status) || application.approvedAt) {
+    timelineSteps[2].status = 'completed';
+    timelineSteps[2].description = 'تمت الموافقة على الطلب';
+  } else if (status === 'under_review') {
+    timelineSteps[2].status = 'upcoming'; // Waiting for review to finish
+  }
+
+  // Step 4: Payment
+  if (['payment_verified', 'ready', 'completed'].includes(status) || application.paymentVerifiedAt) {
+    timelineSteps[3].status = 'completed';
+    timelineSteps[3].description = 'تم الدفع بنجاح';
+  } else if (status === 'approved_payment_pending') {
+    timelineSteps[3].status = 'active';
+    timelineSteps[3].description = 'يرجى سداد الرسوم';
+  }
+
+  // Step 5: Delivery
+  if (status === 'completed') {
+    timelineSteps[4].status = 'completed';
+    timelineSteps[4].description = 'تم استلام الترخيص';
+  } else if (status === 'ready') {
+    timelineSteps[4].status = 'active';
+    timelineSteps[4].description = 'الترخيص جاهز للاستلام';
+  } else if (status === 'payment_verified') {
+    timelineSteps[4].status = 'upcoming'; // Preparing
+    timelineSteps[4].description = 'جاري إعداد الترخيص (7-12 يوم)';
+  }
+
+  // Handle Rejection
+  if (status === 'rejected') {
+    // Find the current active step and mark as rejected? 
+    // Or just show a global rejection state. 
+    // For simplicity with this UI, we might mark the current step as error.
+    // simpler to just pass a flag.
+  }
+
   res.status(200).render('applications/details', {
     title: `تفاصيل الطلب #${application.applicationNumber}`,
     user: req.user,
     application,
+    applicationData,
+    bankAccount,
+    timelineSteps
   });
 });
 
