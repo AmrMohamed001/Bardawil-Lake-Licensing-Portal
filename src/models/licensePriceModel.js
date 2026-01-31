@@ -109,7 +109,7 @@ LicensePrice.CATEGORY_BASE_DURATIONS = {
   'ميكانيكي': '1_month',
 
   // 3 months base
-  'صياد مؤمن عليه': '3_months',
+  'صياد مؤمن عليه': 'season',
   'صياد غير مؤمن عليه': '3_months',
   'صياد تحت السن': '3_months',
   'صيد رجلي': '3_months',
