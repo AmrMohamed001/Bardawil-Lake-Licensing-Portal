@@ -38,6 +38,12 @@ Application.belongsTo(User, {
   as: 'paymentVerifier',
 });
 
+// User currently reviewing (lock holder)
+Application.belongsTo(User, {
+  foreignKey: 'activeReviewerId',
+  as: 'activeReviewer',
+});
+
 // Application belongs to ApplicationStatus (lookup table)
 Application.belongsTo(ApplicationStatus, {
   foreignKey: 'statusId',

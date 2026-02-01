@@ -1041,6 +1041,17 @@
                     </div>
 
                     <div class="info-field">
+                      <label><i class="fas fa-clock"></i> المدة</label>
+                      <p>
+                        <%= application.duration === '1_month' ? 'شهر واحد' : 
+                            application.duration === '3_months' ? '3 أشهر' : 
+                            application.duration === '6_months' ? '6 أشهر' : 
+                            application.duration === 'season' ? 'الموسم (9 أشهر)' : 
+                            application.duration || 'غير محدد' %>
+                      </p>
+                    </div>
+
+                    <div class="info-field">
                       <label><i class="far fa-calendar-alt"></i> تاريخ التقديم</label>
                       <p>
                         <%= new Date(application.createdAt).toLocaleDateString('ar-EG') %>
@@ -1696,29 +1707,13 @@
           }
 
           function downloadSupplyOrder(id) {
-            api.get('/admin/applications/' + id + '/supply-order')
-              .then(function (res) {
-                if (res.data.status === 'success') {
-                  console.log('Supply order:', res.data.data);
-                  alert('بيانات أمر التوريد جاهزة');
-                }
-              })
-              .catch(function (err) {
-                alert(err.response?.data?.message || 'حدث خطأ');
-              });
+            // Open supply order PDF in new tab
+            window.open('/api/v1/admin/applications/' + id + '/supply-order', '_blank');
           }
 
           function printLicense(id) {
-            api.get('/admin/applications/' + id + '/license-pdf')
-              .then(function (res) {
-                if (res.data.status === 'success') {
-                  console.log('License:', res.data.data);
-                  alert('بيانات الشهادة جاهزة');
-                }
-              })
-              .catch(function (err) {
-                alert(err.response?.data?.message || 'حدث خطأ');
-              });
+            // Open license PDF in new tab
+            window.open('/api/v1/admin/applications/' + id + '/license-pdf', '_blank');
           }
 
           // Close modal on outside click
@@ -1726,6 +1721,107 @@
             if (e.target === this) {
               hideRejectModal();
             }
+          });
+
+          // ============================================================
+          // REVIEW LOCK MANAGEMENT
+          // ============================================================
+          
+          var lockHeartbeatInterval = null;
+          var applicationId = '<%= application.id %>';
+          var lockAcquired = false;
+          
+          // Check and acquire lock on page load
+          function initReviewLock() {
+            console.log('[Lock] Checking lock status for:', applicationId);
+            api.get('/admin/applications/' + applicationId + '/lock')
+              .then(function(res) {
+                var data = res.data.data;
+                console.log('[Lock] Status:', data);
+                if (data.isLocked && !data.isOwnLock) {
+                  console.log('[Lock] Locked by another user');
+                  showLockWarning(data.lockedBy, data.expiresAt);
+                } else {
+                  console.log('[Lock] Available, acquiring...');
+                  acquireReviewLock();
+                }
+              })
+              .catch(function(err) {
+                console.error('[Lock] Check failed:', err);
+              });
+          }
+          
+          function acquireReviewLock() {
+            api.post('/admin/applications/' + applicationId + '/lock')
+              .then(function(res) {
+                console.log('[Lock] Acquired successfully:', res.data);
+                lockAcquired = true;
+                startLockHeartbeat();
+              })
+              .catch(function(err) {
+                console.error('[Lock] Acquire failed:', err);
+                if (err.response?.status === 423) {
+                  showLockWarning(null, null, err.response?.data?.message);
+                }
+              });
+          }
+          
+          function startLockHeartbeat() {
+            // Extend lock every 5 minutes
+            lockHeartbeatInterval = setInterval(function() {
+              api.put('/admin/applications/' + applicationId + '/lock')
+                .then(function(res) {
+                  console.log('[Lock] Extended');
+                })
+                .catch(function(err) {
+                  console.error('[Lock] Extension failed');
+                  clearInterval(lockHeartbeatInterval);
+                });
+            }, 5 * 60 * 1000); // 5 minutes
+          }
+          
+          function releaseReviewLock() {
+            if (!lockAcquired) return;
+            console.log('[Lock] Releasing...');
+            // Use fetch with keepalive for reliable page unload
+            fetch('/api/v1/admin/applications/' + applicationId + '/lock/release', {
+              method: 'POST',
+              keepalive: true,
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include'
+            }).catch(function() {});
+          }
+          
+          function showLockWarning(lockedBy, expiresAt, message) {
+            var banner = document.createElement('div');
+            banner.id = 'lockWarningBanner';
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#f44336,#d32f2f);color:white;padding:16px 24px;text-align:center;font-size:16px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;gap:12px;';
+            
+            var lockerName = lockedBy ? (lockedBy.firstNameAr + ' ' + (lockedBy.lastNameAr || '')) : 'مستخدم آخر';
+            var displayMessage = message || ('⚠️ هذا الطلب قيد المراجعة بواسطة: ' + lockerName);
+            
+            banner.innerHTML = '<i class="fas fa-lock"></i> ' + displayMessage + 
+              ' <button onclick="location.href=\'/admin/applications\'" style="margin-right:16px;padding:8px 16px;background:white;color:#d32f2f;border:none;border-radius:6px;cursor:pointer;font-weight:600;">العودة للقائمة</button>' +
+              ' <button onclick="location.reload()" style="padding:8px 16px;background:rgba(255,255,255,0.2);color:white;border:1px solid white;border-radius:6px;cursor:pointer;font-weight:600;">تحديث</button>';
+            
+            document.body.insertBefore(banner, document.body.firstChild);
+            
+            // Disable action buttons
+            var actionButtons = document.querySelectorAll('.action-button');
+            actionButtons.forEach(function(btn) {
+              btn.disabled = true;
+              btn.style.opacity = '0.5';
+              btn.style.pointerEvents = 'none';
+            });
+          }
+          
+          // Initialize lock on page load
+          initReviewLock();
+          
+          // Release lock on page unload
+          window.addEventListener('beforeunload', function() {
+            releaseReviewLock();
+            if (lockHeartbeatInterval) clearInterval(lockHeartbeatInterval);
           });
         </script>
 </body>

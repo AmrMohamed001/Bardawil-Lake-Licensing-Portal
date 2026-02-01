@@ -61,25 +61,34 @@ const sequelize = new Sequelize(
  * @param {number} delay - Delay between retries in ms
  */
 const connectDB = async (retries = 5, delay = 3000) => {
+  // Check if running in cluster mode
+  const cluster = require('cluster');
+  const isWorker = cluster.isWorker || cluster.isPrimary === false;
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await sequelize.authenticate();
-      console.log('✅ PostgreSQL connected successfully');
-      console.log(`   Host: ${process.env.DB_HOST}`);
-      console.log(`   Database: ${process.env.DB_NAME}`);
-      console.log(`   Pool: max=${sequelize.options.pool.max}, min=${sequelize.options.pool.min}`);
+      
+      // Condensed logging in cluster mode
+      if (isWorker) {
+        console.log(`  └─ Worker ${process.pid}: PostgreSQL connected`);
+      } else {
+        console.log('✅ PostgreSQL connected successfully');
+        console.log(`   Host: ${process.env.DB_HOST}`);
+        console.log(`   Database: ${process.env.DB_NAME}`);
+        console.log(`   Pool: max=${sequelize.options.pool.max}, min=${sequelize.options.pool.min}`);
+      }
 
-      // Sync models based on environment
       // Sync models based on environment and configuration
       const shouldSyncAlter = process.env.DB_SYNC === 'true';
 
       if (shouldSyncAlter) {
         await sequelize.sync({ alter: true });
-        console.log('✅ Database models synchronized (alter mode)');
+        if (!isWorker) console.log('✅ Database models synchronized (alter mode)');
       } else {
         // Fast startup: Only create tables if they don't exist, don't check/alter columns
         await sequelize.sync();
-        console.log('✅ Database models synchronized (basic mode)');
+        if (!isWorker) console.log('✅ Database models synchronized (basic mode)');
       }
 
       return true;

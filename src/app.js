@@ -34,9 +34,18 @@ app.use(compression({
 // Set View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// Enable view caching in production for faster rendering
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
 
-// Serve Static Files
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve Static Files with caching headers
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '30d' : '1d', // Cache for 30 days in production
+  etag: true,
+  lastModified: true,
+  immutable: process.env.NODE_ENV === 'production', // For hashed assets
+}));
 
 /////////////////////////////////////////////////////////////////
 // SECURITY MIDDLEWARES
@@ -120,6 +129,18 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
+});
+
+/////////////////////////////////////////////////////////////////
+// HEALTH CHECK ENDPOINT (for load balancers and monitoring)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    pid: process.pid,
+  });
 });
 
 /////////////////////////////////////////////////////////////////

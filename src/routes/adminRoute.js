@@ -70,6 +70,50 @@ router.get(
   adminController.getApplicationForReview
 );
 
+// =============================================
+// Review Lock Management
+// =============================================
+
+// @route   GET /api/v1/admin/applications/:id/lock (check lock status)
+router.get(
+  '/applications/:id/lock',
+  adminValidator.applicationIdValidator,
+  validatorMiddleware,
+  adminController.checkReviewLock
+);
+
+// @route   POST /api/v1/admin/applications/:id/lock (acquire lock)
+router.post(
+  '/applications/:id/lock',
+  adminValidator.applicationIdValidator,
+  validatorMiddleware,
+  adminController.acquireReviewLock
+);
+
+// @route   PUT /api/v1/admin/applications/:id/lock (extend lock / heartbeat)
+router.put(
+  '/applications/:id/lock',
+  adminValidator.applicationIdValidator,
+  validatorMiddleware,
+  adminController.extendReviewLock
+);
+
+// @route   DELETE /api/v1/admin/applications/:id/lock (release lock)
+router.delete(
+  '/applications/:id/lock',
+  adminValidator.applicationIdValidator,
+  validatorMiddleware,
+  adminController.releaseReviewLock
+);
+
+// @route   POST /api/v1/admin/applications/:id/lock/release (for page unload - POST works better with fetch keepalive)
+router.post(
+  '/applications/:id/lock/release',
+  adminValidator.applicationIdValidator,
+  validatorMiddleware,
+  adminController.releaseReviewLock
+);
+
 // @route   PUT /api/v1/admin/applications/:id/review
 router.put(
   '/applications/:id/review',

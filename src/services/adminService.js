@@ -24,7 +24,7 @@ const cacheService = require('./cacheService');
  * Get admin dashboard statistics (FR-ADMIN-001)
  */
 exports.getDashboardStats = async () => {
-  return cacheService.getOrSet('admin_dashboard_stats', async () => {
+  return cacheService.getOrSet(cacheService.CACHE_KEYS.DASHBOARD_STATS, async () => {
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -91,7 +91,7 @@ exports.getDashboardStats = async () => {
       byStatus,
       monthlyTrend: monthlyStats,
     };
-  }, 300); // Cache for 5 minutes
+  }, cacheService.TTL.DASHBOARD_STATS);
 };
 
 
@@ -211,6 +211,147 @@ exports.getApplicationForReview = async applicationId => {
   }
 
   return application;
+};
+
+// ============================================================
+// REVIEW LOCK MANAGEMENT
+// ============================================================
+
+const LOCK_DURATION_MINUTES = 10; // Lock expires after 10 minutes
+
+/**
+ * Check if application is locked by another reviewer
+ * @param {string} applicationId - Application ID
+ * @param {string} currentUserId - Current admin's user ID
+ * @returns {Object} Lock status
+ */
+exports.checkReviewLock = async (applicationId, currentUserId) => {
+  const application = await Application.findByPk(applicationId, {
+    include: [{
+      model: User,
+      as: 'activeReviewer',
+      attributes: ['id', 'firstNameAr', 'lastNameAr'],
+    }],
+  });
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  const now = new Date();
+  
+  // Check if lock exists and is still valid
+  if (application.activeReviewerId && application.lockExpiresAt) {
+    const lockExpired = new Date(application.lockExpiresAt) < now;
+    
+    if (!lockExpired) {
+      // Lock is active
+      const isOwnLock = application.activeReviewerId === currentUserId;
+      return {
+        isLocked: true,
+        isOwnLock,
+        lockedBy: application.activeReviewer,
+        expiresAt: application.lockExpiresAt,
+        message: isOwnLock 
+          ? 'أنت تقوم بمراجعة هذا الطلب حالياً'
+          : `هذا الطلب قيد المراجعة بواسطة ${application.activeReviewer?.firstNameAr || 'مستخدم آخر'}`,
+      };
+    }
+  }
+
+  return { isLocked: false, isOwnLock: false };
+};
+
+/**
+ * Acquire review lock for an application
+ * @param {string} applicationId - Application ID
+ * @param {string} userId - Admin user ID
+ * @returns {Object} Lock result
+ */
+exports.acquireReviewLock = async (applicationId, userId) => {
+  const application = await Application.findByPk(applicationId);
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  const now = new Date();
+  
+  // Check if already locked by someone else
+  if (application.activeReviewerId && 
+      application.activeReviewerId !== userId && 
+      application.lockExpiresAt && 
+      new Date(application.lockExpiresAt) > now) {
+    
+    const locker = await User.findByPk(application.activeReviewerId, {
+      attributes: ['firstNameAr', 'lastNameAr'],
+    });
+    
+    throw new AppError(423, `هذا الطلب قيد المراجعة بواسطة ${locker?.firstNameAr || 'مستخدم آخر'}`);
+  }
+
+  // Acquire or extend lock
+  const expiresAt = new Date(now.getTime() + LOCK_DURATION_MINUTES * 60 * 1000);
+  
+  application.activeReviewerId = userId;
+  application.lockExpiresAt = expiresAt;
+  await application.save();
+
+  return {
+    success: true,
+    expiresAt,
+    message: 'تم تأمين الطلب للمراجعة',
+  };
+};
+
+/**
+ * Release review lock for an application
+ * @param {string} applicationId - Application ID
+ * @param {string} userId - Admin user ID (optional - only owner can release)
+ */
+exports.releaseReviewLock = async (applicationId, userId = null) => {
+  const application = await Application.findByPk(applicationId);
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  // Only the lock owner can release (unless force release by system)
+  if (userId && application.activeReviewerId !== userId) {
+    throw new AppError(403, 'لا يمكنك إلغاء تأمين طلب محجوز بواسطة مستخدم آخر');
+  }
+
+  application.activeReviewerId = null;
+  application.lockExpiresAt = null;
+  await application.save();
+
+  return { success: true, message: 'تم إلغاء تأمين الطلب' };
+};
+
+/**
+ * Extend review lock (heartbeat)
+ * @param {string} applicationId - Application ID
+ * @param {string} userId - Admin user ID
+ */
+exports.extendReviewLock = async (applicationId, userId) => {
+  const application = await Application.findByPk(applicationId);
+
+  if (!application) {
+    throw new AppError(404, 'الطلب غير موجود');
+  }
+
+  // Only the lock owner can extend
+  if (application.activeReviewerId !== userId) {
+    throw new AppError(403, 'لا يمكنك تمديد تأمين طلب محجوز بواسطة مستخدم آخر');
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + LOCK_DURATION_MINUTES * 60 * 1000);
+  
+  application.lockExpiresAt = expiresAt;
+  await application.save();
+
+  return { success: true, expiresAt };
 };
 
 /**

@@ -23,19 +23,33 @@ const client = redis.createClient({
     password: process.env.REDIS_PASSWORD || undefined,
 });
 
+// Check if running in cluster mode
+const cluster = require('cluster');
+const isWorker = cluster.isWorker || cluster.isPrimary === false;
+
 // Event handlers
 client.on('error', (err) => {
     // Only log non-connection-reset errors in detail
     if (err.code === 'ECONNRESET') {
-        console.log('⚠️ Redis: Connection reset, will reconnect automatically...');
+        if (!isWorker) console.log('⚠️ Redis: Connection reset, will reconnect automatically...');
     } else {
         console.log('Redis Client Error:', err.message);
     }
 });
 
-client.on('connect', () => console.log('✅ Redis Client Connected'));
-client.on('reconnecting', () => console.log('🔄 Redis: Reconnecting...'));
-client.on('ready', () => console.log('✅ Redis Client Ready'));
+client.on('connect', () => {
+    if (isWorker) {
+        console.log(`  └─ Worker ${process.pid}: Redis connected`);
+    } else {
+        console.log('✅ Redis Client Connected');
+    }
+});
+client.on('reconnecting', () => {
+    if (!isWorker) console.log('🔄 Redis: Reconnecting...');
+});
+client.on('ready', () => {
+    if (!isWorker) console.log('✅ Redis Client Ready');
+});
 
 // Connect to Redis
 (async () => {
@@ -54,6 +68,7 @@ const CACHE_KEYS = {
     PUBLISHED_NEWS: 'published_news',
     PUBLISHED_NEWS_PAGE: 'published_news_page_',
     PORTAL_INFO: 'portal_info',
+    DASHBOARD_STATS: 'admin_dashboard_stats',
 };
 
 // TTL constants (in seconds)
@@ -62,6 +77,7 @@ const TTL = {
     ACTIVE_PRICES: 900, // 15 minutes
     PUBLISHED_NEWS: 300, // 5 minutes
     PORTAL_INFO: 3600, // 1 hour
+    DASHBOARD_STATS: 120, // 2 minutes - frequently updated
 };
 
 /**
@@ -205,6 +221,14 @@ const invalidateNews = async () => {
     console.log('[Cache] Invalidated news');
 };
 
+/**
+ * Invalidate dashboard stats cache
+ */
+const invalidateDashboard = async () => {
+    await del(CACHE_KEYS.DASHBOARD_STATS);
+    console.log('[Cache] Invalidated dashboard stats');
+};
+
 module.exports = {
     get,
     set,
@@ -216,6 +240,7 @@ module.exports = {
     invalidateStatuses,
     invalidatePrices,
     invalidateNews,
+    invalidateDashboard,
     CACHE_KEYS,
     TTL,
     client // Export client if needed

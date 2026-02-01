@@ -52,6 +52,58 @@ exports.getApplicationForReview = catchAsync(async (req, res, next) => {
   });
 });
 
+// ============================================================
+// REVIEW LOCK MANAGEMENT
+// ============================================================
+
+// @desc    Check review lock status
+// @route   GET /api/v1/admin/applications/:id/lock
+// @access  Private/Admin
+exports.checkReviewLock = catchAsync(async (req, res, next) => {
+  const result = await adminService.checkReviewLock(req.params.id, req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
+// @desc    Acquire review lock
+// @route   POST /api/v1/admin/applications/:id/lock
+// @access  Private/Admin
+exports.acquireReviewLock = catchAsync(async (req, res, next) => {
+  const result = await adminService.acquireReviewLock(req.params.id, req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
+// @desc    Release review lock
+// @route   DELETE /api/v1/admin/applications/:id/lock
+// @access  Private/Admin
+exports.releaseReviewLock = catchAsync(async (req, res, next) => {
+  const result = await adminService.releaseReviewLock(req.params.id, req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
+// @desc    Extend review lock (heartbeat)
+// @route   PUT /api/v1/admin/applications/:id/lock
+// @access  Private/Admin
+exports.extendReviewLock = catchAsync(async (req, res, next) => {
+  const result = await adminService.extendReviewLock(req.params.id, req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    data: result,
+  });
+});
+
 // @desc    Start reviewing application
 // @route   PUT /api/v1/admin/applications/:id/review
 // @access  Private/Admin
@@ -218,28 +270,24 @@ exports.deletePrice = catchAsync(async (req, res, next) => {
 // PDF Generation (FR-ADMIN-004)
 // =============================================
 
-// @desc    Get Supply Order (HTML for printing or JSON data)
+// @desc    Get Supply Order (HTML for printing)
 // @route   GET /api/v1/admin/applications/:id/supply-order
 // @access  Private/Admin
 exports.getSupplyOrderPdf = catchAsync(async (req, res, next) => {
   const data = await adminService.getSupplyOrderData(req.params.id);
 
-  res.status(200).json({
-    status: 'success',
-    data,
-  });
+  // Render printable HTML view
+  res.render('admin/supply-order-print', { data });
 });
 
-// @desc    Get License Certificate (HTML for printing or JSON data)
+// @desc    Get License Certificate (HTML for printing)
 // @route   GET /api/v1/admin/applications/:id/license-pdf
 // @access  Private/Admin
 exports.getLicensePdf = catchAsync(async (req, res, next) => {
   const data = await adminService.getLicenseData(req.params.id);
 
-  res.status(200).json({
-    status: 'success',
-    data,
-  });
+  // Render printable HTML view
+  res.render('admin/license-print', { data });
 });
 
 // =============================================

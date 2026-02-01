@@ -192,6 +192,21 @@ const Application = sequelize.define(
       allowNull: true,
       defaultValue: {},
     },
+    // Review Lock Fields - prevent concurrent reviewers
+    activeReviewerId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
+      field: 'active_reviewer_id',
+    },
+    lockExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'lock_expires_at',
+    },
   },
   {
     tableName: 'applications',

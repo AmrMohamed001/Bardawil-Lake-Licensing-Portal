@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "dev:cluster": "node src/cluster.js",
+    "start:prod": "pm2 start ecosystem.config.js --env production",
+    "reload:prod": "pm2 reload ecosystem.config.js --env production",
+    "stop:prod": "pm2 stop ecosystem.config.js",
     "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "jest --watch --detectOpenHandles",
     "test:coverage": "jest --coverage --detectOpenHandles --forceExit",
