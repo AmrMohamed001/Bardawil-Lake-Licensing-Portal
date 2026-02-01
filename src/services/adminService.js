@@ -45,7 +45,8 @@ exports.getDashboardStats = async () => {
       Application.count({ where: { status: 'under_review' } }),
       Application.count({
         where: {
-          status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
+          // Include completed since they also went through approval
+          status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready', 'completed'] }
         }
       }),
       Application.count({ where: { status: 'completed' } }),

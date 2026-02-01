@@ -111,7 +111,8 @@ exports.getUserDashboardData = async (userId, query) => {
         Application.count({
             where: {
                 userId,
-                status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
+                // Include completed since they also went through approval
+                status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready', 'completed'] }
             },
         }),
         Application.count({

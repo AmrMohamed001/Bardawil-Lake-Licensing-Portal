@@ -73,8 +73,20 @@ exports.generateLicenseCertificate = async (application, user) => {
     month: 'long',
     day: 'numeric',
   });
+
+  // Calculate expiry date based on application duration
+  let daysToAdd = 270; // Default: season (9 months)
+  const duration = application.duration;
+  if (duration === '1_month') {
+    daysToAdd = 30;
+  } else if (duration === '3_months') {
+    daysToAdd = 90;
+  } else if (duration === 'season') {
+    daysToAdd = 270; // 9 months
+  }
+
   const expiryDate = new Date(
-    Date.now() + 365 * 24 * 60 * 60 * 1000
+    Date.now() + daysToAdd * 24 * 60 * 60 * 1000
   ).toLocaleDateString('ar-EG', {
     year: 'numeric',
     month: 'long',
