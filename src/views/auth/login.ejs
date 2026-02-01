@@ -311,6 +311,8 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script src="/js/egyptian-national-id.js"></script>
+    <script src="/js/formValidation.js"></script>
     <script>
       function togglePassword() {
         const password = document.getElementById('password');
@@ -347,10 +349,25 @@
   `;
       }
 
+      // Initialize form validation
+      const loginFieldConfigs = {
+        nationalId: { type: 'nationalId', validateOnInput: true },
+        password: { type: 'password', validateOnInput: true }
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        FormValidator.init('loginForm', loginFieldConfigs);
+      });
+
       document
         .getElementById('loginForm')
         .addEventListener('submit', async function (e) {
           e.preventDefault();
+
+          // Validate all fields before submitting
+          if (!FormValidator.validateForm('loginForm', loginFieldConfigs)) {
+            return;
+          }
 
           const submitBtn = document.getElementById('submitBtn');
           const btnText = submitBtn.querySelector('.btn-text');

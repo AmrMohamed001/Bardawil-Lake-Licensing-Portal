@@ -146,6 +146,25 @@
                       </span>
                     </div>
 
+                    <% if (application.duration) { %>
+                    <div class="info-item">
+                      <span class="label">
+                        <i class="fas fa-clock"></i> مدة الترخيص
+                      </span>
+                      <span class="value">
+                        <% if (application.duration === '1_month') { %>
+                          شهر واحد
+                        <% } else if (application.duration === '3_months') { %>
+                          3 شهور
+                        <% } else if (application.duration === 'season') { %>
+                          الموسم (9 شهور)
+                        <% } else { %>
+                          <%= application.duration %>
+                        <% } %>
+                      </span>
+                    </div>
+                    <% } %>
+
                     <% if (application.paymentAmount) { %>
                       <div class="info-item highlight">
                         <span class="label">

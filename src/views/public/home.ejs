@@ -306,9 +306,9 @@
                     <% let imgPath=item.imagePath; if (imgPath) { imgPath=imgPath.replace(/\\/g, '/' ); if
                       (imgPath.startsWith('src/public/')) imgPath=imgPath.replace('src/public/', '/' ); else if
                       (imgPath.startsWith('public/')) imgPath=imgPath.replace('public/', '/' ); if
-                      (!imgPath.startsWith('http') && !imgPath.startsWith('/')) { imgPath='/uploads/' + imgPath; } if
+                      (!imgPath.startsWith('http') && !imgPath.startsWith('/')) { imgPath='/uploads/news/' + imgPath; } if
                       (imgPath.startsWith('//')) imgPath=imgPath.substring(1); } else { imgPath='/imgs/news1.png' ; } %>
-                      <img src="<%= imgPath %>" alt="<%= item.titleAr %>" width="400" height="250" loading="lazy"
+                      <img src="<%= imgPath %>?v=<%= new Date(item.updatedAt).getTime() %>" alt="<%= item.titleAr %>" width="400" height="250" loading="lazy"
                         style="object-fit: cover; height: 200px; width: 100%;">
                       <% if (new Date(item.createdAt)> new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
                         <div class="news-badge">جديد</div>

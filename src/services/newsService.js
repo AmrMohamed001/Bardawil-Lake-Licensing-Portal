@@ -32,7 +32,7 @@ exports.getAllNews = async (query) => {
         include: [
             {
                 model: User,
-                as: 'creator',
+                as: 'author',
                 attributes: ['id', 'firstNameAr', 'lastNameAr'],
             },
         ],
@@ -60,7 +60,7 @@ exports.getNewsById = async (id) => {
         include: [
             {
                 model: User,
-                as: 'creator',
+                as: 'author',
                 attributes: ['id', 'firstNameAr', 'lastNameAr'],
             },
         ],
@@ -77,7 +77,15 @@ exports.getNewsById = async (id) => {
  * Create news
  */
 exports.createNews = async (data, userId, fileFilename) => {
-    const { titleAr, titleEn, contentAr, contentEn, category, isPinned } = data;
+    const { titleAr, titleEn, contentAr, contentEn, category, isPinned, imagePath } = data;
+
+    // Priority: uploaded file > form imagePath > null
+    let finalImagePath = null;
+    if (fileFilename) {
+        finalImagePath = `/uploads/news/${fileFilename}`;
+    } else if (imagePath) {
+        finalImagePath = imagePath;
+    }
 
     const news = await News.create({
         titleAr,
@@ -87,7 +95,7 @@ exports.createNews = async (data, userId, fileFilename) => {
         category: category || 'news',
         isPinned: isPinned || false,
         createdBy: userId,
-        imagePath: fileFilename || null,
+        imagePath: finalImagePath,
     });
 
     // Invalidate news cache
@@ -106,7 +114,15 @@ exports.updateNews = async (id, data, fileFilename) => {
         throw new AppError(404, 'الخبر غير موجود');
     }
 
-    const { titleAr, titleEn, contentAr, contentEn, category, isPinned } = data;
+    const { titleAr, titleEn, contentAr, contentEn, category, isPinned, imagePath } = data;
+
+    // Priority: uploaded file > form imagePath > existing value
+    let finalImagePath = news.imagePath;
+    if (fileFilename) {
+        finalImagePath = `/uploads/news/${fileFilename}`;
+    } else if (imagePath) {
+        finalImagePath = imagePath;
+    }
 
     await news.update({
         titleAr: titleAr || news.titleAr,
@@ -115,7 +131,7 @@ exports.updateNews = async (id, data, fileFilename) => {
         contentEn: contentEn !== undefined ? contentEn : news.contentEn,
         category: category || news.category,
         isPinned: isPinned !== undefined ? isPinned : news.isPinned,
-        imagePath: fileFilename || news.imagePath,
+        imagePath: finalImagePath,
     });
 
     // Invalidate news cache

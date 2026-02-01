@@ -1,11 +1,12 @@
 const { body } = require('express-validator');
+const egyptianNationalId = require('../utils/egyptianNationalId');
 
 /**
  * Auth Validators - Based on SRS Section 3.1
  * Arabic validation messages
  */
 
-// Validate Egyptian National ID (14 digits)
+// Validate Egyptian National ID (14 digits with full validation)
 const validateNationalId = () =>
   body('nationalId')
     .notEmpty()
@@ -13,7 +14,14 @@ const validateNationalId = () =>
     .isLength({ min: 14, max: 14 })
     .withMessage('الرقم القومي يجب أن يتكون من 14 رقم')
     .isNumeric()
-    .withMessage('الرقم القومي يجب أن يحتوي على أرقام فقط');
+    .withMessage('الرقم القومي يجب أن يحتوي على أرقام فقط')
+    .custom((value) => {
+      const validation = egyptianNationalId.validate(value);
+      if (!validation.isValid) {
+        throw new Error(validation.errors[0] || 'الرقم القومي غير صالح');
+      }
+      return true;
+    });
 
 // Validate Egyptian phone number
 const validatePhone = () =>

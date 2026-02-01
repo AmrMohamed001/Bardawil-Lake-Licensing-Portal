@@ -640,19 +640,33 @@
                             const btn = document.getElementById('submitBtn');
                             btn.disabled = true;
 
-                            const data = {
-                                titleAr: document.getElementById('titleAr').value,
-                                contentAr: document.getElementById('contentAr').value,
-                                category: document.getElementById('category').value,
-                                isPinned: document.getElementById('isPinned').checked,
-                                imagePath: document.getElementById('imagePath').value,
-                            };
+                            // Use FormData to support file upload
+                            const formData = new FormData();
+                            formData.append('titleAr', document.getElementById('titleAr').value);
+                            formData.append('contentAr', document.getElementById('contentAr').value);
+                            formData.append('category', document.getElementById('category').value);
+                            formData.append('isPinned', document.getElementById('isPinned').checked);
+                            
+                            // Check if a file is selected for upload
+                            const fileInput = document.getElementById('imageFile');
+                            if (fileInput.files && fileInput.files[0]) {
+                                formData.append('image', fileInput.files[0]);
+                            } else {
+                                // No file uploaded - send the default image path
+                                const imagePath = document.getElementById('imagePath').value;
+                                if (imagePath) {
+                                    formData.append('imagePath', imagePath);
+                                }
+                            }
 
                             try {
+                                const config = {
+                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                };
                                 if (id) {
-                                    await axios.put(`/api/v1/admin/news/${id}`, data);
+                                    await axios.put(`/api/v1/admin/news/${id}`, formData, config);
                                 } else {
-                                    await axios.post('/api/v1/admin/news', data);
+                                    await axios.post('/api/v1/admin/news', formData, config);
                                 }
                                 window.location.reload();
                             } catch (err) {

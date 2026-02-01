@@ -92,29 +92,29 @@ const FormValidator = {
     },
 
     /**
-     * Validate National ID (14 digits)
+     * Validate National ID (calls EgyptianNationalId utility)
      * @param {HTMLElement} field - The input field
      * @returns {boolean} - Validation result
      */
     validateNationalId(field) {
         const value = field.value.trim();
 
+        // Use the EgyptianNationalId utility if available
+        if (typeof EgyptianNationalId !== 'undefined') {
+            const result = EgyptianNationalId.validate(value);
+            if (!result.isValid) {
+                return this.showError(field, result.error);
+            }
+            return this.showSuccess(field);
+        }
+
+        // Fallback: basic validation if utility not loaded
         if (!value) {
             return this.showError(field, this.rules.nationalId.requiredMessage);
         }
-
-        if (!/^[0-9]+$/.test(value)) {
-            return this.showError(field, 'الرقم القومي يجب أن يحتوي على أرقام فقط');
+        if (!/^[0-9]{14}$/.test(value)) {
+            return this.showError(field, this.rules.nationalId.message);
         }
-
-        if (value.length < 14) {
-            return this.showError(field, `الرقم القومي يجب أن يتكون من 14 رقم (أدخلت ${value.length} رقم)`);
-        }
-
-        if (value.length > 14) {
-            return this.showError(field, 'الرقم القومي يجب أن لا يتجاوز 14 رقم');
-        }
-
         return this.showSuccess(field);
     },
 

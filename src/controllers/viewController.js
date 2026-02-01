@@ -15,6 +15,11 @@ exports.getHome = catchAsync(async (req, res, next) => {
     limit: 4,
   });
 
+  // Prevent browser caching of this page
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+
   res.status(200).render('public/home', {
     title: 'الرئيسية | بوابة تراخيص بحيرة البردويل',
     user: req.user || null,
