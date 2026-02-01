@@ -84,7 +84,8 @@
       </a>
       <% } %>
 
-        <!-- News -->
+        <!-- News (super_admin only) -->
+        <% if (locals.user && user.role === 'super_admin') { %>
         <a href="/admin/news" class="sidebar-link <%= currentPage === 'news' ? 'active' : '' %>">
           <div class="link-icon">
             <i class="fas fa-newspaper"></i>
@@ -94,8 +95,10 @@
             <i class="fas fa-chevron-left"></i>
           </div>
         </a>
+        <% } %>
 
-        <!-- Pricing -->
+        <!-- Pricing (financial_officer and super_admin only) -->
+        <% if (locals.user && (user.role === 'financial_officer' || user.role === 'super_admin')) { %>
         <a href="/admin/pricing" class="sidebar-link <%= currentPage === 'pricing' ? 'active' : '' %>">
           <div class="link-icon">
             <i class="fas fa-tags"></i>
@@ -105,8 +108,10 @@
             <i class="fas fa-chevron-left"></i>
           </div>
         </a>
+        <% } %>
 
-        <!-- Users -->
+        <!-- Users (super_admin only) -->
+        <% if (locals.user && user.role === 'super_admin') { %>
         <a href="/admin/users" class="sidebar-link <%= currentPage === 'users' ? 'active' : '' %>">
           <div class="link-icon">
             <i class="fas fa-users"></i>
@@ -116,6 +121,7 @@
             <i class="fas fa-chevron-left"></i>
           </div>
         </a>
+        <% } %>
 
         <% if (locals.user && (user.role==='SUPER_ADMIN' || user.role==='super_admin' )) { %>
           <div class="sidebar-divider"></div>

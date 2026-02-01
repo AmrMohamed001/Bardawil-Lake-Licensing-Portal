@@ -35,7 +35,7 @@ router.get(
   '/admin-dashboard',
   protect,
   attachUnreadCount,
-  restrictTo('admin', 'super_admin'),
+  restrictTo('admin', 'super_admin', 'financial_officer'),
   viewController.getAdminDashboard
 );
 
@@ -68,7 +68,7 @@ router.get(
   '/admin/pricing',
   protect,
   attachUnreadCount,
-  restrictTo('admin', 'super_admin'),
+  restrictTo('super_admin', 'financial_officer'),
   viewController.getAdminPricing
 );
 

@@ -110,24 +110,28 @@
             </div>
 
             <div class="user-dropdown-menu">
-              <% if (user.role==='admin' || user.role==='super_admin' ) { %>
+              <% if (user.role==='admin' || user.role==='super_admin' || user.role==='financial_officer') { %>
                 <a href="/admin-dashboard" class="user-dropdown-item">
                   <i class="fas fa-cog"></i>
                   <span>لوحة الإدارة</span>
                 </a>
-                <% } %>
-                  <% if (user.role==='financial_officer' || user.role==='super_admin' ) { %>
-                    <a href="/financial/dashboard" class="user-dropdown-item">
-                      <i class="fas fa-coins"></i>
-                      <span>القسم المالي</span>
-                    </a>
-                    <% } %>
-                      <% if (user.role==='super_admin' ) { %>
-                        <a href="/super-admin-dashboard" class="user-dropdown-item">
-                          <i class="fas fa-chart-line"></i>
-                          <span>الإحصائيات المتقدمة</span>
-                        </a>
-                        <% } %>
+              <% } %>
+              <% if (user.role==='financial_officer' || user.role==='super_admin' ) { %>
+                <a href="/financial/dashboard" class="user-dropdown-item">
+                  <i class="fas fa-coins"></i>
+                  <span>القسم المالي</span>
+                </a>
+                <a href="/admin/pricing" class="user-dropdown-item">
+                  <i class="fas fa-tags"></i>
+                  <span>إعدادات التسعير</span>
+                </a>
+              <% } %>
+              <% if (user.role==='super_admin' ) { %>
+                <a href="/super-admin-dashboard" class="user-dropdown-item">
+                  <i class="fas fa-chart-line"></i>
+                  <span>الإحصائيات المتقدمة</span>
+                </a>
+              <% } %>
                           <% if (user.role !=='admin' && user.role !=='super_admin' && user.role !=='financial_officer'
                             ) { %>
                             <a href="/dashboard" class="user-dropdown-item">
@@ -188,9 +192,12 @@
       <a href="/dashboard" class="mobile-menu-link"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
       <a href="/profile" class="mobile-menu-link"><i class="fas fa-user"></i> الملف الشخصي</a>
       <a href="/notifications" class="mobile-menu-link"><i class="fas fa-bell"></i> الإشعارات</a>
-      <% if (user.role==='admin' || user.role==='super_admin' ) { %>
+      <% if (user.role==='admin' || user.role==='super_admin' || user.role==='financial_officer') { %>
         <a href="/admin-dashboard" class="mobile-menu-link"><i class="fas fa-cog"></i> لوحة الإدارة</a>
-        <% } %>
+      <% } %>
+      <% if (user.role==='financial_officer') { %>
+        <a href="/admin/pricing" class="mobile-menu-link"><i class="fas fa-tags"></i> إعدادات التسعير</a>
+      <% } %>
           <a href="#" class="mobile-menu-link text-danger" id="mobileLogoutBtn"><i class="fas fa-sign-out-alt"></i>
             تسجيل الخروج</a>
           <% } else { %>

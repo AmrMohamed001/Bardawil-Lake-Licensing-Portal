@@ -1,23 +1,48 @@
 const redis = require('redis');
 
-// Create Redis client
+// Create Redis client with robust reconnection strategy
 const client = redis.createClient({
     socket: {
         host: process.env.REDIS_HOST || 'localhost',
         port: process.env.REDIS_PORT || 6379,
+        // Reconnection strategy with exponential backoff
+        reconnectStrategy: (retries) => {
+            if (retries > 20) {
+                console.error('❌ Redis: Max reconnection attempts reached');
+                return new Error('Max reconnection attempts reached');
+            }
+            // Exponential backoff: min 100ms, max 30 seconds
+            const delay = Math.min(retries * 100, 30000);
+            console.log(`🔄 Redis: Reconnecting in ${delay}ms (attempt ${retries})...`);
+            return delay;
+        },
+        // Keep connection alive
+        keepAlive: 30000, // 30 seconds
+        connectTimeout: 10000, // 10 seconds
     },
     password: process.env.REDIS_PASSWORD || undefined,
 });
 
-client.on('error', (err) => console.log('Redis Client Error', err));
+// Event handlers
+client.on('error', (err) => {
+    // Only log non-connection-reset errors in detail
+    if (err.code === 'ECONNRESET') {
+        console.log('⚠️ Redis: Connection reset, will reconnect automatically...');
+    } else {
+        console.log('Redis Client Error:', err.message);
+    }
+});
+
 client.on('connect', () => console.log('✅ Redis Client Connected'));
+client.on('reconnecting', () => console.log('🔄 Redis: Reconnecting...'));
+client.on('ready', () => console.log('✅ Redis Client Ready'));
 
 // Connect to Redis
 (async () => {
     try {
         await client.connect();
     } catch (err) {
-        console.error('❌ Redis Connection Failed:', err);
+        console.error('❌ Redis Connection Failed:', err.message);
     }
 })();
 
