@@ -151,7 +151,7 @@ exports.getProfile = catchAsync(async (req, res, next) => {
 exports.getAdminPricing = catchAsync(async (req, res, next) => {
   const prices = await viewService.getAdminPricingData();
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/pricing', {
@@ -165,7 +165,7 @@ exports.getAdminPricing = catchAsync(async (req, res, next) => {
 
 exports.getAuditLogs = catchAsync(async (req, res, next) => {
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/audit', {
@@ -179,7 +179,7 @@ exports.getAuditLogs = catchAsync(async (req, res, next) => {
 exports.getAdminApplications = catchAsync(async (req, res, next) => {
   const result = await adminService.getAllApplications(req.query);
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/applications', {
@@ -342,7 +342,7 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
 exports.getSuperAdminDashboard = catchAsync(async (req, res, next) => {
   const data = await viewService.getSuperAdminDashboardData();
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/super-dashboard', {
@@ -361,7 +361,7 @@ exports.getSuperAdminDashboard = catchAsync(async (req, res, next) => {
 exports.getAdminUsers = catchAsync(async (req, res, next) => {
   const data = await viewService.getAdminUsersData(req.query);
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/users', {
@@ -378,7 +378,7 @@ exports.getAdminUsers = catchAsync(async (req, res, next) => {
 exports.getAdminNews = catchAsync(async (req, res, next) => {
   const data = await viewService.getAdminNewsData(req.query);
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/news', {
@@ -408,7 +408,7 @@ exports.getLicenseReview = catchAsync(async (req, res, next) => {
   const result = await adminService.getLicenseReview(req.query);
   const stats = await adminService.getLicenseReviewStats();
   const pendingCount = await Application.count({
-    where: { status: { [Op.in]: ['received', 'under_review'] } }
+    where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } }
   });
 
   res.status(200).render('admin/license-review', {

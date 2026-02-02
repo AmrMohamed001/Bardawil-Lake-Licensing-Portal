@@ -397,12 +397,33 @@
           <!-- Payment Required Section -->
           <% if (application.status==='approved_payment_pending' ) { %>
             <div class="payment-required-card">
+              
+              <!-- Rejection Alert -->
+              <% if (application.paymentVerificationNotes) { %>
+                <div class="alert alert-danger mb-4" style="background: #ffebee; border: 1px solid #ef5350; border-radius: 8px; padding: 1rem;">
+                  <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                    <i class="fas fa-exclamation-circle" style="color: #c62828; font-size: 1.25rem; margin-top: 2px;"></i>
+                    <div>
+                      <h4 style="color: #c62828; margin: 0 0 0.25rem 0; font-size: 1rem; font-weight: 700;">تم رفض إيصال الدفع السابق</h4>
+                      <p style="color: #d32f2f; margin: 0;"><strong>السبب:</strong> <%= application.paymentVerificationNotes %></p>
+                      <p style="color: #c62828; margin: 0.5rem 0 0 0; font-size: 0.9rem;">يرجى مراجعة السبب ورفع إيصال جديد صحيح.</p>
+                    </div>
+                  </div>
+                </div>
+              <% } %>
+
               <div class="payment-icon">
                 <i class="fas fa-wallet"></i>
               </div>
               <div class="payment-info">
                 <h3>مطلوب دفع الرسوم</h3>
-                <p>تمت الموافقة على طلبك بنجاح! يرجى دفع الرسوم لإتمام الإجراءات</p>
+                <p>
+                  <% if (application.paymentVerificationNotes) { %>
+                    يرجى إعادة محاولة الدفع ورفع الإيصال الجديد
+                  <% } else { %>
+                    تمت الموافقة على طلبك بنجاح! يرجى دفع الرسوم لإتمام الإجراءات
+                  <% } %>
+                </p>
 
                 <% if (application.paymentAmount) { %>
                   <div class="payment-amount">
@@ -435,7 +456,13 @@
               <div class="payment-actions">
                 <a href="/payment/<%= application.id %>" class="btn-pay">
                   <i class="fas fa-upload"></i>
-                  <span>رفع إيصال السداد</span>
+                  <span>
+                    <% if (application.paymentVerificationNotes) { %>
+                      رفع إيصال جديد
+                    <% } else { %>
+                      رفع إيصال السداد
+                    <% } %>
+                  </span>
                 </a>
                 <p class="payment-note">
                   <i class="fas fa-info-circle"></i>

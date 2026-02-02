@@ -21,6 +21,7 @@ exports.getDashboardStats = async () => {
     const [
         pendingCount,
         todayVerified,
+        totalVerified,
         monthlyVerified,
         monthlyTotalResult,
         todayTotalResult,
@@ -29,10 +30,7 @@ exports.getDashboardStats = async () => {
         // Pending verification count
         Application.count({
             where: {
-                [Op.or]: [
-                    { status: 'payment_submitted' },
-                    { status: 'approved_payment_pending' }
-                ]
+                status: 'payment_submitted'
             }
         }),
         // Today's verified count
@@ -40,6 +38,12 @@ exports.getDashboardStats = async () => {
             where: {
                 status: 'payment_verified',
                 paymentVerifiedAt: { [Op.gte]: today },
+            },
+        }),
+        // Total verified count (all time)
+        Application.count({
+            where: {
+                status: 'payment_verified'
             },
         }),
         // This month verified count
@@ -66,7 +70,8 @@ exports.getDashboardStats = async () => {
         // Rejected this month
         ApplicationStatusHistory.count({
             where: {
-                newStatus: 'approved_payment_required',
+                newStatus: 'approved_payment_pending',
+                oldStatus: 'payment_submitted',
                 changedAt: { [Op.gte]: firstDayOfMonth },
             },
         }),
@@ -75,6 +80,7 @@ exports.getDashboardStats = async () => {
     return {
         pending: pendingCount,
         todayVerified,
+        totalVerified,
         monthlyVerified,
         monthlyTotal: monthlyTotalResult || 0,
         todayTotal: todayTotalResult || 0,
@@ -83,17 +89,16 @@ exports.getDashboardStats = async () => {
 };
 
 /**
- * Get Recent Applications for Dashboard
+ * Get Recent Applications for Dashboard (Split by Status)
  */
 exports.getRecentApplications = async (query) => {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, tab = 'pending' } = query;
     const offset = (page - 1) * limit;
 
-    const where = {
-        status: {
-            [Op.in]: ['payment_submitted', 'approved_payment_pending', 'payment_verified']
-        }
-    };
+    // Determine which status to filter by based on tab
+    const status = tab === 'verified' ? 'payment_verified' : 'payment_submitted';
+
+    const where = { status };
 
     // Build include with optional search filtering
     const applicantInclude = {
@@ -154,6 +159,7 @@ exports.getRecentApplications = async (query) => {
 
     return {
         applications,
+        activeTab: tab,
         pagination: {
             total: count,
             pages: Math.ceil(count / limit),
@@ -171,10 +177,7 @@ exports.getPendingPayments = async (query) => {
     const offset = (page - 1) * limit;
 
     const where = {
-        [Op.or]: [
-            { status: 'payment_submitted' },
-            { status: 'approved_payment_pending' }
-        ]
+        status: 'payment_submitted'
     };
 
     if (search) {
@@ -314,6 +317,7 @@ exports.rejectPayment = async (id, adminId, reason) => {
     const oldStatus = application.status;
 
     await application.update({
+        status: 'approved_payment_pending',
         paymentReceiptPath: null,
         paymentVerifiedBy: adminId,
         paymentVerificationNotes: reason
@@ -329,7 +333,7 @@ exports.rejectPayment = async (id, adminId, reason) => {
 
     await Notification.create({
         userId: application.userId,
-        type: 'payment_rejected',
+        type: 'payment_failed',
         title: 'تم رفض إيصال الدفع',
         message: `تم رفض إيصال الدفع لطلب ${application.applicationNumber}. السبب: ${reason}. يرجى رفع إيصال صحيح.`,
         applicationId: application.id,
@@ -464,11 +468,18 @@ exports.generateExcelReport = async (query) => {
 
     const applications = await Application.findAll({
         where,
-        include: [{
-            model: User,
-            as: 'applicant',
-            attributes: ['firstNameAr', 'lastNameAr', 'nationalId'],
-        }],
+        include: [
+            {
+                model: User,
+                as: 'applicant',
+                attributes: ['firstNameAr', 'lastNameAr', 'nationalId'],
+            },
+            {
+                model: User,
+                as: 'paymentVerifier',
+                attributes: ['firstNameAr', 'lastNameAr'],
+            }
+        ],
         order: [['paymentVerifiedAt', 'DESC']],
     });
 
@@ -484,8 +495,11 @@ exports.generateExcelReport = async (query) => {
         { header: 'رقم الطلب', key: 'applicationNumber', width: 20 },
         { header: 'مقدم الطلب', key: 'applicantName', width: 30 },
         { header: 'الرقم القومي', key: 'nationalId', width: 20 },
+        { header: 'نوع الطلب', key: 'applicationType', width: 15 },
+        { header: 'المدة', key: 'duration', width: 15 },
         { header: 'المبلغ', key: 'amount', width: 15 },
         { header: 'تاريخ التحقق', key: 'date', width: 20 },
+        { header: 'تم التحقق بواسطة', key: 'verifierName', width: 20 },
         { header: 'الحالة', key: 'status', width: 15 },
     ];
 
@@ -502,13 +516,36 @@ exports.generateExcelReport = async (query) => {
         'completed': 'مكتمل'
     };
 
+    const typeMap = {
+        'fisherman': 'صياد',
+        'boat': 'مركب',
+        'vehicle': 'سيارة',
+        'trade': 'تجارة',
+        'entry': 'دخول'
+    };
+
+    const durationMap = {
+        'monthly': 'شهري',
+        '1_month': 'شهر',
+        '3_months': '3 شهور',
+        '6_months': '6 شهور',
+        '12_months': 'سنة',
+        'seasonal': 'موسمي',
+        'season': 'موسمي',
+        'annual': 'سنوي',
+        'yearly': 'سنوي'
+    };
+
     applications.forEach(app => {
         worksheet.addRow({
             applicationNumber: app.applicationNumber,
             applicantName: app.applicant ? `${app.applicant.firstNameAr} ${app.applicant.lastNameAr}` : '-',
             nationalId: app.applicant?.nationalId || '-',
+            applicationType: typeMap[app.applicationType] || app.applicationType || '-',
+            duration: durationMap[app.duration] || app.duration || '-',
             amount: app.paymentAmount || 0,
             date: app.paymentVerifiedAt ? new Date(app.paymentVerifiedAt).toLocaleDateString('ar-EG') : '-',
+            verifierName: app.paymentVerifier ? `${app.paymentVerifier.firstNameAr} ${app.paymentVerifier.lastNameAr}` : '-',
             status: statusMap[app.status] || app.status
         });
     });

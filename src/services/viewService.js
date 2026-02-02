@@ -106,13 +106,13 @@ exports.getUserDashboardData = async (userId, query) => {
         }),
         Application.count({ where: { userId } }),
         Application.count({
-            where: { userId, status: { [Op.in]: ['received', 'under_review'] } },
+            where: { userId, status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } },
         }),
         Application.count({
             where: {
                 userId,
-                // Include completed since they also went through approval
-                status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready', 'completed'] }
+                // Approved but not yet completed (Active process)
+                status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
             },
         }),
         Application.count({

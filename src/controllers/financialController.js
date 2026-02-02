@@ -17,6 +17,7 @@ exports.getDashboard = async (req, res, next) => {
             user: req.user,
             query: req.query,
             stats,
+            activeTab: recentData.activeTab,
             recentApplications: recentData.applications,
             pagination: recentData.pagination
         });

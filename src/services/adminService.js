@@ -24,7 +24,8 @@ const cacheService = require('./cacheService');
  * Get admin dashboard statistics (FR-ADMIN-001)
  */
 exports.getDashboardStats = async () => {
-  return cacheService.getOrSet(cacheService.CACHE_KEYS.DASHBOARD_STATS, async () => {
+  // Bypass cache for debugging
+  // return cacheService.getOrSet(cacheService.CACHE_KEYS.DASHBOARD_STATS, async () => {
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -42,11 +43,11 @@ exports.getDashboardStats = async () => {
     ] = await Promise.all([
       Application.count(),
       Application.count({ where: { status: 'received' } }),
-      Application.count({ where: { status: 'under_review' } }),
+      Application.count({ where: { status: { [Op.in]: ['under_review', 'payment_submitted'] } } }),
       Application.count({
         where: {
-          // Include completed since they also went through approval
-          status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready', 'completed'] }
+          // Approved but not yet completed (Active process)
+          status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required', 'payment_verified', 'ready'] }
         }
       }),
       Application.count({ where: { status: 'completed' } }),
@@ -92,7 +93,7 @@ exports.getDashboardStats = async () => {
       byStatus,
       monthlyTrend: monthlyStats,
     };
-  }, cacheService.TTL.DASHBOARD_STATS);
+  // }, cacheService.TTL.DASHBOARD_STATS);
 };
 
 
@@ -822,14 +823,21 @@ exports.getLicenseReviewStats = async () => {
   const [
     totalLicenses,
     completedLicenses,
-    pendingLicenses,
+    underReview,
+    pendingPayment,
+    paidProcessing,
     totalRevenue,
     byType,
     recentApplications
   ] = await Promise.all([
     Application.count(),
     Application.count({ where: { status: 'completed' } }),
-    Application.count({ where: { status: { [Op.notIn]: ['completed', 'rejected'] } } }),
+    // Under Review (Admin/Financial)
+    Application.count({ where: { status: { [Op.in]: ['received', 'under_review', 'payment_submitted'] } } }),
+    // Pending Payment (Approved by Admin, Waiting for User)
+    Application.count({ where: { status: { [Op.in]: ['approved_payment_pending', 'approved_payment_required'] } } }),
+    // Paid & Processing (Verified, Printing)
+    Application.count({ where: { status: { [Op.in]: ['payment_verified', 'ready'] } } }),
     Application.sum('paymentAmount', { where: { status: 'completed' } }),
     Application.findAll({
       attributes: [
@@ -855,7 +863,9 @@ exports.getLicenseReviewStats = async () => {
     overview: {
       total: totalLicenses,
       completed: completedLicenses,
-      pending: pendingLicenses,
+      underReview,
+      pendingPayment,
+      paidProcessing,
       revenue: totalRevenue || 0,
     },
     byType,

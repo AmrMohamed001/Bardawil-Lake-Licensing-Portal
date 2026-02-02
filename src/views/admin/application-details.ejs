@@ -1580,6 +1580,7 @@
                       </div>
                     </div>
 
+
                     <!-- Payment Display Card -->
                     <% if (application.paymentAmount) { %>
                       <div class="admin-card">
@@ -1590,6 +1591,24 @@
                               <%= application.paymentAmount %>
                             </div>
                             <div class="payment-currency">جنيه مصري</div>
+                            
+                            <% if (application.paymentVerifiedAt) { %>
+                              <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; text-align: center;">
+                                <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.25rem;">تاريخ التحقق</div>
+                                <div style="font-weight: 600; color: #2ecc71;">
+                                  <%= new Date(application.paymentVerifiedAt).toLocaleDateString('ar-EG') %>
+                                  <span style="color: #999; font-size: 0.8em; margin-right: 4px;">
+                                    <%= new Date(application.paymentVerifiedAt).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'}) %>
+                                  </span>
+                                </div>
+                                <% if (application.paymentVerifier) { %>
+                                  <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">تم التحقق بواسطة</div>
+                                  <div style="font-weight: 600; color: #34495e;">
+                                    <%= application.paymentVerifier.firstNameAr %> <%= application.paymentVerifier.lastNameAr %>
+                                  </div>
+                                <% } %>
+                              </div>
+                            <% } %>
                           </div>
                         </div>
                       </div>

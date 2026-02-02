@@ -37,7 +37,7 @@
                         </div>
 
                         <!-- Statistics Cards -->
-                        <div class="stats-grid">
+                        <div class="stats-grid stats-grid-5">
                             <div class="stat-card stat-total">
                                 <div class="stat-icon">
                                     <i class="fas fa-file-alt"></i>
@@ -46,7 +46,40 @@
                                     <h3>
                                         <%= overviewStats?.total || 0 %>
                                     </h3>
-                                    <p>إجمالي التراخيص</p>
+                                    <p>إجمالي الطلبات</p>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-review">
+                                <div class="stat-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.underReview || 0 %>
+                                    </h3>
+                                    <p>قيد المراجعة</p>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-pending-payment">
+                                <div class="stat-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.pendingPayment || 0 %>
+                                    </h3>
+                                    <p>بانتظار الدفع</p>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-paid">
+                                <div class="stat-icon">
+                                    <i class="fas fa-money-check-alt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>
+                                        <%= overviewStats?.paidProcessing || 0 %>
+                                    </h3>
+                                    <p>تم الدفع - جاري التجهيز</p>
                                 </div>
                             </div>
                             <div class="stat-card stat-completed">
@@ -57,18 +90,7 @@
                                     <h3>
                                         <%= overviewStats?.completed || 0 %>
                                     </h3>
-                                    <p>تراخيص مكتملة</p>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-pending">
-                                <div class="stat-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h3>
-                                        <%= overviewStats?.pending || 0 %>
-                                    </h3>
-                                    <p>قيد المعالجة</p>
+                                    <p>مكتمل</p>
                                 </div>
                             </div>
                         </div>
@@ -334,6 +356,10 @@
                             margin-bottom: 2rem;
                         }
 
+                        .stats-grid-5 {
+                            grid-template-columns: repeat(5, 1fr);
+                        }
+
                         .stat-card {
                             background: white;
                             border-radius: 16px;
@@ -369,8 +395,17 @@
                             background: linear-gradient(135deg, #2e7d32, #4caf50);
                         }
 
-                        .stat-pending .stat-icon {
+                        .stat-review .stat-icon {
                             background: linear-gradient(135deg, #f57c00, #ff9800);
+                        }
+
+                        .stat-pending-payment .stat-icon {
+                            background: linear-gradient(135deg, #fbc02d, #ffeb3b);
+                            color: #5d4037;
+                        }
+
+                        .stat-paid .stat-icon {
+                            background: linear-gradient(135deg, #00897b, #26a69a);
                         }
 
                         /* Removed Revenue Card Styles */
@@ -657,6 +692,10 @@
                         @media (max-width: 1024px) {
                             .stats-grid {
                                 grid-template-columns: repeat(2, 1fr);
+                            }
+
+                            .stats-grid-5 {
+                                grid-template-columns: repeat(3, 1fr);
                             }
 
                             .license-types-grid {

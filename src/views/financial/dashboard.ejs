@@ -104,13 +104,14 @@
 
                         <div class="search-filter-section">
                             <form class="search-form" method="GET" action="/financial/dashboard">
+                                <input type="hidden" name="tab" value="<%= typeof activeTab !== 'undefined' ? activeTab : 'pending' %>">
                                 <div class="search-input-wrapper">
                                     <i class="fas fa-search search-icon"></i>
                                     <input type="text" name="search" class="search-input"
                                         placeholder="بحث برقم الطلب، الاسم، أو الرقم القومي..."
                                         value="<%= typeof query !== 'undefined' ? query.search : '' %>">
                                     <% if (typeof query !=='undefined' && query.search) { %>
-                                        <a href="/financial/dashboard" class="clear-search"
+                                        <a href="/financial/dashboard?tab=<%= typeof activeTab !== 'undefined' ? activeTab : 'pending' %>" class="clear-search"
                                             style="text-decoration: none;">
                                             <i class="fas fa-times"></i>
                                         </a>
@@ -124,6 +125,22 @@
                         </div>
                     </div>
 
+                    <!-- Tab Navigation -->
+                    <div class="tab-navigation">
+                        <a href="/financial/dashboard?tab=pending" 
+                           class="tab-btn <%= (typeof activeTab === 'undefined' || activeTab === 'pending') ? 'active' : '' %>">
+                            <i class="fas fa-clock"></i>
+                            بانتظار التحقق
+                            <span class="tab-count"><%= stats.pending %></span>
+                        </a>
+                        <a href="/financial/dashboard?tab=verified" 
+                           class="tab-btn <%= activeTab === 'verified' ? 'active' : '' %>">
+                            <i class="fas fa-check-circle"></i>
+                            تم التحقق
+                            <span class="tab-count"><%= stats.totalVerified %></span>
+                        </a>
+                    </div>
+
                     <div class="applications-table-wrapper">
                         <div class="table-responsive">
                             <table class="applications-table">
@@ -133,6 +150,9 @@
                                         <th>مقدم الطلب</th>
                                         <th>نوع الترخيص</th>
                                         <th>تاريخ التقديم</th>
+                                        <% if (typeof activeTab !== 'undefined' && activeTab === 'verified') { %>
+                                            <th>تاريخ التحقق</th>
+                                        <% } %>
                                         <th>المحقق / المراجع</th>
                                         <th>الحالة</th>
                                         <th>الإجراءات</th>
@@ -187,6 +207,11 @@
                                                     <td>
                                                         <%= new Date(app.updatedAt).toLocaleDateString('ar-EG') %>
                                                     </td>
+                                                    <% if (typeof activeTab !== 'undefined' && activeTab === 'verified') { %>
+                                                        <td>
+                                                            <%= app.paymentVerifiedAt ? new Date(app.paymentVerifiedAt).toLocaleDateString('ar-EG') : '-' %>
+                                                        </td>
+                                                    <% } %>
                                                     <td>
                                                         <span style="font-size: 0.85rem; color: #666;">
                                                             <%= app.paymentVerifier ? (app.paymentVerifier.firstNameAr
@@ -300,6 +325,60 @@
 
             .page-subtitle {
                 color: #7f8c8d;
+            }
+
+            /* Tab Navigation */
+            .tab-navigation {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+                background: white;
+                padding: 0.5rem;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            .tab-btn {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.875rem 1.5rem;
+                border: none;
+                border-radius: 10px;
+                background: transparent;
+                color: #666;
+                font-size: 0.9375rem;
+                font-weight: 600;
+                font-family: inherit;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .tab-btn:hover {
+                background: #f0f0f0;
+                color: #333;
+            }
+
+            .tab-btn.active {
+                background: linear-gradient(135deg, #2E9B9F 0%, #1F4788 100%);
+                color: white;
+            }
+
+            .tab-btn i {
+                font-size: 1rem;
+            }
+
+            .tab-count {
+                background: rgba(0, 0, 0, 0.1);
+                padding: 0.125rem 0.5rem;
+                border-radius: 999px;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+
+            .tab-btn.active .tab-count {
+                background: rgba(255, 255, 255, 0.2);
             }
 
             .stats-grid {

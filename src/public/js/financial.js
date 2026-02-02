@@ -58,6 +58,30 @@ async function viewPaymentDetails(applicationId) {
             <label>المبلغ المطلوب:</label>
             <span class="text-success fw-bold fs-5">${app.paymentAmount || 0} جنيه مصري</span>
           </div>
+
+          <div class="detail-item">
+            <label>نوع الطلب:</label>
+            <span>
+                ${app.applicationType === 'fisherman' ? 'صياد' : 
+                  app.applicationType === 'boat' ? 'مركب' : 
+                  app.applicationType === 'vehicle' ? 'سيارة' : 
+                  app.applicationType === 'trade' ? 'تجارة' : 
+                  app.applicationType === 'entry' ? 'دخول' : app.applicationType}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>الفئة:</label>
+            <span>${app.licenseCategory || '-'}</span>
+          </div>
+          <div class="detail-item">
+            <label>المدة:</label>
+            <span>
+                ${app.duration === '1_month' ? 'شهر واحد' : 
+                  app.duration === '3_months' ? '3 شهور' : 
+                  app.duration === 'season' ? 'الموسم (9 شهور)' : 
+                  app.duration || '-'}
+            </span>
+          </div>
           <div class="detail-item">
             <label>المراجع (الموافقة المبدئية):</label>
             <span>${app.reviewer ? (app.reviewer.firstNameAr + ' ' + app.reviewer.lastNameAr) : '-'}</span>
@@ -84,6 +108,9 @@ async function viewPaymentDetails(applicationId) {
           ` : '<div class="alert alert-warning">لم يتم العثور على ملف الإيصال</div>'}
         </div>
 
+        </div>
+        
+        ${(app.status === 'payment_submitted' || app.status === 'approved_payment_pending') ? `
         <div class="verification-actions">
           <h5>إجراء التحقق</h5>
           <textarea 
@@ -110,6 +137,13 @@ async function viewPaymentDetails(applicationId) {
             </button>
           </div>
         </div>
+        ` : `
+        <div class="alert alert-success mt-3 text-center">
+            <i class="fas fa-check-circle fa-2x mb-2"></i>
+            <h5>تم التحقق من الدفع</h5>
+            <p class="mb-0">قام بالتحقق: ${app.paymentVerifier ? (app.paymentVerifier.firstNameAr + ' ' + app.paymentVerifier.lastNameAr) : '-'}</p>
+        </div>
+        `}
       </div>
     `;
 
