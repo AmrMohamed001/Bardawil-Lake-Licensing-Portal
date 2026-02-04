@@ -18,14 +18,14 @@ const handler = async (req, res, next) => {
       dbConnected = true;
     } catch (err) {
       console.error('Database connection failed:', err.message);
-      return res.status(500).json({ 
-        success: false, 
+      return res.status(500).json({
+        success: false,
         message: 'Database connection failed',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined,
       });
     }
   }
-  
+
   // Pass to Express app
   return app(req, res, next);
 };

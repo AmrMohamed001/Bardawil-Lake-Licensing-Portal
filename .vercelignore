@@ -1,9 +1,2 @@
-node_modules
-.git
-.gitignore
-README.md
-coverage
-tests
-.env.example
-ecosystem.config.js
-src/cluster.js
+node_modules .git .gitignore README.md coverage tests .env.example
+ecosystem.config.js src/cluster.js
