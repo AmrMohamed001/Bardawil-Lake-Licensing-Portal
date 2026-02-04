@@ -1,33 +1,24 @@
-// Load environment variables first (path works from project root on Vercel)
+// Load environment variables from project root
 require('dotenv').config({ path: './src/config/config.env', quiet: true });
 
-const app = require('../src/app');
+// Initialize models and DB connection
+require('../src/models');
 const { connectDB } = require('../src/config/db');
 
-// Initialize models
-require('../src/models');
-
-// Connect to database once
-let dbConnected = false;
-
-const handler = async (req, res, next) => {
-  // Ensure DB connection on first request
-  if (!dbConnected) {
-    try {
-      await connectDB();
-      dbConnected = true;
-    } catch (err) {
-      console.error('Database connection failed:', err.message);
-      return res.status(500).json({
-        success: false,
-        message: 'Database connection failed',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined,
-      });
-    }
+// Connect DB once on startup
+let dbPromise;
+const initializeDB = async () => {
+  if (!dbPromise) {
+    dbPromise = connectDB().catch(err => {
+      console.error('Initial DB connection failed:', err.message);
+      // Don't throw, let requests handle it
+    });
   }
-
-  // Pass to Express app
-  return app(req, res, next);
+  return dbPromise;
 };
 
-module.exports = handler;
+// Ensure DB is connected before serving
+initializeDB();
+
+// Export the Express app
+module.exports = require('../src/app');
