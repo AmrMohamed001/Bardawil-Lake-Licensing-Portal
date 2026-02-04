@@ -1,6 +1,16 @@
 {
   "version": 2,
-  "builds": [{ "src": "api/handler.js", "use": "@vercel/node" }],
+  "installCommand": "npm install",
+  "buildCommand": "echo 'Build step completed'",
+  "builds": [
+    {
+      "src": "api/handler.js",
+      "use": "@vercel/node",
+      "config": {
+        "nodeVersion": "20.x"
+      }
+    }
+  ],
   "routes": [{ "src": "/(.*)", "dest": "/api/handler.js" }],
   "env": {
     "NODE_ENV": "production"
