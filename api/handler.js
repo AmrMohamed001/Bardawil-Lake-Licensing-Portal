@@ -10,7 +10,7 @@ const initializeApp = async () => {
     // Load models and app only on first request (after node_modules is available)
     require('../src/models');
     const { connectDB } = require('../src/config/db');
-    
+
     if (!dbInitialized) {
       try {
         await connectDB();
@@ -21,7 +21,7 @@ const initializeApp = async () => {
         // Continue anyway - some routes may work without DB
       }
     }
-    
+
     app = require('../src/app');
   }
   return app;
