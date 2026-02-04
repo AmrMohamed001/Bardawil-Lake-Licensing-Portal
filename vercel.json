@@ -1,11 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/handler.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/handler.js" }
-  ],
+  "builds": [{ "src": "api/handler.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/api/handler.js" }],
   "env": {
     "NODE_ENV": "production"
   }
